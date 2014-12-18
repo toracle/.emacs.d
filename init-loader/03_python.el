@@ -1,3 +1,8 @@
+(elpy-enable)
+(setq elpy-rpc-backend "rope")
+
+(smart-tabs-advice python-indent-line-1 python-indent)
+
 (add-hook 'python-mode-hook
 	  (lambda ()
 	    (setq indent-tabs-mode t)
@@ -12,3 +17,4 @@
 
 (require 'smart-mode-line)
 (sml/setup)
+

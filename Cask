@@ -26,7 +26,7 @@
 (depends-on "tabbar-ruler")
 (depends-on "virtualenv")
 (depends-on "yasnippet")
-
+(depends-on "ample-theme")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")

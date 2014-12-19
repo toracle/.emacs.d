@@ -8,7 +8,11 @@
 	    (setq indent-tabs-mode t)
 	    (setq tab-width (default-value 'tab-width))
 	    (setq ropemacs-mode t)
-	    (setq elpy-mode t)))
+	    (setq elpy-mode t)
+	    (setq flycheck-pylintrc (concat user-emacs-directory "init-loader/" "pylintrc"))
+	    (flycheck-select-checker 'python-pylint)
+	    )
+	  )
 
 (setq ropemacs-enable-autoimport t)
 

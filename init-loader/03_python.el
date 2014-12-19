@@ -16,8 +16,6 @@
 
 (setq ropemacs-enable-autoimport t)
 
-(require 'smart-mode-line)
-(sml/setup)
 
 ;(add-to-list 'load-path "~/.emacs.d/elisp/Pymacs")
 ;(require 'pymacs)

@@ -27,6 +27,7 @@ Elpy에 필요한 라이브러리들을 설치하기 위해서는 아래 명령�
 ```
 pip install rope
 pip install ropemode
+pip install ropemacs
 pip install flake8
 ```
 

@@ -11,12 +11,9 @@
 	    (setq elpy-mode t)
 	    (setq flycheck-pylintrc (concat user-emacs-directory "init-loader/" "pylintrc"))
 	    (flycheck-select-checker 'python-pylint)
+	    (require 'pymacs)
+	    (pymacs-load "ropemacs" "rope-")
+	    (setq ropemacs-enable-autoimport t)
 	    )
 	  )
 
-(setq ropemacs-enable-autoimport t)
-
-
-;(add-to-list 'load-path "~/.emacs.d/elisp/Pymacs")
-;(require 'pymacs)
-;(pymacs-load "ropemacs" "rope-")

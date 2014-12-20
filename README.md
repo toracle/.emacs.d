@@ -30,3 +30,11 @@ pip install ropemode
 pip install flake8
 ```
 
+Pymacs를 설치하기 위해서는 아래 명령을 수행한다.
+
+```
+git clone https://github.com/pinard/Pymacs.git
+cd Pymacs
+make
+sudo make install
+```

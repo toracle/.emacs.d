@@ -26,6 +26,7 @@
 (depends-on "tabbar-ruler")
 (depends-on "virtualenv")
 (depends-on "yasnippet")
+(depends-on "pymacs")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")

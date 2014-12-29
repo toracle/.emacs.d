@@ -27,6 +27,7 @@
 (depends-on "virtualenv")
 (depends-on "yasnippet")
 (depends-on "pymacs")
+(depends-on "ample-theme")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")

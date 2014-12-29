@@ -6,6 +6,7 @@
 	    (elpy-enable)
 	    (setq elpy-rpc-backend "rope")
 	    (setq elpy-mode t)
+	    (smart-tabs-mode t)
 	    (smart-tabs-advice python-indent-line-1 python-indent)
 	    (setq flycheck-pylintrc (concat user-emacs-directory "init-loader/" "pylintrc"))
 	    (flycheck-select-checker 'python-pylint)

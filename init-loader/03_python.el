@@ -1,14 +1,12 @@
-(elpy-enable)
-(setq elpy-rpc-backend "rope")
-
-(smart-tabs-advice python-indent-line-1 python-indent)
-
 (add-hook 'python-mode-hook
 	  (lambda ()
 	    (setq indent-tabs-mode t)
 	    (setq tab-width (default-value 'tab-width))
 	    (setq ropemacs-mode t)
+	    (elpy-enable)
+	    (setq elpy-rpc-backend "rope")
 	    (setq elpy-mode t)
+	    (smart-tabs-advice python-indent-line-1 python-indent)
 	    (setq flycheck-pylintrc (concat user-emacs-directory "init-loader/" "pylintrc"))
 	    (flycheck-select-checker 'python-pylint)
 	    (require 'pymacs)

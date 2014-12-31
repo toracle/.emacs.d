@@ -1,6 +1,7 @@
 (if (display-graphic-p)
     (progn
       (tool-bar-mode -1)
+      (scroll-bar-mode -1)
       (ample-theme)
       )
   )

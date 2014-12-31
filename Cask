@@ -28,6 +28,7 @@
 (depends-on "yasnippet")
 (depends-on "pymacs")
 (depends-on "ample-theme")
+(depends-on "dtrt-indent")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")

@@ -29,6 +29,7 @@
 (depends-on "pymacs")
 (depends-on "ample-theme")
 (depends-on "dtrt-indent")
+(depends-on "web-mode")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")
@@ -45,4 +46,3 @@
 ;; (depends-on "s")
 ;; (depends-on "smartparens")
 ;; (depends-on "smex")
-;; (depends-on "web-mode")

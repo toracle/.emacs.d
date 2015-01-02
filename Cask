@@ -30,6 +30,9 @@
 (depends-on "ample-theme")
 (depends-on "dtrt-indent")
 (depends-on "helm")
+(depends-on "projectile")
+(depends-on "helm-projectile")
+(depends-on "flx-ido")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")
@@ -42,7 +45,6 @@
 ;; (depends-on "nyan-mode")
 ;; (depends-on "popwin")
 ;; (depends-on "prodigy")
-;; (depends-on "projectile")
 ;; (depends-on "s")
 ;; (depends-on "smartparens")
 ;; (depends-on "smex")

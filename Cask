@@ -33,6 +33,7 @@
 (depends-on "projectile")
 (depends-on "helm-projectile")
 (depends-on "flx-ido")
+(depends-on "web-mode")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")
@@ -48,4 +49,3 @@
 ;; (depends-on "s")
 ;; (depends-on "smartparens")
 ;; (depends-on "smex")
-;; (depends-on "web-mode")

@@ -14,6 +14,7 @@
 (depends-on "elpy")
 (depends-on "emmet-mode")
 (depends-on "jedi")
+(depends-on "epc")
 (depends-on "markdown-mode")
 (depends-on "nose")
 (depends-on "powerline")

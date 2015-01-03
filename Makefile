@@ -1,6 +1,12 @@
-CASK=~/.cask/bin/cask
 EMACS=emacs
-PIP=sudo pip
+
+ifeq ($(OS),Windows_NT)
+CASK_BIN=~/.cask/bin/cask
+PIP_BIN=pip
+else
+CASK_BIN=$(HOME_DIR)/.cask/bin/cask
+PIP_BIN=sudo pip
+endif
 
 all:
 
@@ -8,7 +14,7 @@ init: ~/.cask
 	curl -fsSkL https://raw.github.com/cask/cask/master/go | python
 
 cask: Cask
-	$(CASK) install
+	$(CASK_BIN) install
 
 clean:
 	rm -rf ~/.cask
@@ -18,13 +24,13 @@ compile:
 	emacs -batch -f batch-byte-compile *.el
 
 py_rope:
-	$(PIP) install rope ropemode ropemacs
+	$(PIP_BIN) install rope ropemode ropemacs
 
 py_lint:
-	$(PIP) install pylint
+	$(PIP_BIN) install pylint
 
 py_flakes:
-	$(PIP) install pyflakes
+	$(PIP_BIN) install pyflakes
 
 pymacs:
 	rm -rf Pymacs
@@ -35,9 +41,9 @@ pymacs:
 	rm -rf Pymacs
 
 py_jedi:
-	$(PIP) install jedi
+	$(PIP_BIN) install jedi
 
 py_epc:
-	$(PIP) install epc argparse
+	$(PIP_BIN) install epc argparse
 
 external: py_rope py_lint py_flakes pymacs py_jedi py_epc

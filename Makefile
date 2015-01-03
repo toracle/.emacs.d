@@ -1,24 +1,28 @@
 EMACS=emacs
 
 ifeq ($(OS),Windows_NT)
+HOME_DIR=$(HOME)
 CASK_BIN=~/.cask/bin/cask
 PIP_BIN=pip
+RM_TREE=rmdir /S /Q
 else
+HOME_DIR=~
 CASK_BIN=$(HOME_DIR)/.cask/bin/cask
 PIP_BIN=sudo pip
+RM_TREE=rm -rf
 endif
 
 all:
 
-init: ~/.cask
+init: $(HOME_DIR)/.cask
 	curl -fsSkL https://raw.github.com/cask/cask/master/go | python
 
 cask: Cask
 	$(CASK_BIN) install
 
 clean:
-	rm -rf ~/.cask
-	rm -rf ~/.emacs.d
+	$(RM_TREE) $(HOME_DIR)/.cask
+	$(RM_TREE) $(HOME_DIR)/.emacs.d
 
 compile:
 	emacs -batch -f batch-byte-compile *.el
@@ -33,12 +37,12 @@ py_flakes:
 	$(PIP_BIN) install pyflakes
 
 pymacs:
-	rm -rf Pymacs
+	$(RM_TREE) Pymacs
 	git clone https://github.com/pinard/Pymacs.git
 	cd Pymacs
 	make -C Pymacs all
 	sudo make -C Pymacs install
-	rm -rf Pymacs
+	$(RM_TREE) Pymacs
 
 py_jedi:
 	$(PIP_BIN) install jedi

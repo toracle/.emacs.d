@@ -51,13 +51,16 @@
 (depends-on "web-mode")
 
 
+;; Program
+
+(depends-on "restclient")
+
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")
 ;; (depends-on "exec-path-from-shell")
 ;; (depends-on "f")
 ;; (depends-on "htmlize")
 ;; (depends-on "idle-highlight-mode")
-;; (depends-on "nyan-mode")
 ;; (depends-on "popwin")
 ;; (depends-on "prodigy")
 ;; (depends-on "s")

@@ -15,3 +15,5 @@
 (sml/setup)
 (sml/apply-theme 'powerline)
 (ample-theme)
+
+(global-page-break-lines-mode t)

@@ -14,10 +14,10 @@ endif
 
 all:
 
-init: $(HOME_DIR)/.cask
+init:
 	curl -fsSkL https://raw.github.com/cask/cask/master/go | python
 
-cask: Cask
+cask:
 	$(CASK_BIN) install
 
 clean:

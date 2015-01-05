@@ -17,3 +17,4 @@
 (ample-theme)
 
 (global-page-break-lines-mode t)
+(setq inhibit-startup-screen t)

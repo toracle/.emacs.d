@@ -35,6 +35,7 @@
 (depends-on "helm-projectile")
 (depends-on "flx-ido")
 (depends-on "web-mode")
+(depends-on "page-break-lines")
 
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")

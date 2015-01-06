@@ -3,3 +3,4 @@ ido.last
 .cask/
 server/
 elpa/
+*.elc

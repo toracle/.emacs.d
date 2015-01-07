@@ -4,4 +4,4 @@
       (setq magit-git-executable "C:/Program Files (x86)/Git/bin/git.exe")
       (setenv "PATH" (concat "C:\\Program Files (x86)\\Git\\bin;" (getenv "PATH")))))
 
-(global-set-key (kdb "C-c g") 'magit-status)
+(global-set-key (kbd "C-c g") 'magit-status)

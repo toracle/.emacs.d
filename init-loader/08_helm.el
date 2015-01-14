@@ -19,4 +19,4 @@
       )
 
 (helm-mode t)
-;(helm-autoresize-mode 1)
+(helm-autoresize-mode 1)

@@ -39,7 +39,6 @@
 (depends-on "nose")
 (depends-on "python-environment")
 (depends-on "pyvenv")
-(depends-on "virtualenv")
 (depends-on "pymacs")
 (depends-on "dtrt-indent")
 

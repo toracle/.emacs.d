@@ -12,10 +12,5 @@
 	    (elpy-enable)
 	    (setq elpy-rpc-backend "jedi")
 	    (elpy-use-ipython)
-;	    (setq ropemacs-mode t)
-;	    (require 'pymacs)
-;	    (pymacs-load "ropemacs" "rope-")
-;	    (setq ropemacs-enable-autoimport t)
 	    )
 	  )
-

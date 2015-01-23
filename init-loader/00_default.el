@@ -18,3 +18,13 @@
 
 (global-page-break-lines-mode t)
 (setq inhibit-startup-screen t)
+
+(defun lunaryorn-new-buffer-frame ()
+  "Create a new frame with a new empty buffer."
+  (interactive)
+  (let ((buffer (generate-new-buffer "untitled")))
+    (set-buffer-major-mode buffer)
+    (display-buffer buffer '(display-buffer-pop-up-frame . nil))))
+
+
+(global-set-key (kbd "C-x n RET") #'lunaryorn-new-buffer-frame)

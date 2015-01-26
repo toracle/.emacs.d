@@ -28,3 +28,4 @@
 
 
 (global-set-key (kbd "C-x n RET") #'lunaryorn-new-buffer-frame)
+(global-set-key (kbd "C-x M-o" 'other-frame)

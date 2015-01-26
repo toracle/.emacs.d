@@ -14,3 +14,10 @@
       (add-text-properties (point-min) (point-max) '(line-spacing 0.25 line-height 1.0))
       )
   )
+
+(if (and (display-graphic-p) (eq system-type 'darwin))
+    (progn
+      (tool-bar-mode nil)
+      (setq mac-command-modifier 'meta)
+      )
+  )

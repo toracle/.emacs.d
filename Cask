@@ -71,3 +71,8 @@
 ;; (depends-on "smartparens")
 ;; (depends-on "smex")
 ;; (depends-on "pallet")
+
+
+;; Misc
+
+(depends-on "creole")

@@ -54,6 +54,11 @@
 
 (depends-on "restclient")
 
+
+;; Analysis
+
+(depends-on "ess")
+
 ;; (depends-on "dash")
 ;; (depends-on "drag-stuff")
 ;; (depends-on "exec-path-from-shell")

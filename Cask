@@ -48,6 +48,7 @@
 (depends-on "emmet-mode")
 (depends-on "markdown-mode")
 (depends-on "web-mode")
+(depends-on "yaml-mode")
 
 
 ;; Program

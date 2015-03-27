@@ -5,7 +5,6 @@
       )
   )
 
-
 (if (and (display-graphic-p) (eq system-type 'windows-nt))
     (let ((fontset "fontset-default"))
       (set-face-font 'default "NanumGothicCoding")
@@ -19,5 +18,6 @@
     (progn
       (tool-bar-mode nil)
       (setq mac-command-modifier 'meta)
+      (setq mac-right-option-modifier 'control)
       )
   )

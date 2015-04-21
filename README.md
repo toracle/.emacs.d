@@ -9,7 +9,7 @@ make init
 아래 명령으로 Cask를 통해 패키지들을 설치한다.
 
 ```
-make cask
+make package
 ```
 
 그리고 외부 라이브러리를 설치한다.

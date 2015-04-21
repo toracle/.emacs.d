@@ -4,6 +4,12 @@
    (emacs-lisp . t)
    (R . t)
    (ditaa . t)
+   (dot . t)
+   (sh . t)
+   (gnuplot . t)
+   (js . t)
+   (lisp . t)
+   (ruby . t)
    ))
 
 (setq org-confirm-babel-evaluate nil)

@@ -1,6 +1,12 @@
 *~
-ido.last
+*.elc
 .cask/
 server/
 elpa/
-*.elc
+eshell/
+.python-environments/
+ido.last
+.mc-lists.el
+projectile-bookmarks.eld
+tramp
+ac-comphist.dat

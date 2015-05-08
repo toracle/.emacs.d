@@ -78,4 +78,4 @@
 ;; Misc
 
 (depends-on "creole")
-(depends-on "format-sql')
+(depends-on "format-sql")

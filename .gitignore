@@ -4,3 +4,8 @@ ido.last
 server/
 elpa/
 *.elc
+tramp
+recentf
+projectile-bookmarks.eld
+eshell/
+.mc-lists.el

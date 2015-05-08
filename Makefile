@@ -20,6 +20,9 @@ init:
 package:
 	$(CASK_BIN) install
 
+update:
+	$(CASK_BIN) update
+
 clean:
 	$(RM_TREE) $(HOME_DIR)/.cask
 	$(RM_TREE) $(HOME_DIR)/.emacs.d
@@ -50,4 +53,9 @@ py_jedi:
 py_epc:
 	$(PIP_BIN) install epc argparse
 
-external: py_rope py_lint py_flakes pymacs py_jedi py_epc
+py_virtualenvwrapper:
+	$(PIP_BIN) install virtualenvwrapper
+
+python_external: py_lint py_flakes py_epc py_jedi py_virtualenvwrapper
+
+external: python_external

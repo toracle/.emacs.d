@@ -17,7 +17,7 @@ all:
 init:
 	curl -fsSkL https://raw.github.com/cask/cask/master/go | python
 
-cask:
+package:
 	$(CASK_BIN) install
 
 clean:

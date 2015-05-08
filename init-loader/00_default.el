@@ -13,7 +13,13 @@
 
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
-(setq custom-safe-themes '("e56f1b1c1daec5dbddc50abd00fcd00f6ce4079f4a7f66052cf16d96412a09a9" "b71d5d49d0b9611c0afce5c6237aacab4f1775b74e513d8ba36ab67dfab35e5a" "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e" default))
+(setq custom-safe-themes '
+      ("26614652a4b3515b4bbbb9828d71e206cc249b67c9142c06239ed3418eff95e2"
+       "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e"
+       "e56f1b1c1daec5dbddc50abd00fcd00f6ce4079f4a7f66052cf16d96412a09a9"
+       "b71d5d49d0b9611c0afce5c6237aacab4f1775b74e513d8ba36ab67dfab35e5a"
+       "756597b162f1be60a12dbd52bab71d40d6a2845a3e3c2584c6573ee9c332a66e"
+       default))
 
 (require 'smart-mode-line)
 (sml/setup)

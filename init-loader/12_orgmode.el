@@ -17,3 +17,5 @@
 
 (setq org-plantuml-jar-path
       (expand-file-name (concat user-emacs-directory "init-loader/" "plantuml.jar")))
+
+(setq org-log-done t)

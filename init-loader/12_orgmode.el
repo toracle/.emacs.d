@@ -11,6 +11,7 @@
    (lisp . t)
    (ruby . t)
    (plantuml . t)
+   (ledger . t)
    ))
 
 (setq org-confirm-babel-evaluate nil)

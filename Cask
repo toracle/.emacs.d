@@ -80,3 +80,6 @@
 
 (depends-on "creole")
 (depends-on "format-sql")
+(depends-on "xml-rpc")
+(depends-on "moinmoin-mode")
+(depends-on "ledger-mode")

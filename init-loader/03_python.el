@@ -2,7 +2,12 @@
 	  (lambda ()
 	    (setq indent-tabs-mode nil)
 	    (flymake-mode -1)
-	    (setq flycheck-pylintrc (concat user-emacs-directory "init-loader/" "pylintrc"))
+	    (setq flycheck-pylintrc
+		  (concat
+		   (file-name-as-directory
+		    (concat
+		     user-emacs-directory "init-loader"))
+		   "pylintrc"))
 	    (flycheck-select-checker 'python-pylint)
 	    (jedi:setup)
 	    (add-to-list 'company-backends 'company-jedi)

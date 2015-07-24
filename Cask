@@ -36,6 +36,7 @@
 (depends-on "flycheck-cask")
 (depends-on "elpy")
 (depends-on "jedi")
+(depends-on "company-jedi")
 (depends-on "epc")
 (depends-on "nose")
 (depends-on "python-environment")

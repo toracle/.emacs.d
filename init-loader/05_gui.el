@@ -6,7 +6,7 @@
       (progn
 	(tool-bar-mode -1)
 	(scroll-bar-mode -1)
-	(setq-default line-spacing 0.20)
+	(setq-default line-spacing 4)
 	)
 
       (when (eq system-type 'windows-nt)
@@ -19,8 +19,8 @@
 	(setq mac-command-modifier 'meta)
 	(setq mac-right-option-modifier 'control)
 	
-	(set-frame-font (format "%s:pixelsize=%d" fontname 14) t)
+;	(set-frame-font (format "%s:pixelsize=%d" fontname 14) t)
 	(set-fontset-font (frame-parameter nil 'font) charset
-			  (font-spec :family fontname :size 13))
+			  (font-spec :family fontname :size 12))
 	)
       ))

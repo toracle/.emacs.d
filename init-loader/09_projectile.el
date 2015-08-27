@@ -5,7 +5,7 @@
 (helm-projectile-on)
 
 
-(setq projectile-switch-project-action 'neotree-projectile-action)
+;(setq projectile-switch-project-action 'neotree-projectile-action)
 
 (add-to-list 'projectile-project-root-files ".svn")
 (add-to-list 'projectile-project-root-files ".git")

@@ -21,6 +21,6 @@
 	
 ;	(set-frame-font (format "%s:pixelsize=%d" fontname 14) t)
 	(set-fontset-font (frame-parameter nil 'font) charset
-			  (font-spec :family fontname :size 12))
+			  (font-spec :family fontname :size 14))
 	)
       ))

@@ -15,5 +15,7 @@
    (setq jedi:setup-keys t)
    (setq jedi:complete-on-dot t)
    (setq jedi:tooltip-method t)
+   (local-set-key (kbd "M-.") 'jedi:goto-definition)
+   (local-set-key (kbd "M-*") 'jedi:goto-definition-pop-marker)
    )
  )

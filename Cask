@@ -15,6 +15,7 @@
 (depends-on "page-break-lines")
 (depends-on "multiple-cursors")
 (depends-on "expand-region")
+(depends-on "company")
 
 
 ;; Basic - UI / Navigation
@@ -35,7 +36,6 @@
 (depends-on "flycheck")
 (depends-on "flycheck-cask")
 (depends-on "elpy")
-(depends-on "jedi")
 (depends-on "company-jedi")
 (depends-on "epc")
 (depends-on "nose")
@@ -51,6 +51,7 @@
 (depends-on "markdown-mode")
 (depends-on "web-mode")
 (depends-on "yaml-mode")
+(depends-on "adoc-mode")
 
 
 ;; Program

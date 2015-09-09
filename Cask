@@ -46,6 +46,12 @@
 (depends-on "dtrt-indent")
 
 
+;; Language - Clojure
+
+(depends-on "clojure-mode")
+(depends-on "cider")
+
+
 ;; Language - Markup
 
 (depends-on "emmet-mode")

@@ -29,6 +29,7 @@
 (depends-on "ample-theme")
 (depends-on "helm")
 (depends-on "helm-projectile")
+(depends-on "switch-window")
 
 
 ;; Language - Python

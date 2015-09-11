@@ -29,6 +29,7 @@
 (depends-on "ample-theme")
 (depends-on "helm")
 (depends-on "helm-projectile")
+(depends-on "switch-window")
 
 
 ;; Language - Python
@@ -43,6 +44,12 @@
 (depends-on "pyvenv")
 (depends-on "pymacs")
 (depends-on "dtrt-indent")
+
+
+;; Language - Clojure
+
+(depends-on "clojure-mode")
+(depends-on "cider")
 
 
 ;; Language - Markup

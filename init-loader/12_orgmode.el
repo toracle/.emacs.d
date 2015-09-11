@@ -1,3 +1,9 @@
+;; Org
+
+(setq org-log-done t)
+
+;; Org-Babel
+
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
@@ -16,7 +22,7 @@
 
 (setq org-confirm-babel-evaluate nil)
 
+;; Org-Babel PlantUML
+
 (setq org-plantuml-jar-path
       (expand-file-name (concat user-emacs-directory "init-loader/" "plantuml.jar")))
-
-(setq org-log-done t)

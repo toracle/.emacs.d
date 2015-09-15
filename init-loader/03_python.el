@@ -16,5 +16,6 @@
    (local-set-key (kbd "M-.") 'jedi:goto-definition)
    (local-set-key (kbd "M-*") 'jedi:goto-definition-pop-marker)
    (local-set-key (kbd "C-c C-s") 'projectile-grep)
+   (local-set-key (kbd "C-c C-d") 'jedi:show-doc)
    )
  )

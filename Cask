@@ -36,14 +36,11 @@
 
 (depends-on "flycheck")
 (depends-on "flycheck-cask")
-(depends-on "elpy")
 (depends-on "company-jedi")
 (depends-on "epc")
 (depends-on "nose")
 (depends-on "python-environment")
 (depends-on "pyvenv")
-(depends-on "pymacs")
-(depends-on "dtrt-indent")
 
 
 ;; Language - Clojure
@@ -89,5 +86,5 @@
 (depends-on "creole")
 (depends-on "format-sql")
 (depends-on "xml-rpc")
-(depends-on "moinmoin-mode")
+; (depends-on "moinmoin-mode")
 (depends-on "ledger-mode")

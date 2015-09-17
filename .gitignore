@@ -8,6 +8,7 @@ eshell/
 ido.last
 .mc-lists.el
 projectile-bookmarks.eld
+projectile.cache
 tramp
 ac-comphist.dat
 recentf

@@ -20,12 +20,9 @@
 
 ;; Basic - UI / Navigation
 
-(depends-on "neotree")
 (depends-on "powerline")
 (depends-on "smart-mode-line")
 (depends-on "smart-mode-line-powerline-theme")
-(depends-on "tabbar")
-(depends-on "tabbar-ruler")
 (depends-on "ample-theme")
 (depends-on "helm")
 (depends-on "helm-projectile")
@@ -36,14 +33,10 @@
 
 (depends-on "flycheck")
 (depends-on "flycheck-cask")
-(depends-on "elpy")
 (depends-on "company-jedi")
 (depends-on "epc")
-(depends-on "nose")
 (depends-on "python-environment")
 (depends-on "pyvenv")
-(depends-on "pymacs")
-(depends-on "dtrt-indent")
 
 
 ;; Language - Clojure
@@ -59,6 +52,7 @@
 (depends-on "web-mode")
 (depends-on "yaml-mode")
 (depends-on "adoc-mode")
+(depends-on "creole")
 
 
 ;; Program
@@ -70,24 +64,10 @@
 
 (depends-on "ess")
 
-;; (depends-on "dash")
-;; (depends-on "drag-stuff")
-;; (depends-on "exec-path-from-shell")
-;; (depends-on "f")
-;; (depends-on "htmlize")
-;; (depends-on "idle-highlight-mode")
-;; (depends-on "popwin")
-;; (depends-on "prodigy")
-;; (depends-on "s")
-;; (depends-on "smartparens")
-;; (depends-on "smex")
-;; (depends-on "pallet")
-
 
 ;; Misc
 
-(depends-on "creole")
 (depends-on "format-sql")
 (depends-on "xml-rpc")
-(depends-on "moinmoin-mode")
 (depends-on "ledger-mode")
+; (depends-on "moinmoin-mode")

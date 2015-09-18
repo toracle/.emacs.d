@@ -39,3 +39,6 @@
 
 (global-set-key (kbd "C-x n RET") #'lunaryorn-new-buffer-frame)
 (global-set-key (kbd "C-x C-o") 'other-frame)
+
+(when (eq system-type 'darwin)
+  (add-to-list 'exec-path "/usr/local/bin"))

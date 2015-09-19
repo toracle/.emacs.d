@@ -1,5 +1,6 @@
 (source gnu)
-(source melpa)
+; (source melpa)
+(source melpa-stable)
 (source marmalade)
 
 ;; Basic - system

@@ -17,6 +17,7 @@
 (depends-on "multiple-cursors")
 (depends-on "expand-region")
 (depends-on "company")
+(depends-on "dedicated")
 
 
 ;; Basic - UI / Navigation

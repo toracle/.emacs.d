@@ -27,4 +27,5 @@
 	    ;; Org-Babel PlantUML
 
 	    (setq org-plantuml-jar-path
-		  (expand-file-name (concat user-emacs-directory "init-loader/" "plantuml.jar")))))
+		  (expand-file-name (concat user-emacs-directory "init-loader/" "plantuml.jar")))
+	    (local-set-key (kbd "C-c `") 'org-edit-src-code)))

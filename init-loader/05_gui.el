@@ -15,4 +15,4 @@
 
       (when (eq system-type 'darwin)
 	(setq mac-command-modifier 'meta)
-	(setq mac-right-option-modifier 'control))))
+	(setq mac-option-modifier 'super))))

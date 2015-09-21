@@ -1,5 +1,7 @@
 ;; Windmove
 
+;;; Code:
+
 (when (fboundp 'windmove-default-keybindings)
   (windmove-default-keybindings 'meta))
 

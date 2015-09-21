@@ -9,9 +9,7 @@
     (define-key input-decode-map "\e\eOD" [S-left])))
 
 (when (fboundp 'windmove-default-keybindings)
-  (if (display-graphic-p)
-      (windmove-default-keybindings 'meta)
-      (windmove-default-keybindings)))
+  (windmove-default-keybindings 'meta))
 
 (global-set-key (kbd "C-c <left>")  'windmove-left)
 (global-set-key (kbd "C-c <right>") 'windmove-right)

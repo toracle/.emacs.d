@@ -1,3 +1,7 @@
+;;; 00_default.el
+
+;;; Code:
+
 (prefer-coding-system 'utf-8)
 
 (tool-bar-mode -1)
@@ -44,3 +48,10 @@
   (add-to-list 'exec-path "/usr/local/bin"))
 
 (require 'dedicated)
+
+(require 'zoom-window)
+
+(global-set-key (kbd "C-x C-z") 'zoom-window-zoom)
+
+(provide '00_default)
+;;; 00_default.el ends here

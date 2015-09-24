@@ -44,3 +44,8 @@
   (add-to-list 'exec-path "/usr/local/bin"))
 
 (require 'dedicated)
+
+(add-to-list 'display-buffer-alist
+	     '(("\\*compilation\\*" . (display-buffer-reuse-window . ((reusable-frames . t))))
+	       ("\\*jedi:doc\\*". (display-buffer-reuse-window . ((reusable-frames . t))))
+	       ("\\*Flycheck errors\\*". (display-buffer-reuse-window . ((reusable-frames . t))))))

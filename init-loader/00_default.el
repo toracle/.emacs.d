@@ -1,3 +1,7 @@
+;;; 00_default.el
+
+;;; Code:
+
 (prefer-coding-system 'utf-8)
 
 (tool-bar-mode -1)
@@ -49,3 +53,10 @@
 	     '(("\\*compilation\\*" . (display-buffer-reuse-window . ((reusable-frames . t))))
 	       ("\\*jedi:doc\\*". (display-buffer-reuse-window . ((reusable-frames . t))))
 	       ("\\*Flycheck errors\\*". (display-buffer-reuse-window . ((reusable-frames . t))))))
+
+(require 'zoom-window)
+
+(global-set-key (kbd "C-x C-z") 'zoom-window-zoom)
+
+(provide '00_default)
+;;; 00_default.el ends here

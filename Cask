@@ -29,6 +29,7 @@
 (depends-on "helm")
 (depends-on "helm-projectile")
 (depends-on "switch-window")
+(depends-on "zoom-window")
 
 
 ;; Language - Python

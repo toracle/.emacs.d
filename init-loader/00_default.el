@@ -52,7 +52,8 @@
 (add-to-list 'display-buffer-alist
 	     '(("\\*compilation\\*" . (display-buffer-reuse-window . ((reusable-frames . t))))
 	       ("\\*jedi:doc\\*". (display-buffer-reuse-window . ((reusable-frames . t))))
-	       ("\\*Flycheck errors\\*". (display-buffer-reuse-window . ((reusable-frames . t))))))
+	       ("\\*Flycheck errors\\*". (display-buffer-reuse-window . ((reusable-frames . t))))
+	       ("\\*magit:*". (display-buffer-reuse-window . ((reusable-frames . t))))))
 
 (require 'zoom-window)
 

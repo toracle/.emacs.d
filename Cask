@@ -1,5 +1,5 @@
 (source gnu)
-; (source melpa)
+(source melpa)
 (source melpa-stable)
 (source marmalade)
 
@@ -58,6 +58,11 @@
 (depends-on "yaml-mode")
 (depends-on "adoc-mode")
 (depends-on "creole")
+
+
+;; Web Development
+
+(depends-on "impatient-mode")
 
 
 ;; Program

@@ -9,6 +9,9 @@
 
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-enable-engine-detection t)
   (local-set-key (kbd "C-c /")  'web-mode-element-close)
   )
 

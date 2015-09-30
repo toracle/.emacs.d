@@ -19,6 +19,7 @@
 (depends-on "company")
 (depends-on "dedicated")
 (depends-on "rainbow-delimiters")
+(depends-on "ibuffer-vc")
 
 
 ;; Basic - UI / Navigation

@@ -55,9 +55,7 @@
 	       ("\\*Flycheck errors\\*". (display-buffer-reuse-window . ((reusable-frames . t))))
 	       ("\\*magit:*". (display-buffer-reuse-window . ((reusable-frames . t))))))
 
-(require 'zoom-window)
-
-(global-set-key (kbd "C-x C-z") 'zoom-window-zoom)
+(desktop-save-mode t)
 
 (provide '00_default)
 ;;; 00_default.el ends here

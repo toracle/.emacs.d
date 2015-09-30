@@ -8,6 +8,8 @@
 	  (file-name-as-directory
 	   (concat user-emacs-directory "init-loader"))
 	  "pylintrc"))
+   (when (not (null pyvenv-virtual-env))
+     (setq flycheck-python-pylint-executable (concat pyvenv-virtual-env "bin/pylint")))
    (flycheck-select-checker 'python-pylint)
    (jedi:setup)
    (company-mode)

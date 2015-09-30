@@ -1,11 +1,17 @@
+[Master]
+init-hook='sys.path = list(); sys.path.append("/path/to/foo")'
+
 [MESSAGES CONTROL]
-disable=C0111,
+disable=C0103,
+	C0111,
+	C1001,
 	C0301,
 	C0303,
 	W0142,
 	W0312,
 	W0232,
 	W0613,
+	W0170,
 	R0201,
 	R0903
 

@@ -5,4 +5,4 @@
 (init-loader-load (concat user-emacs-directory "init-loader"))
 
 (setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+(load custom-file 'noerror)

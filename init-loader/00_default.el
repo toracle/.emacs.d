@@ -49,9 +49,13 @@
 
 (require 'dedicated)
 
-(require 'zoom-window)
+(add-to-list 'display-buffer-alist
+	     '(("\\*compilation\\*" . (display-buffer-reuse-window . ((reusable-frames . t))))
+	       ("\\*jedi:doc\\*". (display-buffer-reuse-window . ((reusable-frames . t))))
+	       ("\\*Flycheck errors\\*". (display-buffer-reuse-window . ((reusable-frames . t))))
+	       ("\\*magit:*". (display-buffer-reuse-window . ((reusable-frames . t))))))
 
-(global-set-key (kbd "C-x C-z") 'zoom-window-zoom)
+(desktop-save-mode t)
 
 (provide '00_default)
 ;;; 00_default.el ends here

@@ -1,18 +1,18 @@
-(if (display-graphic-p)
-    (let
-	((fontname "NanumGothicCoding")
-	 (charset 'unicode-bmp)
-	 (fontset "fontset-default"))
-      (progn
-	(tool-bar-mode -1)
-	(scroll-bar-mode -1)
-	(setq-default line-spacing 4)
-	(set-fontset-font (frame-parameter nil 'font) charset
-			  (font-spec :family fontname :size 14)))
+;;; 05_gui --- Gui related settings
 
-      (when (eq system-type 'windows-nt)
-	(set-face-font 'default fontname))
+;;; Code:
 
-      (when (eq system-type 'darwin)
-	(setq mac-command-modifier 'meta)
-	(setq mac-option-modifier 'super))))
+(when (display-graphic-p)
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (setq-default line-spacing 4)
+  
+  (when (eq system-type 'darwin)
+    (setq mac-command-modifier 'meta)
+    (setq mac-option-modifier 'super))
+
+  (set-fontset-font "fontset-standard"
+		    'unicode-bmp
+		    (font-spec :family "NanumGothicCoding" :size 14)))
+
+;;; 05_gui.el ends here

@@ -18,6 +18,7 @@
 (depends-on "expand-region")
 (depends-on "company")
 (depends-on "dedicated")
+(depends-on "rainbow-delimiters")
 
 
 ;; Basic - UI / Navigation

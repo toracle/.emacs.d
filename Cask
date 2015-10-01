@@ -44,6 +44,11 @@
 (depends-on "pyvenv")
 
 
+;; Language - Ruby
+
+(depends-on "robe")
+
+
 ;; Language - Clojure
 
 (depends-on "clojure-mode")

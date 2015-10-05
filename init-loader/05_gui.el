@@ -2,6 +2,13 @@
 
 ;;; Code:
 
+(defun my-set-default-font (fontname size)
+  (set-frame-font (format "%s:pixelsize=%d" fontname size) t)
+  (set-fontset-font "fontset-standard"
+		    'unicode-bmp
+		    (font-spec :family fontname :size size)))
+
+
 (when (display-graphic-p)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
@@ -11,8 +18,6 @@
     (setq mac-command-modifier 'meta)
     (setq mac-option-modifier 'super))
 
-  (set-fontset-font "fontset-standard"
-		    'unicode-bmp
-		    (font-spec :family "NanumGothicCoding" :size 14)))
+  (my-set-default-font "NanumGothicCoding" 14))
 
 ;;; 05_gui.el ends here

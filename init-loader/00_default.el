@@ -57,5 +57,7 @@
 
 (desktop-save-mode t)
 
+(setq dired-dwim-target t)
+
 (provide '00_default)
 ;;; 00_default.el ends here

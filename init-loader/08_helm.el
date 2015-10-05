@@ -6,7 +6,8 @@
 (global-set-key (kbd "M-x") 'helm-M-x)
 (global-set-key (kbd "M-y") 'helm-show-kill-ring)
 (global-set-key (kbd "C-x b") 'helm-mini)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
+(global-set-key (kbd "C-x C-f") 'ido-find-file)
+; (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
 (setq helm-split-window-in-side-p t
       helm-move-to-line-cycle-in-source t

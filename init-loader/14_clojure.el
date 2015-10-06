@@ -23,5 +23,3 @@
                     :foreground 'unspecified
                     :inherit 'show-paren-mismatch
                     :strike-through t)
-
-(electric-pair-mode 1)

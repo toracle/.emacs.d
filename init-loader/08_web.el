@@ -12,8 +12,11 @@
   "Hooks for Web mode."
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 4)
   (setq web-mode-enable-engine-detection t)
   (local-set-key (kbd "C-c /")  'web-mode-element-close)
   )
 
 (add-hook 'web-mode-hook  'my-web-mode-hook)
+(add-hook 'css-mode-hook #'aggressive-indent-mode)
+(add-hook 'web-mode-hook #'aggressive-indent-mode)

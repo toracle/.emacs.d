@@ -34,6 +34,11 @@
 (depends-on "zoom-window")
 
 
+;; General Programming
+
+(depends-on "aggresive-indent")
+
+
 ;; Language - Python
 
 (depends-on "flycheck")

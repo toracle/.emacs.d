@@ -12,7 +12,7 @@
      (setq flycheck-python-pylint-executable (concat pyvenv-virtual-env "bin/pylint")))
    (flycheck-select-checker 'python-pylint)
    (jedi:setup)
-   (company-mode)
+   (company-mode t)
    (add-to-list 'company-backends 'company-jedi)
    (setq jedi:complete-on-dot t)
    (local-set-key (kbd "M-.") 'jedi:goto-definition)

@@ -36,7 +36,7 @@
 
 ;; General Programming
 
-(depends-on "aggresive-indent")
+(depends-on "aggressive-indent")
 
 
 ;; Language - Python

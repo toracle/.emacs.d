@@ -18,6 +18,6 @@
     (setq mac-command-modifier 'meta)
     (setq mac-option-modifier 'super))
 
-  (my-set-default-font "NanumGothicCoding" 14))
+  (my-set-default-font "D2Coding" 14))
 
 ;;; 05_gui.el ends here

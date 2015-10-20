@@ -12,9 +12,6 @@
 
 (xterm-mouse-mode t)
 
-(require 'neotree)
-(global-set-key [f8] 'neotree-toggle)
-
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 (setq custom-safe-themes '

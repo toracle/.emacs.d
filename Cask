@@ -2,6 +2,7 @@
 (source melpa)
 (source melpa-stable)
 (source marmalade)
+(source org)
 
 ;; Basic - system
 
@@ -20,6 +21,7 @@
 (depends-on "dedicated")
 (depends-on "rainbow-delimiters")
 (depends-on "ibuffer-vc")
+(depends-on "org-plus-contrib")
 
 
 ;; Basic - UI / Navigation

@@ -28,4 +28,5 @@
 
 	    (setq org-plantuml-jar-path
 		  (expand-file-name (concat user-emacs-directory "init-loader/" "plantuml.jar")))
-	    (local-set-key (kbd "C-c `") 'org-edit-src-code)))
+	    (local-set-key (kbd "C-c `") 'org-edit-src-code)
+	    (require 'ox-taskjuggler)))

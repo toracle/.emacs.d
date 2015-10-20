@@ -34,6 +34,7 @@
 (depends-on "helm-projectile")
 (depends-on "switch-window")
 (depends-on "zoom-window")
+(depends-on "visual-regexp-steroids")
 
 
 ;; General Programming

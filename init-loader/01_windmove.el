@@ -15,6 +15,8 @@
 (global-set-key (kbd "M-K") 'shrink-window)
 (global-set-key (kbd "M-J") 'enlarge-window)
 
-(global-set-key (kbd "C-x o") 'switch-window)
+; (global-set-key (kbd "C-x o") 'switch-window)
+
+
 
 ;;; 01_windmove.el ends here

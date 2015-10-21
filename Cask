@@ -71,6 +71,7 @@
 (depends-on "yaml-mode")
 (depends-on "adoc-mode")
 (depends-on "creole")
+(depends-on "scss-mode")
 
 
 ;; Web Development

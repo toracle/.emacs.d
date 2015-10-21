@@ -56,5 +56,14 @@
 
 (setq dired-dwim-target t)
 
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
+
+(when (eq system-type 'darwin)
+  (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+  (setenv "LANG" "ko_KR.UTF-8"))
+
 (provide '00_default)
 ;;; 00_default.el ends here

@@ -35,6 +35,7 @@
 (depends-on "switch-window")
 (depends-on "zoom-window")
 (depends-on "visual-regexp-steroids")
+(depends-on "w3m")
 
 
 ;; General Programming

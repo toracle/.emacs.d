@@ -17,3 +17,5 @@ url/
 custom.el
 .emacs.desktop
 .emacs.desktop.lock
+/.org-id-locations
+/smex-items

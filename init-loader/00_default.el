@@ -65,5 +65,8 @@
   (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
   (setenv "LANG" "ko_KR.UTF-8"))
 
+(setq default-input-method "korean-hangul")
+(global-set-key (kbd "S-SPC") 'toggle-input-method)
+
 (provide '00_default)
 ;;; 00_default.el ends here

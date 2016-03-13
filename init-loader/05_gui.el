@@ -4,7 +4,7 @@
 
 (defun my-set-default-font (fontname size)
   (set-frame-font (format "%s:pixelsize=%d" fontname size) t)
-  (set-fontset-font "fontset-standard"
+  (set-fontset-font t
 		    'unicode-bmp
 		    (font-spec :family fontname :size size)))
 

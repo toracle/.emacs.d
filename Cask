@@ -75,6 +75,11 @@
 (depends-on "scss-mode")
 
 
+;; Language - Common Lisp
+
+(depends-on "slime")
+
+
 ;; Web Development
 
 (depends-on "impatient-mode")

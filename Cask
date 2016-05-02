@@ -75,7 +75,7 @@
 (depends-on "scss-mode")
 
 
-; Language - CL
+;; Language - Common Lisp
 
 (depends-on "slime")
 

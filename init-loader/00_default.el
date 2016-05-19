@@ -13,6 +13,7 @@
 (add-hook 'after-init-hook #'global-flycheck-mode)
 
 (require 'smart-mode-line)
+(setq sml/no-confirm-load-theme t)
 (sml/setup)
 (sml/apply-theme 'powerline)
 (ample-theme)

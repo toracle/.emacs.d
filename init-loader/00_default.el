@@ -40,5 +40,8 @@
 (setq default-input-method "korean-hangul")
 (global-set-key (kbd "S-SPC") 'toggle-input-method)
 
+(require 'zoom-window)
+(global-set-key (kbd "C-x C-z") 'zoom-window-zoom)
+
 (provide '00_default)
 ;;; 00_default.el ends here

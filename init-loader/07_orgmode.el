@@ -1,5 +1,15 @@
 ;; Org
 
+(require 'org-mime)
+
+(add-hook 'message-mode-hook
+	  (lambda ()
+	    (local-set-key (kbd "C-c M-o") 'org-mime-htmlize)))
+
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (local-set-key (kbd "C-c M-o") 'org-mime-org-buffer-htmlize)))
+
 (global-set-key (kbd "C-c l") 'org-store-link)
 (global-set-key (kbd "C-c a") 'org-agenda)
 (global-set-key (kbd "C-c c") 'org-capture)

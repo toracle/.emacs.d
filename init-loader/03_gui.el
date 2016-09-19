@@ -2,23 +2,45 @@
 
 ;;; Code:
 
-(defun toracle-set-default-font (fontname size)
-  (setq toracle-default-font-family fontname)
-  (setq toracle-default-font-size size)
+(defvar toracle--base-font-family "D2Coding")
+
+(defvar toracle--base-font-size 14)
+
+(add-to-list 'default-frame-alist (cons 'toracle--frame-font-size toracle--base-font-size))
+
+(defun set-current-frame-parameter (key value)
+  (set-frame-parameter (selected-frame) key value))
+
+(defun get-current-frame-parameter (key)
+  (frame-parameter (selected-frame) key))
+
+(defun toracle--set-frame-font-size (size)
+  (set-current-frame-parameter 'toracle--frame-font-size size))
+
+(defun toracle--get-frame-font-size ()
+  (get-current-frame-parameter 'toracle--frame-font-size))
+
+(defun toracle--set-font (fontname size)
   (set-frame-font (format "%s:pixelsize=%d" fontname size) t)
   (set-fontset-font t
 		    'unicode-bmp
-		    (font-spec :family fontname :size size)))
+		    (font-spec :family fontname :size size))
+  (minibuffer-message (format "Set frame-font to: %s %s" fontname size)))
 
-(defun toracle-increase-font-size ()
-  (interactive)
-  (setq toracle-default-font-size (+ toracle-default-font-size 2))
-  (toracle-set-default-font toracle-default-font-family toracle-default-font-size))
+(defun toracle--set-base-font (fontname size)
+  (setq toracle--base-font-family fontname)
+  (setq toracle--base-font-size size)
+  (toracle--set-font fontname size))
 
-(defun toracle-decrease-font-size ()
+(defun toracle--increase-frame-font-size ()
   (interactive)
-  (setq toracle-default-font-size (- toracle-default-font-size 2))
-  (toracle-set-default-font toracle-default-font-family toracle-default-font-size))
+  (toracle--set-frame-font-size (+ (toracle--get-frame-font-size) 2))
+  (toracle--set-font toracle--base-font-family (toracle--get-frame-font-size)))
+
+(defun toracle--decrease-frame-font-size ()
+  (interactive)
+  (toracle--set-frame-font-size (- (toracle--get-frame-font-size) 2))
+  (toracle--set-font toracle--base-font-family (toracle--get-frame-font-size)))
 
 (when (display-graphic-p)
   (tool-bar-mode -1)
@@ -29,12 +51,11 @@
     (setq mac-command-modifier 'meta)
     (setq mac-option-modifier 'super))
 
-  (defvar toracle-default-font-size 14)
-  (defvar toracle-default-font-family "D2Coding")
+  (defvar toracle--frame-font-size toracle--base-font-size)
 
-  (global-set-key (kbd "M-_") 'toracle-decrease-font-size)
-  (global-set-key (kbd "M-+") 'toracle-increase-font-size)
+  (global-set-key (kbd "M-_") 'toracle--decrease-frame-font-size)
+  (global-set-key (kbd "M-+") 'toracle--increase-frame-font-size)
   
-  (toracle-set-default-font "D2Coding" 14))
+  (toracle--set-base-font "D2Coding" 14))
 
 ;;; 05_gui.el ends here

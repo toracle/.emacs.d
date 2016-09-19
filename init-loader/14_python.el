@@ -16,6 +16,7 @@
   (local-set-key (kbd "M-.") 'jedi:goto-definition)
   (local-set-key (kbd "M-*") 'jedi:goto-definition-pop-marker)
   (local-set-key (kbd "C-c C-d") 'jedi:show-doc)
+  (add-to-list 'grep-find-ignored-directories "build")
   )
 
 (add-hook 'python-mode-hook 'toracle-setup-python)

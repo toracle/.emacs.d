@@ -1,24 +1,25 @@
-(require 'helm)
-(require 'helm-config)
+(use-package helm
+  :ensure t
+  :init (global-unset-key (kbd "C-x c"))
+  :config (progn
+	    (setq helm-split-window-in-side-p t
+		  helm-move-to-line-cycle-in-source t
+		  helm-ff-search-library-in-sexp t
+		  helm-scroll-amout 8
+		  helm-ff-file-name-history-use-recentf t
+		  helm-M-x-fuzzy-match t
+		  helm-buffers-fuzzy-matching t
+		  helm-recentf-fuzzy-match t)
+	    (helm-mode t)
+	    (helm-autoresize-mode 1))
+  :bind (("C-c h" . helm-command-prefix)
+	 ("M-x" . helm-M-x)
+	 ("M-y" . helm-show-kill-ring)
+	 ("C-x b" . helm-mini)))
 
-(setq helm-split-window-in-side-p t
-      helm-move-to-line-cycle-in-source t
-      helm-ff-search-library-in-sexp t
-      helm-scroll-amout 8
-      helm-ff-file-name-history-use-recentf t
-      helm-M-x-fuzzy-match t
-      helm-buffers-fuzzy-matching t
-      helm-recentf-fuzzy-match t
-      )
+(use-package helm-projectile
+  :ensure t)
 
-(helm-mode t)
-(helm-autoresize-mode 1)
-
-(global-unset-key (kbd "C-x c"))
-
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "M-y") 'helm-show-kill-ring)
-(global-set-key (kbd "C-x b") 'helm-mini)
-(global-set-key (kbd "C-x C-f") 'ido-find-file)
-
+(use-package flx-ido
+  :ensure t
+  :bind (("C-x C-f" . ido-find-file)))

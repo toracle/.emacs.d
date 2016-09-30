@@ -6,8 +6,9 @@
 
 (require 'package)
 (setq package-enable-at-startup nil)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+(add-to-list 'package-archives '(" marmalade" . "http://marmalade-repo.org/packages/"))
 
 (package-initialize)
 
@@ -21,7 +22,8 @@
 ;; (cask-initialize)
 
 (use-package init-loader
-  :init (init-loader-load (concat user-emacs-directory "init-loader")))
+  :ensure t
+  :config (init-loader-load (concat user-emacs-directory "init-loader")))
 
 ;; (require 'init-loader)
 ;; (init-loader-load (concat user-emacs-directory "init-loader"))

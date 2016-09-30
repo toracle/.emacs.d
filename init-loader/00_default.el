@@ -8,17 +8,19 @@
 (column-number-mode t)
 (xterm-mouse-mode t)
 
+(setq save-abbrevs 'silently)
+
 (use-package smart-mode-line
   :init (setq sml/no-confirm-load-theme t)
   :config (sml/setup)
   :ensure t)
 
 (use-package smart-mode-line-powerline-theme
-  :ensure smart-mode-line
+  :ensure t
   :config (sml/apply-theme 'powerline))
 
 (use-package ample-theme
-  :ensure smart-mode-line-powerline-theme
+  :ensure t
   :config (ample-theme))
 
 (use-package page-break-lines

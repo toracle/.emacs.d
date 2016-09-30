@@ -1,5 +1,6 @@
 
 (use-package slime
+  :ensure t
   :config (progn
 	    (cond
 	     ((executable-find "sbcl") (setq inferior-lisp-program "sbcl"))

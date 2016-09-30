@@ -19,3 +19,5 @@ custom.el
 .emacs.desktop.lock
 /.org-id-locations
 /smex-items
+/abbrev_defs
+/network-security.data

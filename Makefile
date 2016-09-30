@@ -21,6 +21,9 @@ compile:
 clean:
 	$(RM_TREE) $(HOME_DIR)/.emacs.d
 
+clean_packages:
+	$(RM_TREE) $(HOME_DIR)/.emacs.d/elpa
+
 py_lint:
 	$(PIP_BIN) install pylint
 

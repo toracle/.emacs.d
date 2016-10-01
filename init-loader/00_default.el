@@ -55,10 +55,19 @@
 
 (use-package flycheck
   :ensure t
-  :config (add-hook 'after-init-hook #'global-flycheck-mode))
+  :config (progn
+	    (add-hook 'after-init-hook #'global-flycheck-mode)
+	    (add-hook 'python-mode-hook (lambda () (flymake-mode -1)))
+	    (add-hook 'python-mode-hook (lambda () (flycheck-select-checker 'python-pylint)))
+	    (add-hook 'python-mode-hook (lambda ()
+					  (setq flycheck-pylintrc
+						(concat (file-name-as-directory (concat user-emacs-directory "init-loader"))
+							"pylintrc"))))))
 
 (use-package company
-  :ensure t)
+  :ensure t
+  :config (progn
+	    (add-hook 'python-mode-hook (lambda () (company-mode t)))))
 
 (use-package dedicated
   :ensure t)

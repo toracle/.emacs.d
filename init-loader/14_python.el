@@ -7,12 +7,23 @@
 (use-package pyvenv
   :ensure t)
 
+(defun python/init-eldoc-mode ()
+  (eldoc-mode)
+  (anaconda-eldoc-mode))
+
+(defun python/init-grep-find ()
+  (add-to-list 'grep-find-ignored-directories "build"))
+
+(defun python/init-indent ()
+  (setq indent-tabs-mode nil))
+
 (use-package anaconda-mode
   :ensure t
   :bind (:map python-mode-map
 	      ("C-c C-d" . anaconda-mode-show-doc))
   :config (progn
-	    (add-hook 'python-mode-hook 'anaconda-mode)))
+	    (add-hook 'python-mode-hook 'anaconda-mode)
+	    (add-hook 'python-mode-hook 'python/init-eldoc-mode)))
 
 (use-package company-anaconda
   :ensure t
@@ -20,8 +31,7 @@
 	    (add-to-list 'company-backends 'company-anaconda)))
 
 (defun toracle-setup-python ()
-  (setq indent-tabs-mode nil)
-  (add-to-list 'grep-find-ignored-directories "build")
   )
 
-(add-hook 'python-mode-hook 'toracle-setup-python)
+(add-hook 'python-mode-hook 'python/init-grep-find)
+(add-hook 'python-mode-hook 'python/init-indent)

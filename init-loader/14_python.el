@@ -22,8 +22,9 @@
 
 (use-package anaconda-mode
   :ensure t
-  :bind (:map python-mode-map
-	      ("C-c C-d" . anaconda-mode-show-doc))
+  :bind (:map anaconda-mode-map
+	      ("C-c C-d" . anaconda-mode-show-doc)
+	      ("M-?" . anaconda-mode-find-references))
   :config (progn
 	    (add-hook 'python-mode-hook 'anaconda-mode)
 	    (add-hook 'python-mode-hook 'python/init-eldoc-mode)))

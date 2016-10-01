@@ -9,6 +9,20 @@
 (xterm-mouse-mode t)
 
 (setq save-abbrevs 'silently)
+(setq inhibit-startup-screen t)
+(setq dired-dwim-target t)
+(setq backup-directory-alist `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
+(setq default-input-method "korean-hangul")
+
+(global-set-key (kbd "C-x C-o") 'other-frame)
+(global-set-key (kbd "S-SPC") 'toggle-input-method)
+
+(when (eq system-type 'darwin)
+  (setenv "LANG" "en_US.UTF-8")
+  (when (file-exists-p "/usr/local/bin")
+    (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
+    (add-to-list 'exec-path "/usr/local/bin")))
 
 (use-package smart-mode-line
   :init (setq sml/no-confirm-load-theme t)
@@ -26,28 +40,6 @@
 (use-package page-break-lines
   :ensure t
   :config (global-page-break-lines-mode t))
-
-(setq inhibit-startup-screen t)
-
-(global-set-key (kbd "C-x C-o") 'other-frame)
-
-(when (eq system-type 'darwin)
-  (add-to-list 'exec-path "/usr/local/bin"))
-
-(setq dired-dwim-target t)
-
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
-
-(setq auto-save-file-name-transforms
-      `((".*" ,temporary-file-directory t)))
-
-(when (eq system-type 'darwin)
-  (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-  (setenv "LANG" "en_US.UTF-8"))
-
-(setq default-input-method "korean-hangul")
-(global-set-key (kbd "S-SPC") 'toggle-input-method)
 
 (use-package zoom-window
   :ensure t

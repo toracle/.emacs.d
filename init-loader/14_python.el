@@ -17,6 +17,9 @@
 (defun python/init-indent ()
   (setq indent-tabs-mode nil))
 
+(defun python/electric ()
+  (electric-pair-mode))
+
 (use-package anaconda-mode
   :ensure t
   :bind (:map python-mode-map
@@ -36,3 +39,4 @@
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)
+(add-hook 'python-mode-hook 'python/electric)

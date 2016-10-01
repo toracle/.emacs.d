@@ -30,8 +30,9 @@
   :config (progn
 	    (add-to-list 'company-backends 'company-anaconda)))
 
-(defun toracle-setup-python ()
-  )
+(use-package pip-requirements
+  :ensure t)
+
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)

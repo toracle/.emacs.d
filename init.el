@@ -3,13 +3,30 @@
 ;; installed packages.  Don't delete this line.  If you don't want it,
 ;; just comment it out by adding a semicolon to the start of the line.
 ;; You may delete these explanatory comments.
+
+(require 'package)
+(setq package-enable-at-startup nil)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
+(add-to-list 'package-archives '(" marmalade" . "http://marmalade-repo.org/packages/"))
+
 (package-initialize)
 
-(require 'cask "~/.cask/cask.el")
-(cask-initialize)
+;; Bootstrap `use-package'
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 
-(require 'init-loader)
-(init-loader-load (concat user-emacs-directory "init-loader"))
+
+;; (require 'cask "~/.cask/cask.el")
+;; (cask-initialize)
+
+(use-package init-loader
+  :ensure t
+  :config (init-loader-load (concat user-emacs-directory "init-loader")))
+
+;; (require 'init-loader)
+;; (init-loader-load (concat user-emacs-directory "init-loader"))
 
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)

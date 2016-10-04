@@ -1,21 +1,43 @@
-(defun toracle-setup-python ()
-  (setq indent-tabs-mode nil)
-  (flymake-mode -1)
-  (setq flycheck-pylintrc
-	(concat (file-name-as-directory (concat user-emacs-directory "init-loader"))
-		"pylintrc"))
-  (when (and (boundp 'pyvenv-virtual-env)
-             (not (null pyvenv-virtual-env)))
-    (setq flycheck-python-pylint-executable
-          (concat pyvenv-virtual-env "bin/pylint")))
-  (flycheck-select-checker 'python-pylint)
-  (jedi:setup)
-  (setq jedi:complete-on-dot t)
-  (company-mode t)
-  (add-to-list 'company-backends 'company-jedi)
-  (local-set-key (kbd "M-.") 'jedi:goto-definition)
-  (local-set-key (kbd "M-*") 'jedi:goto-definition-pop-marker)
-  (local-set-key (kbd "C-c C-d") 'jedi:show-doc)
-  )
+(use-package epc
+  :ensure t)
 
-(add-hook 'python-mode-hook 'toracle-setup-python)
+(use-package python-environment
+  :ensure t)
+
+(use-package pyvenv
+  :ensure t)
+
+(defun python/init-eldoc-mode ()
+  (eldoc-mode)
+  (anaconda-eldoc-mode))
+
+(defun python/init-grep-find ()
+  (add-to-list 'grep-find-ignored-directories "build"))
+
+(defun python/init-indent ()
+  (setq indent-tabs-mode nil))
+
+(defun python/electric ()
+  (electric-pair-mode))
+
+(use-package anaconda-mode
+  :ensure t
+  :bind (:map anaconda-mode-map
+	      ("C-c C-d" . anaconda-mode-show-doc)
+	      ("M-?" . anaconda-mode-find-references))
+  :config (progn
+	    (add-hook 'python-mode-hook 'anaconda-mode)
+	    (add-hook 'python-mode-hook 'python/init-eldoc-mode)))
+
+(use-package company-anaconda
+  :ensure t
+  :config (progn
+	    (add-to-list 'company-backends 'company-anaconda)))
+
+(use-package pip-requirements
+  :ensure t)
+
+
+(add-hook 'python-mode-hook 'python/init-grep-find)
+(add-hook 'python-mode-hook 'python/init-indent)
+(add-hook 'python-mode-hook 'python/electric)

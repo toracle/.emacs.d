@@ -1,19 +1,19 @@
 ;; Org
 
-(require 'org-mime)
+(use-package org-plus-contrib
+  :ensure t)
 
-(add-hook 'message-mode-hook
-	  (lambda ()
-	    (local-set-key (kbd "C-c M-o") 'org-mime-htmlize)))
-
-(add-hook 'org-mode-hook
-	  (lambda ()
-	    (local-set-key (kbd "C-c M-o") 'org-mime-org-buffer-htmlize)))
-
-(global-set-key (kbd "C-c l") 'org-store-link)
-(global-set-key (kbd "C-c a") 'org-agenda)
-(global-set-key (kbd "C-c c") 'org-capture)
-(global-set-key (kbd "C-c b") 'org-iswitchb)
+(use-package org-mime
+  :ensure t
+  :config (progn
+	    (add-hook 'message-mode-hook
+			(local-set-key (kbd "C-c M-o") 'org-mime-htmlize))
+	    (add-hook 'org-mode-hook
+			(local-set-key (kbd "C-c M-o") 'org-mime-org-buffer-htmlize)))
+  :bind (("C-c l" . org-store-link)
+	 ("C-c a" . org-agenda)
+	 ("C-c c" . org-capture)
+	 ("C-c b" . org-iswitchb)))
 
 (setq org-log-done t)
 (defun toracle-babel-config ()

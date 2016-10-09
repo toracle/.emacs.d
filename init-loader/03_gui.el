@@ -45,7 +45,7 @@
 (when (display-graphic-p)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
-  (setq-default line-spacing 4)
+  (setq-default line-spacing 1)
   
   (when (eq system-type 'darwin)
     (setq mac-command-modifier 'meta)

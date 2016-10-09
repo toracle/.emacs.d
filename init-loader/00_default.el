@@ -94,5 +94,8 @@
 (use-package ledger-mode
   :ensure t)
 
+(use-package ag
+  :ensure t)
+
 (provide '00_default)
 ;;; 00_default.el ends here

@@ -15,6 +15,9 @@
 	 ("C-c c" . org-capture)
 	 ("C-c b" . org-iswitchb)))
 
+(use-package ox-pandoc
+  :ensure t)
+
 (setq org-log-done t)
 (defun toracle-babel-config ()
   (org-babel-do-load-languages 'org-babel-load-languages

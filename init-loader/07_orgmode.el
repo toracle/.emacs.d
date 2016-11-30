@@ -31,6 +31,7 @@
 				 (js . t)
 				 (lisp . t)
 				 (ruby . t)
+				 (sql . t)
 				 (plantuml . t)
 				 (sql . t)
 				 (ledger . t)))

@@ -33,6 +33,7 @@
 				 (ruby . t)
 				 (sql . t)
 				 (plantuml . t)
+				 (sql . t)
 				 (ledger . t)))
   
   (setq org-confirm-babel-evaluate nil)

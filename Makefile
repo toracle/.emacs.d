@@ -5,6 +5,9 @@ else
 PIP_BIN=pip3
 endif
 
+NPM_BIN=npm
+NPM_OPTS=-g
+
 ifeq ($(OS),Windows_NT)
 HOME_DIR=$(HOME)
 RM_TREE=rmdir /S /Q
@@ -40,5 +43,13 @@ py_virtualenvwrapper:
 	$(PIP_BIN) install virtualenvwrapper
 
 python_external: py_lint py_flakes py_epc py_jedi py_virtualenvwrapper
+
+js_eslint:
+	$(NPM_BIN) install $(NPM_OPTS) eslint
+
+js_tern:
+	$(NPM_BIN) install $(NPM_OPTS) tern
+
+js_external: js_eslint js_tern
 
 external: python_external

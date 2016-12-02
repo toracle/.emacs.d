@@ -54,7 +54,12 @@ js_external: js_eslint js_tern
 
 rust_racer:
 	cargo install racer
+	echo "Add ~/.cargo/bin/racer to PATH env variable"
 
-rust_external: rust_racer
+rust_src:
+	mkdir -p ~/src
+	git clone git@github.com:rust-lang/rust.git ~/src/rust
+
+rust_external: rust_racer rust_src
 
 external: python_external js_external rust_external

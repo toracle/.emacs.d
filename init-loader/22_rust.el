@@ -18,7 +18,7 @@
   :ensure t
   :config (progn
 	    (setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH
-	    (setq racer-rust-src-path "~/rust/src") ;; Rust source code PATH
+	    (setq racer-rust-src-path "~/src/rust/src") ;; Rust source code PATH
 	    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
 	    (setq company-tooltip-align-annotations t)
 	    (add-hook 'rust-mode-hook #'racer-mode)

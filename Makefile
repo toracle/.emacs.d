@@ -52,4 +52,9 @@ js_tern:
 
 js_external: js_eslint js_tern
 
-external: python_external
+rust_racer:
+	cargo install racer
+
+rust_external: rust_racer
+
+external: python_external js_external rust_external

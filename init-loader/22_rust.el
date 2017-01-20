@@ -8,7 +8,9 @@
 
 (use-package rust-mode
   :ensure t
-  :config (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode)))
+  :config (progn
+	    (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
+	    (local-set-key (kbd "C-c C-j") #'imenu)))
 
 (use-package cargo
   :ensure t
@@ -23,7 +25,8 @@
 	    (setq company-tooltip-align-annotations t)
 	    (add-hook 'rust-mode-hook #'racer-mode)
 	    (add-hook 'racer-mode-hook #'eldoc-mode)
-	    (add-hook 'racer-mode-hook #'company-mode)))
+	    (add-hook 'racer-mode-hook #'company-mode)
+	    (local-set-key (kbd "C-c C-d") #'racer-describe)))
 
 (use-package flycheck-rust
   :ensure t

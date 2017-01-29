@@ -5,6 +5,9 @@ else
 PIP_BIN=pip3
 endif
 
+NPM_BIN=npm
+NPM_OPTS=-g
+
 ifeq ($(OS),Windows_NT)
 HOME_DIR=$(HOME)
 RM_TREE=rmdir /S /Q
@@ -41,4 +44,22 @@ py_virtualenvwrapper:
 
 python_external: py_lint py_flakes py_epc py_jedi py_virtualenvwrapper
 
-external: python_external
+js_eslint:
+	$(NPM_BIN) install $(NPM_OPTS) eslint
+
+js_tern:
+	$(NPM_BIN) install $(NPM_OPTS) tern
+
+js_external: js_eslint js_tern
+
+rust_racer:
+	cargo install racer
+	echo "Add ~/.cargo/bin/racer to PATH env variable"
+
+rust_src:
+	mkdir -p ~/src
+	git clone git@github.com:rust-lang/rust.git ~/src/rust
+
+rust_external: rust_racer rust_src
+
+external: python_external js_external rust_external

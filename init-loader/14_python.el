@@ -1,3 +1,9 @@
+;;; 14_python.el --- python.el configuration
+;;;
+;;; Commentary:
+;;; 
+;;; Code:
+
 (use-package epc
   :ensure t)
 
@@ -8,17 +14,27 @@
   :ensure t)
 
 (defun python/init-eldoc-mode ()
+  "Setup eldoc."
   (eldoc-mode)
   (anaconda-eldoc-mode))
 
 (defun python/init-grep-find ()
+  "Setup grep find."
   (add-to-list 'grep-find-ignored-directories "build"))
 
 (defun python/init-indent ()
+  "Setup indentation."
   (setq indent-tabs-mode nil))
 
-(defun python/electric ()
-  (electric-pair-mode))
+(defun python/init-imenu ()
+  "Setup imenu."
+  (when (fboundp #'python-imenu-create-flat-index)
+    (setq-local imenu-create-index-function
+		#'python-imenu-create-flat-index)))
+
+(defun python/init-misc ()
+  "Setup misc stuffs."
+  (subword-mode +1))
 
 (use-package anaconda-mode
   :ensure t
@@ -40,4 +56,9 @@
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)
-(add-hook 'python-mode-hook 'python/electric)
+(add-hook 'python-mode-hook 'python/init-imenu)
+(add-hook 'python-mode-hook 'python/init-misc)
+
+(provide '14_python)
+
+;;; 14_python.el ends here

@@ -24,6 +24,11 @@
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
     (add-to-list 'exec-path "/usr/local/bin")))
 
+(defun init-loader-file-path (name)
+  "Return a file path with NAME on init-loader directory."
+  (concat (file-name-as-directory (concat user-emacs-directory "init-loader"))
+	  name))
+
 (use-package smart-mode-line
   :init (setq sml/no-confirm-load-theme t)
   :config (sml/setup)
@@ -44,22 +49,6 @@
 (use-package zoom-window
   :ensure t
   :bind (("C-x C-z" . zoom-window-zoom)))
-
-(use-package flycheck
-  :ensure t
-  :config (progn
-	    (add-hook 'after-init-hook #'global-flycheck-mode)
-	    (add-hook 'python-mode-hook (lambda () (flymake-mode -1)))
-	    (add-hook 'python-mode-hook (lambda () (flycheck-select-checker 'python-pylint)))
-	    (add-hook 'python-mode-hook (lambda ()
-					  (setq flycheck-pylintrc
-						(concat (file-name-as-directory (concat user-emacs-directory "init-loader"))
-							"pylintrc"))))))
-
-(use-package company
-  :ensure t
-  :config (progn
-	    (add-hook 'python-mode-hook (lambda () (company-mode t)))))
 
 (use-package dedicated
   :ensure t)

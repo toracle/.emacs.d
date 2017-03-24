@@ -10,16 +10,19 @@
 	    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
+	    (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))))
 
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
-  (setq web-mode-markup-indent-offset 4)
-  (setq web-mode-css-indent-offset 4)
-  (setq web-mode-code-indent-offset 4)
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2)
   (setq web-mode-enable-engine-detection t)
+  (setq web-mode-style-padding 0)
+  (setq web-mode-script-padding 0)
   (local-set-key (kbd "C-c /")  'web-mode-element-close)
-  )
+  (setq indent-tabs-mode nil))
 
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 (add-hook 'css-mode-hook  'my-web-mode-hook)

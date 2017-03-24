@@ -36,23 +36,43 @@
   "Setup misc stuffs."
   (subword-mode +1))
 
+(defun python/init-flycheck ()
+  "Setup flycheck."
+  (flymake-mode -1)
+  (flycheck-mode t)
+  (flycheck-select-checker 'python-pylint)
+  (defvar flycheck-pylintrc (init-loader-file-path "pylintrc")))
+
+(defun python/init-company ()
+  "Setup company."
+  (company-mode t))
+
+(defun python/init-anaconda ()
+  "Setup anaconda."
+  (anaconda-mode t)
+  (python/init-eldoc-mode))
+
+(use-package flycheck
+  :ensure t
+  :config (add-hook 'python-mode-hook 'python/init-flycheck))
+
+(use-package company
+  :ensure t
+  :config (add-hook 'python-mode-hook 'python/init-company))
+
 (use-package anaconda-mode
   :ensure t
   :bind (:map anaconda-mode-map
 	      ("C-c C-d" . anaconda-mode-show-doc)
 	      ("M-?" . anaconda-mode-find-references))
-  :config (progn
-	    (add-hook 'python-mode-hook 'anaconda-mode)
-	    (add-hook 'python-mode-hook 'python/init-eldoc-mode)))
+  :config (add-hook 'python-mode-hook 'python/init-anaconda))
 
 (use-package company-anaconda
   :ensure t
-  :config (progn
-	    (add-to-list 'company-backends 'company-anaconda)))
+  :config (add-to-list 'company-backends 'company-anaconda))
 
 (use-package pip-requirements
   :ensure t)
-
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)

@@ -88,5 +88,11 @@
 (use-package ag
   :ensure t)
 
+(defun spacemacs-ui-visual//compilation-buffer-apply-ansi-colors ()
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region compilation-filter-start (point-max))))
+
+(add-hook 'compilation-filter-hook 'spacemacs-ui-visual//compilation-buffer-apply-ansi-colors)
+
 (provide '00_default)
 ;;; 00_default.el ends here

@@ -15,6 +15,8 @@
 (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
 (setq default-input-method "korean-hangul")
 
+(setq-default indent-tabs-mode nil)
+
 (global-set-key (kbd "C-x C-o") 'other-frame)
 (global-set-key (kbd "S-SPC") 'toggle-input-method)
 

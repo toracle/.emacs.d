@@ -44,10 +44,6 @@
   :ensure t
   :config (ample-theme))
 
-(use-package page-break-lines
-  :ensure t
-  :config (global-page-break-lines-mode t))
-
 (use-package zoom-window
   :ensure t
   :bind (("C-x C-z" . zoom-window-zoom)))
@@ -65,9 +61,6 @@
   :ensure t)
 
 (use-package visual-regexp-steroids
-  :ensure t)
-
-(use-package aggressive-indent
   :ensure t)
 
 (use-package robe

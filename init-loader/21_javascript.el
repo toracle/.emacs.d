@@ -16,6 +16,10 @@
   "Setup company."
   (company-mode t))
 
+(defun js/init-misc ()
+  "Setup misc stuffs."
+  (subword-mode +1))
+
 (defun js/init-js2 ()
   (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
   (add-hook 'js2-mode-hook '(flycheck-select-checker javascript-eslint))
@@ -42,6 +46,8 @@
 (use-package company-tern
   :ensure t
   :config (add-to-list 'company-backends 'company-tern))
+
+(add-hook 'js2-mode-hook 'js/init-misc)
 
 (provide '21_javascript)
 ;;; 21_javascript.el ends here

@@ -86,6 +86,8 @@
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
 (add-hook 'compilation-filter-hook 'spacemacs-ui-visual//compilation-buffer-apply-ansi-colors)
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
 (provide '00_default)
 ;;; 00_default.el ends here

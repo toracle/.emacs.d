@@ -26,7 +26,7 @@
 				 (R . t)
 				 (ditaa . t)
 				 (dot . t)
-				 (sh . t)
+				 (shell . t)
 				 (gnuplot . t)
 				 (js . t)
 				 (lisp . t)

@@ -1,4 +1,4 @@
-;; Windmove
+;; window
 
 ;;; Code:
 
@@ -17,6 +17,24 @@
 
 ; (global-set-key (kbd "C-x o") 'switch-window)
 
+(winner-mode 1)
 
+(defun purpose/init ()
+  (add-to-list 'purpose-user-regexp-purposes '("magit:.*" . magit))
+  (purpose-compile-user-configuration)
+  (purpose-mode 1))
 
-;;; 01_windmove.el ends here
+(use-package window-purpose
+  :ensure t
+  :config (purpose/init))
+
+(use-package ivy
+  :ensure t
+  :config (ivy-mode 1))
+
+(use-package ivy-purpose
+  :ensure t
+  :config (ivy-purpose-setup)
+  :bind (("C-x b" . ivy-purpose-switch-buffer-with-purpose)))
+
+;;; 01_window.el ends here

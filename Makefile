@@ -27,6 +27,9 @@ clean:
 clean_packages:
 	$(RM_TREE) $(HOME_DIR)/.emacs.d/elpa
 
+py_mypy:
+	$(PIP_BIN) install mypy
+
 py_lint:
 	$(PIP_BIN) install pylint
 
@@ -42,7 +45,7 @@ py_epc:
 py_virtualenvwrapper:
 	$(PIP_BIN) install virtualenvwrapper
 
-python_external: py_lint py_flakes py_epc py_jedi py_virtualenvwrapper
+python_external: py_mypy py_flakes py_epc py_jedi py_virtualenvwrapper
 
 js_eslint:
 	$(NPM_BIN) install $(NPM_OPTS) eslint

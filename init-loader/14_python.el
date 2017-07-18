@@ -13,6 +13,9 @@
 (use-package pyvenv
   :ensure t)
 
+(use-package flycheck-mypy
+  :ensure t)
+
 (defun python/init-eldoc-mode ()
   "Setup eldoc."
   (eldoc-mode)
@@ -40,8 +43,7 @@
   "Setup flycheck."
   (flymake-mode -1)
   (flycheck-mode t)
-  (flycheck-select-checker 'python-pylint)
-  (defvar flycheck-pylintrc (init-loader-file-path "pylintrc")))
+  (flycheck-select-checker 'python-mypy))
 
 (defun python/init-company ()
   "Setup company."

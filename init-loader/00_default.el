@@ -85,6 +85,14 @@
   (let ((inhibit-read-only t))
     (ansi-color-apply-on-region compilation-filter-start (point-max))))
 
+(defun create-new-scratch-buffer ()
+  (interactive)
+  (let ((buff (generate-new-buffer "*scratch*")))
+    (set-buffer buff)
+    (display-buffer buff)))
+
+(global-set-key (kbd "C-x n RET") 'create-new-scratch-buffer)
+
 (add-hook 'compilation-filter-hook 'spacemacs-ui-visual//compilation-buffer-apply-ansi-colors)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)

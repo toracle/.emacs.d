@@ -37,13 +37,14 @@
 
 (defun python/init-misc ()
   "Setup misc stuffs."
-  (subword-mode +1))
+  (subword-mode +1)
+  (pyvenv-mode t))
 
 (defun python/init-flycheck ()
   "Setup flycheck."
   (flymake-mode -1)
   (flycheck-mode t)
-  (flycheck-select-checker 'python-mypy))
+  (flycheck-select-checker 'python-pycheckers))
 
 (defun python/init-company ()
   "Setup company."
@@ -75,6 +76,12 @@
 
 (use-package pip-requirements
   :ensure t)
+
+(use-package flycheck-pycheckers
+  :ensure t
+  :config (progn (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)
+                 (setq flycheck-pycheckers-max-line-length 100)
+                 (setq flycheck-pycheckers-checkers '(pylint mypy3))))
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)

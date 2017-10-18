@@ -80,7 +80,7 @@
 (use-package flycheck-pycheckers
   :ensure t
   :config (progn (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)
-                 (setq flycheck-pycheckers-max-line-length 100)
+                 (setq flycheck-pycheckers-max-line-length 200)
                  (setq flycheck-pycheckers-checkers '(pylint mypy3))))
 
 (add-hook 'python-mode-hook 'python/init-grep-find)

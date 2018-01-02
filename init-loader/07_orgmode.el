@@ -18,10 +18,17 @@
 (use-package ox-pandoc
   :ensure t)
 
+(use-package ob-ipython
+  :ensure t)
+
+(use-package ob-restclient
+  :ensure t)
+
 (setq org-log-done t)
 (defun toracle-babel-config ()
   (org-babel-do-load-languages 'org-babel-load-languages
 			       '((python . t)
+                                 (ipython . t)
 				 (emacs-lisp . t)
 				 (R . t)
 				 (ditaa . t)
@@ -34,7 +41,8 @@
 				 (sql . t)
 				 (plantuml . t)
 				 (sql . t)
-				 (ledger . t)))
+				 (ledger . t)
+                                 (restclient . t)))
   
   (setq org-confirm-babel-evaluate nil)
   (setq org-plantuml-jar-path

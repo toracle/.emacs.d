@@ -1,0 +1,6 @@
+# key: #py
+# name: org-python
+# --
+#+BEGIN_SRC python :exports both :results output
+$1
+#+END_SRC

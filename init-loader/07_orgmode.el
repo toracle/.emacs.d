@@ -50,3 +50,4 @@
   (local-set-key (kbd "C-c `") 'org-edit-src-code))
 
 (add-hook 'org-mode-hook 'toracle-babel-config)
+(add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)

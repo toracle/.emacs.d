@@ -3,7 +3,7 @@
 (use-package projectile
   :ensure t
   :config (progn
-            (setq projectile-mode-line '(:eval (format " Projectile[%s(%s)]"
+            (setq projectile-mode-line '(:eval (format " Projectile[%s]"
                                                        (projectile-project-name))))
 	    (projectile-global-mode)
 	    (add-to-list 'projectile-project-root-files ".svn")

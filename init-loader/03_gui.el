@@ -34,13 +34,21 @@
 
 (defun toracle--increase-frame-font-size ()
   (interactive)
-  (toracle--set-frame-font-size (+ (toracle--get-frame-font-size) 2))
+  (toracle--set-frame-font-size (+ (toracle--get-frame-font-size) 1))
   (toracle--set-font toracle--base-font-family (toracle--get-frame-font-size)))
 
 (defun toracle--decrease-frame-font-size ()
   (interactive)
-  (toracle--set-frame-font-size (- (toracle--get-frame-font-size) 2))
+  (toracle--set-frame-font-size (- (toracle--get-frame-font-size) 1))
   (toracle--set-font toracle--base-font-family (toracle--get-frame-font-size)))
+
+(defun toracle--increase-line-spacing ()
+  (interactive)
+  (setq line-spacing (1+ line-spacing)))
+
+(defun toracle--decrease-line-spacing ()
+  (interactive)
+  (setq line-spacing (1- line-spacing)))
 
 (when (display-graphic-p)
   (tool-bar-mode -1)

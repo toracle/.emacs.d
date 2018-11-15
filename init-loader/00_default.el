@@ -81,9 +81,11 @@
 (use-package ag
   :ensure t)
 
-(defun spacemacs-ui-visual//compilation-buffer-apply-ansi-colors ()
+(defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()
   (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region compilation-filter-start (point-max))))
+    (toggle-read-only)
+    (ansi-color-apply-on-region compilation-filter-start (point-max))
+    (toggle-read-only)))
 
 (defun create-new-scratch-buffer ()
   (interactive)
@@ -93,7 +95,7 @@
 
 (global-set-key (kbd "C-x n RET") 'create-new-scratch-buffer)
 
-(add-hook 'compilation-filter-hook 'spacemacs-ui-visual//compilation-buffer-apply-ansi-colors)
+(add-hook 'compilation-filter-hook 'spacemacs-ui-visual/compilation-buffer-apply-ansi-colors)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 

@@ -1,0 +1,5 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# key: tag
+# name: erb-tag
+# --
+<%= $1 %>

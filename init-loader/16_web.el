@@ -55,3 +55,10 @@
 
 (use-package restclient
   :ensure t)
+
+(defun toracle/init-company-restclient ()
+  (add-to-list 'company-backends 'company-restclient))
+
+(use-package company-restclient
+  :ensure t
+  :config 'toracle/init-company-restclient)

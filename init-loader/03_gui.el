@@ -63,6 +63,8 @@
 
   (global-set-key (kbd "M-_") 'toracle--decrease-frame-font-size)
   (global-set-key (kbd "M-+") 'toracle--increase-frame-font-size)
+  (global-set-key (kbd "C-M-_") 'toracle--decrease-line-spacing)
+  (global-set-key (kbd "C-M-+") 'toracle--increase-line-spacing)
   
   (toracle--set-base-font "D2Coding" 14))
 

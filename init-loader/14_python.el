@@ -87,6 +87,9 @@
                  (setq flycheck-pycheckers-max-line-length 200)
                  (setq flycheck-pycheckers-checkers '(pylint mypy3))))
 
+(use-package python-docstring
+  :ensure t)
+
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)
 (add-hook 'python-mode-hook 'python/init-imenu)

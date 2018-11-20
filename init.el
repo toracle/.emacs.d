@@ -32,3 +32,4 @@
 
 (add-to-list 'load-path "~/.emacs.d/modules/")
 (put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)

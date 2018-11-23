@@ -50,3 +50,6 @@
 
 (use-package restclient
   :ensure t)
+
+(use-package smart-shift
+  :ensure t)

@@ -99,5 +99,11 @@
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
 
+
+(add-to-list 'Info-default-directory-list "~/texinfo")
+
+; Fix: a workaround of slow response on Emacs 26.1
+(setq x-wait-for-event-timeout nil)
+
 (provide '00_default)
 ;;; 00_default.el ends here

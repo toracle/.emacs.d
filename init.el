@@ -8,7 +8,6 @@
 (setq package-enable-at-startup nil)
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/"))
-(add-to-list 'package-archives '(" marmalade" . "http://marmalade-repo.org/packages/"))
 
 (package-initialize)
 
@@ -33,3 +32,4 @@
 
 (add-to-list 'load-path "~/.emacs.d/modules/")
 (put 'narrow-to-region 'disabled nil)
+(put 'upcase-region 'disabled nil)

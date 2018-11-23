@@ -55,6 +55,10 @@
   (anaconda-mode t)
   (python/init-eldoc-mode))
 
+(defun python/init-folding ()
+  (hs-minor-mode t)
+  (local-set-key (kbd "C-c C-;") 'hs-toggle-hiding))
+
 (use-package flycheck
   :ensure t
   :config (add-hook 'python-mode-hook 'python/init-flycheck))
@@ -83,10 +87,14 @@
                  (setq flycheck-pycheckers-max-line-length 200)
                  (setq flycheck-pycheckers-checkers '(pylint mypy3))))
 
+(use-package python-docstring
+  :ensure t)
+
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)
 (add-hook 'python-mode-hook 'python/init-imenu)
 (add-hook 'python-mode-hook 'python/init-misc)
+(add-hook 'python-mode-hook 'python/init-folding)
 
 (provide '14_python)
 

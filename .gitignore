@@ -22,3 +22,4 @@ custom.el
 /abbrev_defs
 /network-security.data
 anaconda-mode/
+session.*

@@ -27,6 +27,9 @@
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 (add-hook 'css-mode-hook  'my-web-mode-hook)
 
+(defun yaml/init-subword ()
+  (subword-mode +1))
+
 (use-package emmet-mode
   :ensure t)
 
@@ -34,6 +37,8 @@
   :ensure t)
 
 (use-package yaml-mode
+  :config (progn
+            (add-hook 'yaml-mode-hook 'yaml/init-subword))
   :ensure t)
 
 (use-package adoc-mode
@@ -53,3 +58,10 @@
 
 (use-package smart-shift
   :ensure t)
+
+(defun toracle/init-company-restclient ()
+  (add-to-list 'company-backends 'company-restclient))
+
+(use-package company-restclient
+  :ensure t
+  :config 'toracle/init-company-restclient)

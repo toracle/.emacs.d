@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: print_r
+# key: print_r
+# --
+error_log(print_r($1, true));

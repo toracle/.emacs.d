@@ -10,4 +10,5 @@
 	    (add-to-list 'projectile-project-root-files ".git")
 	    (add-to-list 'projectile-project-root-files ".projectile")
 	    (add-to-list 'projectile-project-root-files "setup.py")
+            (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 	    (setq projectile-completion-system 'helm)))

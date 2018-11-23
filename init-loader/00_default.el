@@ -81,9 +81,11 @@
 (use-package ag
   :ensure t)
 
-(defun spacemacs-ui-visual//compilation-buffer-apply-ansi-colors ()
+(defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()
   (let ((inhibit-read-only t))
-    (ansi-color-apply-on-region compilation-filter-start (point-max))))
+    (toggle-read-only)
+    (ansi-color-apply-on-region compilation-filter-start (point-max))
+    (toggle-read-only)))
 
 (defun create-new-scratch-buffer ()
   (interactive)
@@ -93,9 +95,17 @@
 
 (global-set-key (kbd "C-x n RET") 'create-new-scratch-buffer)
 
-(add-hook 'compilation-filter-hook 'spacemacs-ui-visual//compilation-buffer-apply-ansi-colors)
+(add-hook 'compilation-filter-hook 'spacemacs-ui-visual/compilation-buffer-apply-ansi-colors)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+
+
+(add-to-list 'Info-default-directory-list "~/texinfo")
+
+; A workaround of slow response on Emacs 26.1
+; See https://debbugs.gnu.org/cgi/bugreport.cgi?bug=30995
+(when (s-starts-with? "GNU Emacs 26.1 " (version))
+  (setq x-wait-for-event-timeout nil))
 
 (provide '00_default)
 ;;; 00_default.el ends here

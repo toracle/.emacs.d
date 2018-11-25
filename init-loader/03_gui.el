@@ -50,6 +50,18 @@
   (interactive)
   (setq line-spacing (1- line-spacing)))
 
+(defun get-string-from-file (path)
+  (with-temp-buffer
+    (insert-file-contents path)
+    (buffer-string)))
+
+(defun wsl-system? ()
+  (s-contains? "Microsoft" (get-string-from-file "/proc/version")))
+
+(defun disable-double-buffering ()
+  (setq default-frame-alist
+         (append default-frame-alist '((inhibit-double-buffering . t)))))
+
 (when (display-graphic-p)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
@@ -66,6 +78,14 @@
   (global-set-key (kbd "C-M-_") 'toracle--decrease-line-spacing)
   (global-set-key (kbd "C-M-+") 'toracle--increase-line-spacing)
   
-  (toracle--set-base-font "D2Coding" 14))
+  (toracle--set-base-font "D2Coding" 14)
+
+  (when (wsl-system?)
+    (disable-double-buffering))
+
+  ; A workaround of slow response on Emacs 26.1
+  ; See https://debbugs.gnu.org/cgi/bugreport.cgi?bug=30995
+  (when (s-starts-with? "GNU Emacs 26.1 " (version))
+    (setq x-wait-for-event-timeout nil)))
 
 ;;; 05_gui.el ends here

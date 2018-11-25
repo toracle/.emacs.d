@@ -102,10 +102,5 @@
 
 (add-to-list 'Info-default-directory-list "~/texinfo")
 
-; A workaround of slow response on Emacs 26.1
-; See https://debbugs.gnu.org/cgi/bugreport.cgi?bug=30995
-(when (s-starts-with? "GNU Emacs 26.1 " (version))
-  (setq x-wait-for-event-timeout nil))
-
 (provide '00_default)
 ;;; 00_default.el ends here

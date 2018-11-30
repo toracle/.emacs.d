@@ -1,9 +1,9 @@
-
 (use-package slime
   :ensure t
   :config (progn
 	    (cond
 	     ((executable-find "sbcl") (setq inferior-lisp-program "sbcl"))
+	     ((executable-find "clisp") (setq inferior-lisp-program "clisp"))
 	     ((executable-find "ccl") (setq inferior-lisp-program "ccl"))
 	     ((executable-find "wx86cl64") (setq inferior-lisp-program "wx86cl64 -K utf-8")))
 	    (slime-setup)))
@@ -23,5 +23,8 @@
                 scheme-mode))
   (font-lock-add-keywords mode
 			  '(("(\\|)" . paren-face))))
+
+;; (mapc (lambda (mode) (font-lock-add-keywords mode '(("(\\|)" . paren-face))))
+;;       '(lisp-mode emacs-lisp-mode scheme-mode))
 
 (add-hook 'slime-repl-mode-hook 'ansi-color-for-comint-mode-on)

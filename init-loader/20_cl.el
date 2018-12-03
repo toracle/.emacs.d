@@ -2,6 +2,7 @@
   :ensure t
   :config (progn
 	    (cond
+	     ((executable-find "ros") (setq inferior-lisp-program "ros -Q run") (load (expand-file-name "~/.roswell/helper.el")))
 	     ((executable-find "sbcl") (setq inferior-lisp-program "sbcl"))
 	     ((executable-find "clisp") (setq inferior-lisp-program "clisp"))
 	     ((executable-find "ccl") (setq inferior-lisp-program "ccl"))

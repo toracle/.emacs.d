@@ -98,9 +98,9 @@
 (add-hook 'compilation-filter-hook 'spacemacs-ui-visual/compilation-buffer-apply-ansi-colors)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
-
-
 (add-to-list 'Info-default-directory-list "~/texinfo")
+
+(add-hook 'yaml-mode-hook (lambda () (yafolding-mode t)))
 
 (provide '00_default)
 ;;; 00_default.el ends here

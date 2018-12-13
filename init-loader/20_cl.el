@@ -19,13 +19,13 @@
 (make-face 'paren-face)
 (set-face-foreground 'paren-face "#444444")
 
-(dolist (mode '(lisp-mode
-                emacs-lisp-mode
-                scheme-mode))
-  (font-lock-add-keywords mode
-			  '(("(\\|)" . paren-face))))
+;; (dolist (mode '(lisp-mode
+;;                 emacs-lisp-mode
+;;                 scheme-mode))
+;;   (font-lock-add-keywords mode
+;; 			  '(("(\\|)" . paren-face))))
 
-;; (mapc (lambda (mode) (font-lock-add-keywords mode '(("(\\|)" . paren-face))))
-;;       '(lisp-mode emacs-lisp-mode scheme-mode))
+(mapc (lambda (mode) (font-lock-add-keywords mode '(("(\\|)" . paren-face))))
+      '(lisp-mode emacs-lisp-mode scheme-mode))
 
 (add-hook 'slime-repl-mode-hook 'ansi-color-for-comint-mode-on)

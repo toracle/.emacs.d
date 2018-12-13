@@ -91,6 +91,10 @@
   (interactive)
   (let ((buff (generate-new-buffer "*scratch*")))
     (set-buffer buff)
+    (lisp-interaction-mode)
+    (insert ";; This buffer is for text that is not saved, and for Lisp evaluation.\n")
+    (insert ";; To create a file, visit it with C-x C-f and enter text in its buffer.\n")
+    (insert "\n")
     (display-buffer buff)))
 
 (global-set-key (kbd "C-x n RET") 'create-new-scratch-buffer)

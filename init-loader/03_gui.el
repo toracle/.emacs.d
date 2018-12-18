@@ -56,7 +56,7 @@
     (buffer-string)))
 
 (defun wsl-system? ()
-  (and (f-file-p "/proc/version")
+  (and (string-equal "gnu/linux" system-type)
        (s-contains? "Microsoft" (get-string-from-file "/proc/version"))))
 
 (defun windows-system? ()

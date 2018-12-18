@@ -4,7 +4,7 @@
 
 (defvar toracle--base-font-family "D2Coding")
 
-(defvar toracle--base-font-size 14)
+(defvar toracle--base-font-size 16)
 
 (add-to-list 'default-frame-alist (cons 'toracle--frame-font-size toracle--base-font-size))
 

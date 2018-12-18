@@ -56,7 +56,14 @@
     (buffer-string)))
 
 (defun wsl-system? ()
-  (s-contains? "Microsoft" (get-string-from-file "/proc/version")))
+  (and (f-file-p "/proc/version")
+       (s-contains? "Microsoft" (get-string-from-file "/proc/version"))))
+
+(defun windows-system? ()
+  (string-equal system-type "windows-nt"))
+
+(defun mac-system? ()
+  (string-equal system-type "darwin"))
 
 (defun disable-double-buffering ()
   (setq default-frame-alist
@@ -66,10 +73,16 @@
   (tool-bar-mode -1)
   (scroll-bar-mode -1)
   (setq-default line-spacing 1)
-  
-  (when (eq system-type 'darwin)
+
+  (when (mac-system?)
     (setq mac-command-modifier 'meta)
     (setq mac-option-modifier 'super))
+
+  (when (wsl-system?)
+    (disable-double-buffering))
+
+  (when (windows-system?)
+    (setq w32-use-visible-system-caret nil))
 
   (defvar toracle--frame-font-size toracle--base-font-size)
 
@@ -80,8 +93,6 @@
   
   (toracle--set-base-font "D2Coding" 14)
 
-  (when (wsl-system?)
-    (disable-double-buffering))
 
   ; A workaround of slow response on Emacs 26.1
   ; See https://debbugs.gnu.org/cgi/bugreport.cgi?bug=30995

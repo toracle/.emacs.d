@@ -34,6 +34,7 @@
   :ensure t)
 
 (use-package markdown-mode
+  :config (setq markdown-code-face "D2Coding")
   :ensure t)
 
 (use-package yaml-mode

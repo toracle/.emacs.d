@@ -3,14 +3,14 @@
 (use-package projectile
   :ensure t
   :config (progn
-            (setq projectile-mode-line '(:eval (format " Projectile[%s]"
-                                                       (projectile-project-name))))
+            ;; (setq projectile-mode-line '(:eval (format " Projectile[%s]"
+            ;;                                            (projectile-project-name))))
 	    (projectile-global-mode)
+            (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
 	    (add-to-list 'projectile-project-root-files ".svn")
 	    (add-to-list 'projectile-project-root-files ".git")
 	    (add-to-list 'projectile-project-root-files ".projectile")
 	    (add-to-list 'projectile-project-root-files "setup.py")
-            (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
             (add-to-list 'projectile-globally-ignored-directories ".pytest_cache")
             (add-to-list 'projectile-globally-ignored-directories "htmlcov")
             (add-to-list 'projectile-globally-ignored-directories ".eggs")

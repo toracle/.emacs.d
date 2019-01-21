@@ -81,6 +81,11 @@
 (use-package ag
   :ensure t)
 
+(use-package perspective
+  :ensure t
+  :config (persp-mode))
+
+
 (defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()
   (let ((inhibit-read-only t))
     (toggle-read-only)

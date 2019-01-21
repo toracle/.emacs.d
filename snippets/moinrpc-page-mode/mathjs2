@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: mathjs2
+# key: {$$
+# --
+{{{ $$ $1 $$ }}}

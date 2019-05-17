@@ -111,5 +111,9 @@
 
 (add-hook 'yaml-mode-hook (lambda () (yafolding-mode t)))
 
+;; to prevent emacs crash when confronts emoji
+;; https://github.com/syl20bnr/spacemacs/issues/10695
+(add-to-list 'face-ignored-fonts "Noto Color Emoji")
+
 (provide '00_default)
 ;;; 00_default.el ends here

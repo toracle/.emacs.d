@@ -81,9 +81,9 @@
 (use-package ag
   :ensure t)
 
-(use-package perspective
-  :ensure t
-  :config (persp-mode))
+;; (use-package perspective
+;;   :ensure t
+;;   :config (persp-mode))
 
 
 (defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()

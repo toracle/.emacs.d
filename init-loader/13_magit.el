@@ -8,6 +8,6 @@
   :config (setq magit-last-seen-setup-instructions "1.4.0"
 		git-commit-summary-max-length 80))
 
-(use-package forge
-  :ensure t
-  :after magit)
+;; (use-package forge
+;;   :ensure t
+;;   :after magit)

@@ -1,7 +1,7 @@
 ;; Org
 
-(use-package org-plus-contrib
-  :ensure t)
+;; (use-package org-plus-contrib
+;;   :ensure t)
 
 (use-package org-mime
   :ensure t

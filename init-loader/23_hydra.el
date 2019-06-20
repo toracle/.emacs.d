@@ -6,7 +6,8 @@
   ("j" windmove-left "left")
   ("l" windmove-right "right")
   ("i" windmove-up "up")
-  ("k" windmove-down "down"))
+  ("k" windmove-down "down")
+  ("o" other-window "other"))
 
 
 (defhydra hydra-switch-frame (global-map "C-x C-o")

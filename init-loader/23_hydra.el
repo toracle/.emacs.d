@@ -1,7 +1,7 @@
 (use-package hydra
   :ensure t)
 
-(defhydra hydra-windmove (global-map "C-x O")
+(defhydra hydra-windmove (global-map "C-x p")
   "windmove"
   ("j" windmove-left "left")
   ("l" windmove-right "right")

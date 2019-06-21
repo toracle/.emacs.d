@@ -8,8 +8,3 @@
   ("i" windmove-up "up")
   ("k" windmove-down "down")
   ("o" other-window "other"))
-
-
-(defhydra hydra-switch-frame (global-map "C-x C-o")
-  "switch-frame"
-  ("o" other-frame "other"))

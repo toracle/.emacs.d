@@ -2,9 +2,10 @@
 
 ;;; Code:
 
-(defvar toracle--base-font-family "D2Coding")
+(defvar toracle--base-font-family "Ubuntu Mono")
+(defvar toracle--base-han-font-family "D2Coding")
+(defvar toracle--base-font-size 15)
 
-(defvar toracle--base-font-size 16)
 
 (add-to-list 'default-frame-alist (cons 'toracle--frame-font-size toracle--base-font-size))
 
@@ -20,27 +21,26 @@
 (defun toracle--get-frame-font-size ()
   (get-current-frame-parameter 'toracle--frame-font-size))
 
-(defun toracle--set-font (fontname size)
-  (set-frame-font (format "%s:pixelsize=%d" fontname size) t)
-  (set-fontset-font t
-		    'unicode-bmp
-		    (font-spec :family fontname :size size))
-  (minibuffer-message (format "Set frame-font to: %s %s" fontname size)))
+(defun toracle--set-font (fontname han-fontname size)
+  (set-face-attribute 'default nil :family fontname :height (* 10 size))
+  (set-fontset-font t 'hangul (font-spec :name han-fontname))
+  (minibuffer-message (format "Set frame-font to: %s %s %s" fontname han-fontname size)))
 
-(defun toracle--set-base-font (fontname size)
+(defun toracle--set-base-font (fontname han-fontname size)
   (setq toracle--base-font-family fontname)
+  (setq toracle--base-han-font-family han-fontname)
   (setq toracle--base-font-size size)
-  (toracle--set-font fontname size))
+  (toracle--set-font fontname han-fontname size))
 
 (defun toracle--increase-frame-font-size ()
   (interactive)
   (toracle--set-frame-font-size (+ (toracle--get-frame-font-size) 1))
-  (toracle--set-font toracle--base-font-family (toracle--get-frame-font-size)))
+  (toracle--set-font toracle--base-font-family toracle--base-han-font-family (toracle--get-frame-font-size)))
 
 (defun toracle--decrease-frame-font-size ()
   (interactive)
-  (toracle--set-frame-font-size (- (toracle--get-frame-font-size) 1))
-  (toracle--set-font toracle--base-font-family (toracle--get-frame-font-size)))
+  (toracle--set-frame-font-size (max (- (toracle--get-frame-font-size) 1) 1))
+  (toracle--set-font toracle--base-font-family toracle--base-han-font-family (toracle--get-frame-font-size)))
 
 (defun toracle--increase-line-spacing ()
   (interactive)
@@ -91,8 +91,9 @@
   (global-set-key (kbd "C-M-_") 'toracle--decrease-line-spacing)
   (global-set-key (kbd "C-M-+") 'toracle--increase-line-spacing)
   
-  (toracle--set-base-font "D2Coding" 16)
-
+  (toracle--set-base-font toracle--base-font-family
+                          toracle--base-han-font-family
+                          toracle--base-font-size)
 
   ; A workaround of slow response on Emacs 26.1
   ; See https://debbugs.gnu.org/cgi/bugreport.cgi?bug=30995

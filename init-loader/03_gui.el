@@ -4,7 +4,14 @@
 
 (defvar toracle--base-font-family "Ubuntu Mono")
 (defvar toracle--base-han-font-family "D2Coding")
+;; (defvar toracle--base-han-font-family "Noto Sans CJK KR Mono")
 (defvar toracle--base-font-size 15)
+
+
+(setq face-font-rescale-alist
+      '(("Noto Sans CJK KR Mono" 1.1)
+        ("Noto Sans CJK Mono" 1.1)
+        ("D2Coding" 1.2)))
 
 
 (add-to-list 'default-frame-alist (cons 'toracle--frame-font-size toracle--base-font-size))
@@ -22,9 +29,11 @@
   (get-current-frame-parameter 'toracle--frame-font-size))
 
 (defun toracle--set-font (fontname han-fontname size)
-  (set-face-attribute 'default nil :family fontname :height (* 10 size))
+  (set-face-attribute 'default nil
+                      :family fontname :height (* 10 size))
   (set-fontset-font t 'hangul (font-spec :name han-fontname))
-  (minibuffer-message (format "Set frame-font to: %s %s %s" fontname han-fontname size)))
+  (minibuffer-message (format "Set frame-font to: %s %s %s"
+                              fontname han-fontname size)))
 
 (defun toracle--set-base-font (fontname han-fontname size)
   (setq toracle--base-font-family fontname)
@@ -39,7 +48,7 @@
 
 (defun toracle--decrease-frame-font-size ()
   (interactive)
-  (toracle--set-frame-font-size (max (- (toracle--get-frame-font-size) 1) 1))
+  (toracle--set-frame-font-size (max (- (toracle--get-frame-font-size) 1) 10))
   (toracle--set-font toracle--base-font-family toracle--base-han-font-family (toracle--get-frame-font-size)))
 
 (defun toracle--increase-line-spacing ()
@@ -99,5 +108,9 @@
   ; See https://debbugs.gnu.org/cgi/bugreport.cgi?bug=30995
   (when (s-starts-with? "GNU Emacs 26.1 " (version))
     (setq x-wait-for-event-timeout nil)))
+
+;; (toracle--set-font "Ubuntu Mono" "Noto Sans CJK KR Mono" 15)
+;; (toracle--set-font "Ubuntu Mono" "D2Coding" 15)
+
 
 ;;; 05_gui.el ends here

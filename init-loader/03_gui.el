@@ -4,7 +4,6 @@
 
 (defvar toracle--base-font-family "Ubuntu Mono")
 (defvar toracle--base-han-font-family "D2Coding")
-;; (defvar toracle--base-han-font-family "Noto Sans CJK KR Mono")
 (defvar toracle--base-font-size 15)
 
 
@@ -14,7 +13,8 @@
         ("D2Coding" 1.2)))
 
 
-(add-to-list 'default-frame-alist (cons 'toracle--frame-font-size toracle--base-font-size))
+(add-to-list 'default-frame-alist
+             (cons 'toracle--frame-font-size toracle--base-font-size))
 
 (defun set-current-frame-parameter (key value)
   (set-frame-parameter (selected-frame) key value))
@@ -44,12 +44,16 @@
 (defun toracle--increase-frame-font-size ()
   (interactive)
   (toracle--set-frame-font-size (+ (toracle--get-frame-font-size) 1))
-  (toracle--set-font toracle--base-font-family toracle--base-han-font-family (toracle--get-frame-font-size)))
+  (toracle--set-font toracle--base-font-family
+                     toracle--base-han-font-family
+                     (toracle--get-frame-font-size)))
 
 (defun toracle--decrease-frame-font-size ()
   (interactive)
   (toracle--set-frame-font-size (max (- (toracle--get-frame-font-size) 1) 10))
-  (toracle--set-font toracle--base-font-family toracle--base-han-font-family (toracle--get-frame-font-size)))
+  (toracle--set-font toracle--base-font-family
+                     toracle--base-han-font-family
+                     (toracle--get-frame-font-size)))
 
 (defun toracle--increase-line-spacing ()
   (interactive)

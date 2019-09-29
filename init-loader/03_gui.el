@@ -8,9 +8,9 @@
 
 
 (setq face-font-rescale-alist
-      '(("Noto Sans CJK KR Mono" 1.1)
-        ("Noto Sans CJK Mono" 1.1)
-        ("D2Coding" 1.2)))
+      '(("Noto Sans CJK KR Mono" . 1.0)
+        ("Noto Sans CJK Mono" . 1.0)
+        ("D2Coding" . 1.07)))
 
 
 (add-to-list 'default-frame-alist

@@ -8,6 +8,7 @@
 	     ((executable-find "clisp") (setq inferior-lisp-program "clisp"))
 	     ((executable-find "ccl") (setq inferior-lisp-program "ccl"))
 	     ((executable-find "wx86cl64") (setq inferior-lisp-program "wx86cl64 -K utf-8")))
+            (setq slime-contribs '(slime-fancy))
 	    (slime-setup)))
 
 (use-package slime-company

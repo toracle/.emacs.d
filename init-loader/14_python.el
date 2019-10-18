@@ -65,7 +65,9 @@
 
 (use-package company
   :ensure t
-  :config (add-hook 'python-mode-hook 'python/init-company))
+  :config (progn
+            (add-hook 'python-mode-hook 'python/init-company)
+            (add-hook 'lisp-mode-hook (lambda () (company-mode t)))))
 
 (use-package anaconda-mode
   :ensure t

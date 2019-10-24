@@ -22,6 +22,7 @@
   (setq web-mode-style-padding 0)
   (setq web-mode-script-padding 0)
   (local-set-key (kbd "C-c /")  'web-mode-element-close)
+  (subword-mode t)
   (setq indent-tabs-mode nil))
 
 (add-hook 'web-mode-hook  'my-web-mode-hook)

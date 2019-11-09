@@ -24,9 +24,6 @@
   :ensure t
   :config (init-loader-load (concat user-emacs-directory "init-loader")))
 
-;; (require 'init-loader)
-;; (init-loader-load (concat user-emacs-directory "init-loader"))
-
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)
 

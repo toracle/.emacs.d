@@ -18,11 +18,30 @@
 (use-package ox-pandoc
   :ensure t)
 
-(use-package ob-ipython
-  :ensure t)
+;; Comment out ob-ipython due to an issue below
+;; https://github.com/syl20bnr/spacemacs/issues/9941#issuecomment-543227397
+;; 
+;; (use-package ob-ipython
+;;   :ensure t)
 
 (use-package ob-restclient
   :ensure t)
+
+
+;; (use-package deft
+;;   :config (progn
+;;             (setq deft-extension "org"
+;;                   deft-text-mode 'org-mode
+;;                   deft-use-filename-as-title t)
+;;             (let ((dropbox-dir-candidates '("/mnt/c/Users/torac/Dropbox/"
+;;                                             "/home/toracle/Dropbox/"))
+;;                   (deft-root-dir "Wooridle/toracle/Org/deft"))
+;;               (dolist (dropbox-dir dropbox-dir-candidates)
+;;                 (when (f-directory? dropbox-dir)
+;;                   (setq deft-directory
+;;                         (concat dropbox-dir deft-root-dir))))
+;;             (global-set-key (kbd "<f9>") 'deft))))
+
 
 (defun get-plantuml-jar-path ()
   (expand-file-name (concat user-emacs-directory "init-loader/" "plantuml.jar")))
@@ -38,20 +57,20 @@
 (defun toracle-babel-config ()
   (org-babel-do-load-languages 'org-babel-load-languages
 			       '((python . t)
-                     (ipython . t)
-				     (emacs-lisp . t)
-				     (R . t)
-				     (ditaa . t)
-				     (dot . t)
-				     (shell . t)
-				     (gnuplot . t)
-				     (js . t)
-				     (lisp . t)
-				     (ruby . t)
-				     (sql . t)
-				     (plantuml . t)
-				     (sql . t)
-				     (ledger . t)
+                                 ;; (ipython . t)
+				 (emacs-lisp . t)
+				 (R . t)
+				 (ditaa . t)
+				 (dot . t)
+				 (shell . t)
+				 (gnuplot . t)
+				 (js . t)
+				 (lisp . t)
+				 (ruby . t)
+				 (sql . t)
+				 (plantuml . t)
+				 (sql . t)
+				 (ledger . t)
                      (restclient . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-plantuml-jar-path (get-plantuml-jar-path))

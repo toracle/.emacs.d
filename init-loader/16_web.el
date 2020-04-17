@@ -10,7 +10,6 @@
 	    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))))
 
 (defun my-web-mode-hook ()
@@ -60,6 +59,10 @@
 
 (use-package smart-shift
   :ensure t)
+
+(use-package vue-mode
+  :ensure t
+  :config (setq mmm-submode-decoration-level 0))
 
 (defun toracle/init-company-restclient ()
   (add-to-list 'company-backends 'company-restclient))

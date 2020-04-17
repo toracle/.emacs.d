@@ -19,8 +19,8 @@
 (use-package racer
   :ensure t
   :config (progn
-	    (setq racer-cmd "~/.cargo/bin/racer") ;; Rustup binaries PATH
-	    (setq racer-rust-src-path "~/src/rust/src") ;; Rust source code PATH
+	    (setq racer-cmd (expand-file-name "~/.cargo/bin/racer")) ;; Rustup binaries PATH
+	    (setq racer-rust-src-path (expand-file-name "~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src")) ;; Rust source code PATH
 	    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
 	    (setq company-tooltip-align-annotations t)
 	    (add-hook 'rust-mode-hook #'racer-mode)

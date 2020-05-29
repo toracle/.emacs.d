@@ -5,3 +5,7 @@
   (toggle-read-only))
   
 (add-hook 'compilation-filter-hook 'ansi-colorize-buffer)
+
+(use-package feature-mode
+  :ensure t
+  :config (add-to-list 'auto-mode-alist '("\.feature$" . feature-mode)))

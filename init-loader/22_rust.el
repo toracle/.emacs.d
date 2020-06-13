@@ -10,7 +10,9 @@
   :ensure t
   :config (progn
 	    (add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-mode))
-	    (local-set-key (kbd "C-c C-j") #'imenu)))
+	    (add-hook 'rust-mode-hook '(lambda () (local-set-key (kbd "C-c C-j") #'imenu)))
+            (add-hook 'rust-mode-hook 'eldoc-mode)
+            (add-hook 'rust-mode-hook 'flycheck-mode)))
 
 (use-package cargo
   :ensure t
@@ -28,9 +30,14 @@
 	    (add-hook 'racer-mode-hook #'company-mode)
 	    (local-set-key (kbd "C-c C-d") #'racer-describe)))
 
+(use-package flycheck-inline
+  :ensure t)
+
 (use-package flycheck-rust
   :ensure t
-  :config (add-hook 'flycheck-mode-hook #'flycheck-rust-setup))
+  :config (progn
+            (add-hook 'flycheck-mode-hook #'flycheck-rust-setup)
+            (add-hook 'flycheck-mode-hook #'flycheck-inline-mode)))
 
 
 (use-package toml-mode

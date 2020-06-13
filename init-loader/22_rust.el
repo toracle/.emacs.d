@@ -28,7 +28,7 @@
 	    (add-hook 'rust-mode-hook #'racer-mode)
 	    (add-hook 'racer-mode-hook #'eldoc-mode)
 	    (add-hook 'racer-mode-hook #'company-mode)
-	    (local-set-key (kbd "C-c C-d") #'racer-describe)))
+            (add-hook 'rust-mode-hook '(lambda () (local-set-key (kbd "C-c d") #'racer-describe)))))
 
 (use-package flycheck-inline
   :ensure t)

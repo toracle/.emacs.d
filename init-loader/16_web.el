@@ -55,7 +55,10 @@
   :ensure t)
 
 (use-package restclient
-  :ensure t)
+  :ensure t
+  :config (progn
+            (add-to-list 'auto-mode-alist '("\\.restclient\\'" . restclient-mode))
+            (add-hook 'restclient-mode-hook 'company-mode)))
 
 (use-package smart-shift
   :ensure t)

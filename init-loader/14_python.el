@@ -91,7 +91,7 @@
 
 (use-package python-docstring
   :ensure t
-  :config (add-hook 'python-mode-hook 'python-docstring))
+  :config (add-hook 'python-mode-hook (lambda () (python-docstring-mode t))))
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)

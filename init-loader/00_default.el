@@ -31,6 +31,10 @@
   (concat (file-name-as-directory (concat user-emacs-directory "init-loader"))
 	  name))
 
+(use-package dashboard
+  :ensure t
+  :config (dashboard-setup-startup-hook))
+
 (use-package smart-mode-line
   :init (setq sml/no-confirm-load-theme t)
   :config (sml/setup)

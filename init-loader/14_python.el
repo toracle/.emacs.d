@@ -90,7 +90,8 @@
                  (setq flycheck-pycheckers-checkers '(pylint mypy3))))
 
 (use-package python-docstring
-  :ensure t)
+  :ensure t
+  :config (add-hook 'python-mode-hook 'python-docstring))
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)

@@ -63,14 +63,14 @@
   :ensure t
   :config (add-hook 'python-mode-hook
                     (lambda ()
-                      (local-set-key "\C-ca" 'pytest-all)
-                      (local-set-key "\C-cm" 'pytest-module)
-                      (local-set-key "\C-c." 'pytest-one)
-                      (local-set-key "\C-cc" 'pytest-again)
-                      (local-set-key "\C-cd" 'pytest-directory)
-                      (local-set-key "\C-cpa" 'pytest-pdb-all)
-                      (local-set-key "\C-cpm" 'pytest-pdb-module)
-                      (local-set-key "\C-cp." 'pytest-pdb-one))))
+                      (local-set-key (kbd "C-c t a") 'pytest-all)
+                      (local-set-key (kbd "C-c t m") 'pytest-module)
+                      (local-set-key (kbd "C-c t .") 'pytest-one)
+                      (local-set-key (kbd "C-c t c") 'pytest-again)
+                      (local-set-key (kbd "C-c t d") 'pytest-directory)
+                      (local-set-key (kbd "C-c t p a") 'pytest-pdb-all)
+                      (local-set-key (kbd "C-c t p m") 'pytest-pdb-module)
+                      (local-set-key (kbd "C-c t p .") 'pytest-pdb-one))))
 
 (use-package flycheck
   :ensure t

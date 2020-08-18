@@ -28,7 +28,8 @@
   :config (progn
 	    (add-hook 'cider-mode-hook #'eldoc-mode)
 	    (setq cider-repl-result-prefix ";; => ")
-	    (setq cider-interactive-eval-result-prefix ";; => ")))
+	    (setq cider-interactive-eval-result-prefix ";; => ")
+            (local-set-key (kbd "C-M-x") 'cider-eval-defun-at-point)))
 
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
 (add-hook 'emacs-listp-mode-hook #'aggressive-indent-mode)

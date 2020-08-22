@@ -31,3 +31,6 @@
       '(lisp-mode emacs-lisp-mode scheme-mode))
 
 (add-hook 'slime-repl-mode-hook 'ansi-color-for-comint-mode-on)
+
+(use-package paredit
+  :ensure t)

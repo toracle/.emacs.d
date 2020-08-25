@@ -2,15 +2,16 @@
 
 ;;; Code:
 
-(defvar toracle--base-font-family "Ubuntu Mono")
+(defvar toracle--base-font-family "D2Coding")
 (defvar toracle--base-han-font-family "D2Coding")
 (defvar toracle--base-font-size 15)
 
 
 (setq face-font-rescale-alist
-      '(("Noto Sans CJK KR Mono" . 1.0)
-        ("Noto Sans CJK Mono" . 1.0)
-        ("D2Coding" . 1.07)))
+      '(((font-spec :family "Noto Sans CJK KR Mono") . 1.0)
+        ((font-spec :family "Noto Sans CJK Mono") . 1.0)
+        ((font-spec :family "D2Coding") . 1.07)
+        ("*" . 1.0)))
 
 
 (add-to-list 'default-frame-alist

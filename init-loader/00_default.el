@@ -121,5 +121,8 @@
 
 (setq epa-file-encrypt-to '("97F2043EC220D593"))
 
+(use-package notmuch
+  :ensure t)
+
 (provide '00_default)
 ;;; 00_default.el ends here

@@ -119,5 +119,7 @@
 ;; https://github.com/syl20bnr/spacemacs/issues/10695
 (add-to-list 'face-ignored-fonts "Noto Color Emoji")
 
+(setq epa-file-encrypt-to '("97F2043EC220D593"))
+
 (provide '00_default)
 ;;; 00_default.el ends here

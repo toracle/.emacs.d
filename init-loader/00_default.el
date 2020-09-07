@@ -124,5 +124,8 @@
 (use-package notmuch
   :ensure t)
 
+(use-package w3m
+  :ensure t)
+
 (provide '00_default)
 ;;; 00_default.el ends here

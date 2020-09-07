@@ -122,7 +122,8 @@
 (setq epa-file-encrypt-to '("97F2043EC220D593"))
 
 (use-package notmuch
-  :ensure t)
+  :ensure t
+  :config (setq notmuch-search-oldest-first nil))
 
 (use-package w3m
   :ensure t)

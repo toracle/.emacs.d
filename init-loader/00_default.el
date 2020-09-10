@@ -128,5 +128,7 @@
 (use-package w3m
   :ensure t)
 
+(setq gnus-select-method '(nntp "reader443.eternal-september.org"))
+
 (provide '00_default)
 ;;; 00_default.el ends here

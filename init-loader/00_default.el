@@ -125,6 +125,12 @@
   :ensure t
   :config (setq notmuch-search-oldest-first nil))
 
+(require 'mu4e)
+
+(setq mu4e-sent-folder   "/toracle/[Gmail]/Sent Mail"
+      mu4e-drafts-folder "/toracle/[Gmail]/Drafts"
+      mu4e-trash-folder  "/toracle/[Gmail]/Trash")
+
 (use-package w3m
   :ensure t)
 

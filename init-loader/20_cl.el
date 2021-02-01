@@ -34,3 +34,16 @@
 
 (use-package paredit
   :ensure t)
+
+
+;; install clhs
+;; ros install clhs
+(let ((clhs-loader-path (expand-file-name "~/.roswell/lisp/quicklisp/clhs-use-local.el")))
+  (when
+      (file-exists-p clhs-loader-path)
+    (load clhs-loader-path t)))
+
+
+(let ((site-init-dir "/etc/emacs/site-start.d/"))
+  (when (file-accessible-directory-p site-init-dir)
+    (add-to-list 'load-path site-init-dir)))

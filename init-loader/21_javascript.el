@@ -44,9 +44,9 @@
   :ensure t
   :config (add-hook 'js2-mode-hook 'tern-mode))
 
-(use-package company-tern
-  :ensure t
-  :config (add-to-list 'company-backends 'company-tern))
+;; (use-package company-tern
+;;   :ensure t
+;;   :config (add-to-list 'company-backends 'company-tern))
 
 (add-hook 'js2-mode-hook 'js/init-misc)
 

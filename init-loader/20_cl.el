@@ -33,7 +33,11 @@
 (add-hook 'slime-repl-mode-hook 'ansi-color-for-comint-mode-on)
 
 (use-package paredit
-  :ensure t)
+  :ensure t
+  :config (progn
+            (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+            (add-hook 'lisp-mode-hook #'paredit-mode)
+            (add-hook 'cider-mode-hook #'paredit-mode)))
 
 
 ;; install clhs

@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: #acl
+# key: #acl
+# --
+#acl +All:read

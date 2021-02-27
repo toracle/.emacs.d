@@ -8,6 +8,7 @@
   :config (progn
 	    (add-hook 'cider-mode-hook #'rainbow-delimiters-mode)
 	    (add-hook 'emacs-lisp-mode-hook #'rainbow-delimiters-mode)
+            (add-hook 'lisp-mode-hook #'rainbow-delimiters-mode)
 	    (set-face-attribute 'rainbow-delimiters-depth-1-face nil :foreground "#78c5d6")
 	    (set-face-attribute 'rainbow-delimiters-depth-2-face nil :foreground "#bf62a6")
 	    (set-face-attribute 'rainbow-delimiters-depth-3-face nil :foreground "#459ba8")
@@ -27,7 +28,8 @@
   :config (progn
 	    (add-hook 'cider-mode-hook #'eldoc-mode)
 	    (setq cider-repl-result-prefix ";; => ")
-	    (setq cider-interactive-eval-result-prefix ";; => ")))
+	    (setq cider-interactive-eval-result-prefix ";; => ")
+            (local-set-key (kbd "C-M-x") 'cider-eval-defun-at-point)))
 
 (add-hook 'cider-mode-hook #'aggressive-indent-mode)
 (add-hook 'emacs-listp-mode-hook #'aggressive-indent-mode)

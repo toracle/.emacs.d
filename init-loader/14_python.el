@@ -59,13 +59,28 @@
   (hs-minor-mode t)
   (local-set-key (kbd "C-c C-;") 'hs-toggle-hiding))
 
+(use-package pytest
+  :ensure t
+  :config (add-hook 'python-mode-hook
+                    (lambda ()
+                      (local-set-key (kbd "C-c t a") 'pytest-all)
+                      (local-set-key (kbd "C-c t m") 'pytest-module)
+                      (local-set-key (kbd "C-c t .") 'pytest-one)
+                      (local-set-key (kbd "C-c t c") 'pytest-again)
+                      (local-set-key (kbd "C-c t d") 'pytest-directory)
+                      (local-set-key (kbd "C-c t p a") 'pytest-pdb-all)
+                      (local-set-key (kbd "C-c t p m") 'pytest-pdb-module)
+                      (local-set-key (kbd "C-c t p .") 'pytest-pdb-one))))
+
 (use-package flycheck
   :ensure t
   :config (add-hook 'python-mode-hook 'python/init-flycheck))
 
 (use-package company
   :ensure t
-  :config (add-hook 'python-mode-hook 'python/init-company))
+  :config (progn
+            (add-hook 'python-mode-hook 'python/init-company)
+            (add-hook 'lisp-mode-hook (lambda () (company-mode t)))))
 
 (use-package anaconda-mode
   :ensure t
@@ -88,7 +103,8 @@
                  (setq flycheck-pycheckers-checkers '(pylint mypy3))))
 
 (use-package python-docstring
-  :ensure t)
+  :ensure t
+  :config (add-hook 'python-mode-hook (lambda () (python-docstring-mode t))))
 
 (add-hook 'python-mode-hook 'python/init-grep-find)
 (add-hook 'python-mode-hook 'python/init-indent)

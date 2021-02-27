@@ -31,6 +31,10 @@
   (concat (file-name-as-directory (concat user-emacs-directory "init-loader"))
 	  name))
 
+(use-package dashboard
+  :ensure t
+  :config (dashboard-setup-startup-hook))
+
 (use-package smart-mode-line
   :init (setq sml/no-confirm-load-theme t)
   :config (sml/setup)
@@ -54,8 +58,8 @@
 (use-package ibuffer-vc
   :ensure t)
 
-(use-package org-plus-contrib
-  :ensure t)
+;; (use-package org-plus-contrib
+;;   :ensure t)
 
 (use-package switch-window
   :ensure t)
@@ -81,6 +85,11 @@
 (use-package ag
   :ensure t)
 
+;; (use-package perspective
+;;   :ensure t
+;;   :config (persp-mode))
+
+
 (defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()
   (let ((inhibit-read-only t))
     (toggle-read-only)
@@ -102,9 +111,30 @@
 (add-hook 'compilation-filter-hook 'spacemacs-ui-visual/compilation-buffer-apply-ansi-colors)
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
-(add-to-list 'Info-default-directory-list "~/texinfo")
+(add-to-list 'Info-additional-directory-list (expand-file-name "~/texinfo"))
 
 (add-hook 'yaml-mode-hook (lambda () (yafolding-mode t)))
+
+;; to prevent emacs crash when confronts emoji
+;; https://github.com/syl20bnr/spacemacs/issues/10695
+(add-to-list 'face-ignored-fonts "Noto Color Emoji")
+
+(setq epa-file-encrypt-to '("97F2043EC220D593"))
+
+(use-package notmuch
+  :ensure t
+  :config (setq notmuch-search-oldest-first nil))
+
+(require 'mu4e)
+
+(setq mu4e-sent-folder   "/toracle/[Gmail]/Sent Mail"
+      mu4e-drafts-folder "/toracle/[Gmail]/Drafts"
+      mu4e-trash-folder  "/toracle/[Gmail]/Trash")
+
+(use-package w3m
+  :ensure t)
+
+(setq gnus-select-method '(nntp "reader443.eternal-september.org"))
 
 (provide '00_default)
 ;;; 00_default.el ends here

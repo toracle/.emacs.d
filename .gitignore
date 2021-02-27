@@ -23,3 +23,5 @@ custom.el
 /network-security.data
 anaconda-mode/
 session.*
+/transient/
+/racket-mode/

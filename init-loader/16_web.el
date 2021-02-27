@@ -10,7 +10,6 @@
 	    (add-to-list 'auto-mode-alist '("\\.mustache\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.djhtml\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
-	    (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))))
 
 (defun my-web-mode-hook ()
@@ -22,6 +21,7 @@
   (setq web-mode-style-padding 0)
   (setq web-mode-script-padding 0)
   (local-set-key (kbd "C-c /")  'web-mode-element-close)
+  (subword-mode t)
   (setq indent-tabs-mode nil))
 
 (add-hook 'web-mode-hook  'my-web-mode-hook)
@@ -34,6 +34,7 @@
   :ensure t)
 
 (use-package markdown-mode
+  :config (setq markdown-code-face "D2Coding")
   :ensure t)
 
 (use-package yaml-mode
@@ -54,10 +55,17 @@
   :ensure t)
 
 (use-package restclient
-  :ensure t)
+  :ensure t
+  :config (progn
+            (add-to-list 'auto-mode-alist '("\\.restclient\\'" . restclient-mode))
+            (add-hook 'restclient-mode-hook 'company-mode)))
 
 (use-package smart-shift
   :ensure t)
+
+(use-package vue-mode
+  :ensure t
+  :config (setq mmm-submode-decoration-level 0))
 
 (defun toracle/init-company-restclient ()
   (add-to-list 'company-backends 'company-restclient))

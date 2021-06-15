@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name: diary
+# key: #diary
+# --
+##master-page:DiaryTemplate
+#acl -All:read AdminGroup:read,write,delete,revert,admin
+#format wiki
+#language en
+
+== $1 ==
+
+$2
+
+----
+CategoryDiary, [[정수/일기]]

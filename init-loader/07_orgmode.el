@@ -47,14 +47,15 @@
 ;;             (global-set-key (kbd "<f9>") 'deft))))
 
 
-(defun get-plantuml-jar-path ()
-  (expand-file-name (concat user-emacs-directory "init-loader/" "plantuml.jar")))
+(defun get-init-loader-resource-path (name)
+  (expand-file-name (concat user-emacs-directory "init-loader/" name)))
+
 
 (use-package plantuml-mode
   :ensure t
   :config (progn (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
                  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
-                 (setq plantuml-jar-path (get-plantuml-jar-path))
+                 (setq plantuml-jar-path (get-init-loader-resource-path "plantuml.jar"))
                  (add-hook 'plantuml-mode-hook '(lambda () (setq tab-width 4)))))
 
 (setq org-log-done t)
@@ -77,8 +78,11 @@
 				 (ledger . t)
                      (restclient . t)))
   (setq org-confirm-babel-evaluate nil)
-  (setq org-plantuml-jar-path (get-plantuml-jar-path))
+  (setq org-plantuml-jar-path (get-init-loader-resource-path "plantuml.jar"))
+  (setq org-ditaa-jar-path (get-init-loader-resource-path "ditaa0_9.jar"))
   (local-set-key (kbd "C-c `") 'org-edit-src-code))
+
+
 
 (add-hook 'org-mode-hook 'toracle-babel-config)
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)

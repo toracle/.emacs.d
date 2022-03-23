@@ -24,7 +24,9 @@
   (setenv "LANG" "en_US.UTF-8")
   (when (file-exists-p "/usr/local/bin")
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
-    (add-to-list 'exec-path "/usr/local/bin")))
+    (add-to-list 'exec-path "/usr/local/bin"))
+  (use-package exec-path-from-shell :ensure t)
+  (exec-path-from-shell-initialize))
 
 (defun init-loader-file-path (name)
   "Return a file path with NAME on init-loader directory."

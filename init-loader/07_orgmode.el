@@ -32,6 +32,14 @@
   :ensure t)
 
 
+(use-package ob-async
+  :ensure t)
+
+
+(use-package toc-org
+  :ensure t)
+
+
 ;; (use-package deft
 ;;   :config (progn
 ;;             (setq deft-extension "org"

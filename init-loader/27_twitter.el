@@ -18,3 +18,8 @@
 
  ")
                         (local-set-key (kbd "s") 'twittering-favorite)))))
+
+
+(defun toracle/reconfigure-twittering-mode ()
+  (defvar twittering-oauth-access-token-alist nil)
+  (setq twittering-allow-insecure-server-cert t))

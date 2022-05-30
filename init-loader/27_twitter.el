@@ -3,6 +3,7 @@
   :config (progn
             (add-hook 'twittering-mode-hook
                       (lambda ()
+                        (toggle-word-wrap t)
                         (setq twittering-timer-interval 300)
                         (setq twittering-icon-mode t)
                         (setq twittering-status-format "%RT{%FACE[bold]{RT}}%i %S,  %@:

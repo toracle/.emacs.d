@@ -147,3 +147,5 @@
 
 (use-package indent-tools
   :ensure t)
+
+(add-to-list 'sql-postgres-login-params '(port :default 5432))

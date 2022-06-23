@@ -13,6 +13,6 @@
   :ensure t)
 
 
-;; (use-package forge
-;;   :ensure t
-;;   :after magit)
+(use-package forge
+  :ensure t
+  :after magit)

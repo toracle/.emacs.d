@@ -18,17 +18,23 @@
   :ensure t
   :config (add-hook 'rust-mode-hook 'cargo-minor-mode))
 
-(use-package racer
+;; (use-package racer
+;;   :ensure t
+;;   :config (progn
+;; 	    (setq racer-cmd (expand-file-name "~/.cargo/bin/racer")) ;; Rustup binaries PATH
+;; 	    (setq racer-rust-src-path (expand-file-name "~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src")) ;; Rust source code PATH
+;; 	    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
+;; 	    (setq company-tooltip-align-annotations t)
+;; 	    (add-hook 'rust-mode-hook #'racer-mode)
+;; 	    (add-hook 'racer-mode-hook #'eldoc-mode)
+;; 	    (add-hook 'racer-mode-hook #'company-mode)
+;;             (add-hook 'rust-mode-hook '(lambda () (local-set-key (kbd "C-c d") #'racer-describe)))))
+
+(use-package lsp-mode
   :ensure t
   :config (progn
-	    (setq racer-cmd (expand-file-name "~/.cargo/bin/racer")) ;; Rustup binaries PATH
-	    (setq racer-rust-src-path (expand-file-name "~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/src/rust/src")) ;; Rust source code PATH
-	    (define-key rust-mode-map (kbd "TAB") #'company-indent-or-complete-common)
-	    (setq company-tooltip-align-annotations t)
-	    (add-hook 'rust-mode-hook #'racer-mode)
-	    (add-hook 'racer-mode-hook #'eldoc-mode)
-	    (add-hook 'racer-mode-hook #'company-mode)
-            (add-hook 'rust-mode-hook '(lambda () (local-set-key (kbd "C-c d") #'racer-describe)))))
+            (add-hook 'rust-mode-hook #'lsp)))
+
 
 (use-package flycheck-inline
   :ensure t)

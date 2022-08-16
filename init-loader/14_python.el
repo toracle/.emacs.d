@@ -112,6 +112,12 @@
 (add-hook 'python-mode-hook 'python/init-misc)
 (add-hook 'python-mode-hook 'python/init-folding)
 
+(use-package cov
+  :ensure t
+  :config (add-hook 'python-mode-hook (lambda ()
+                                        (setq cov-coverage-mode t)
+                                        (cov-mode t))))
+
 (provide '14_python)
 
 ;;; 14_python.el ends here

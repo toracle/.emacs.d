@@ -64,6 +64,7 @@
   :config (progn (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode))
                  (add-to-list 'org-src-lang-modes '("plantuml" . plantuml))
                  (setq plantuml-jar-path (get-init-loader-resource-path "plantuml.jar"))
+                 (setq org-plantuml-jar-path (get-init-loader-resource-path "plantuml.jar"))
                  (add-hook 'plantuml-mode-hook '(lambda () (setq tab-width 4)))))
 
 (setq org-log-done t)

@@ -25,3 +25,7 @@ anaconda-mode/
 session.*
 /transient/
 /racket-mode/
+/forge-database.sqlite
+/.cache/
+/.dap-breakpoints
+/.lsp-session-v1

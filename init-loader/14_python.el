@@ -93,8 +93,8 @@
   :ensure t
   :config (add-to-list 'company-backends 'company-anaconda))
 
-(use-package pip-requirements
-  :ensure t)
+;; (use-package pip-requirements
+;;   :ensure t)
 
 (use-package flycheck-pycheckers
   :ensure t

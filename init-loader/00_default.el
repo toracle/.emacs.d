@@ -124,20 +124,20 @@
 
 (setq epa-file-encrypt-to '("97F2043EC220D593"))
 
-(use-package notmuch
-  :ensure t
-  :config (setq notmuch-search-oldest-first nil))
+;; (use-package notmuch
+;;   :ensure t
+;;   :config (setq notmuch-search-oldest-first nil))
 
-(require 'mu4e)
+;; (require 'mu4e)
 
-(setq mu4e-sent-folder   "/toracle/[Gmail]/Sent Mail"
-      mu4e-drafts-folder "/toracle/[Gmail]/Drafts"
-      mu4e-trash-folder  "/toracle/[Gmail]/Trash")
+;; (setq mu4e-sent-folder   "/toracle/[Gmail]/Sent Mail"
+;;       mu4e-drafts-folder "/toracle/[Gmail]/Drafts"
+;;       mu4e-trash-folder  "/toracle/[Gmail]/Trash")
 
 (use-package w3m
   :ensure t)
 
-(setq gnus-select-method '(nntp "reader443.eternal-september.org"))
+;; (setq gnus-select-method '(nntp "reader443.eternal-september.org"))
 
 (provide '00_default)
 ;;; 00_default.el ends here

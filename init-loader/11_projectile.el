@@ -11,6 +11,8 @@
 	    (add-to-list 'projectile-project-root-files ".git")
 	    (add-to-list 'projectile-project-root-files ".projectile")
 	    (add-to-list 'projectile-project-root-files "setup.py")
+	    (add-to-list 'projectile-project-root-files "gradlew")
+	    (add-to-list 'projectile-project-root-files "gradlew.bat")
             (add-to-list 'projectile-globally-ignored-directories ".pytest_cache")
             (add-to-list 'projectile-globally-ignored-directories "htmlcov")
             (add-to-list 'projectile-globally-ignored-directories ".eggs")

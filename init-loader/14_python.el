@@ -13,8 +13,8 @@
 (use-package pyvenv
   :ensure t)
 
-(use-package flycheck-mypy
-  :ensure t)
+;; (use-package flycheck-mypy
+;;   :ensure t)
 
 (defun python/init-eldoc-mode ()
   "Setup eldoc."
@@ -44,7 +44,9 @@
   "Setup flycheck."
   (flymake-mode -1)
   (flycheck-mode t)
-  (flycheck-select-checker 'python-pycheckers))
+  (require 'flycheck-ruff)
+  (flycheck-select-checker 'python-ruff)
+  (flycheck-add-next-checker 'python-ruff 'python-mypy))
 
 (defun python/init-company ()
   "Setup company."
@@ -96,11 +98,13 @@
 ;; (use-package pip-requirements
 ;;   :ensure t)
 
-(use-package flycheck-pycheckers
-  :ensure t
-  :config (progn (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)
-                 (setq flycheck-pycheckers-max-line-length 200)
-                 (setq flycheck-pycheckers-checkers '(pylint mypy3))))
+;; (use-package flycheck-pycheckers
+;;   :ensure t
+;;   :config (progn (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)
+;;                  (setq flycheck-pycheckers-max-line-length 200)
+;;                  (setq flycheck-pycheckers-checkers '(mypy3 python-ruff))))
+
+
 
 (use-package python-docstring
   :ensure t

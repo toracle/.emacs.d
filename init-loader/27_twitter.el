@@ -21,5 +21,6 @@
 
 
 (defun toracle/reconfigure-twittering-mode ()
+  (interactive)
   (defvar twittering-oauth-access-token-alist nil)
   (setq twittering-allow-insecure-server-cert t))

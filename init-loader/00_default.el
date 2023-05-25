@@ -13,7 +13,7 @@
 (setq dired-dwim-target t)
 (setq backup-directory-alist `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
-(setq default-input-method "korean-hangul")
+(setq default-input-method "korean-hangul390")
 
 (setq-default indent-tabs-mode nil)
 

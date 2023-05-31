@@ -89,9 +89,12 @@
   (setq-default line-spacing 1)
 
   (when (mac-system?)
-    (setq mac-command-modifier 'meta)
-    (setq mac-option-modifier 'meta)
-    )
+    ;; (setq mac-command-modifier 'meta)
+    ;; (setq mac-option-modifier 'meta)
+
+    ;; for glove80 + macos modifier change (ctrl->command, command->control)
+    (setq mac-command-modifier 'control)
+    (setq mac-option-modifier 'meta))
 
   (when (wsl-system?)
     (disable-double-buffering))

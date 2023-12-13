@@ -152,3 +152,6 @@
 
 (use-package po-mode
   :ensure t)
+
+(use-package graphviz-dot-mode
+  :ensure t)

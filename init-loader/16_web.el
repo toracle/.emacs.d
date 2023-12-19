@@ -12,6 +12,9 @@
 	    (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))))
 
+(use-package company-web
+  :ensure t)
+
 (defun my-web-mode-hook ()
   "Hooks for Web mode."
   (setq web-mode-markup-indent-offset 2)
@@ -22,7 +25,13 @@
   (setq web-mode-script-padding 0)
   (local-set-key (kbd "C-c /")  'web-mode-element-close)
   (subword-mode t)
-  (setq indent-tabs-mode nil))
+  (setq indent-tabs-mode nil)
+  (set (make-local-variable 'company-backends) '(company-web-html))
+  (setq company-tooltip-limit 20)
+  (setq company-tooltop-align-annotation 't)
+  (setq company-idle-delay .3)
+  (setq company-begin-commands '(self-insert-command))
+  (company-mode t))
 
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 (add-hook 'css-mode-hook  'my-web-mode-hook)

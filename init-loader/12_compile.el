@@ -2,7 +2,7 @@
 (defun ansi-colorize-buffer ()
   (read-only-mode 'toggle)
   (ansi-color-apply-on-region (point-min) (point-max))
-  (toggle-read-only))
+  (read-only-mode 'toggle))
   
 (add-hook 'compilation-filter-hook 'ansi-colorize-buffer)
 

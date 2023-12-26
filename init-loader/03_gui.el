@@ -27,7 +27,8 @@
   (set-current-frame-parameter 'toracle--frame-font-size size))
 
 (defun toracle--get-frame-font-size ()
-  (get-current-frame-parameter 'toracle--frame-font-size))
+  (or (get-current-frame-parameter 'toracle--frame-font-size)
+      toracle--base-font-size))
 
 (defun toracle--set-font (fontname han-fontname size)
   (set-face-attribute 'default nil

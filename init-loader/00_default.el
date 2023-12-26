@@ -95,9 +95,9 @@
 
 (defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()
   (let ((inhibit-read-only t))
-    (toggle-read-only)
+    (read-only-mode 'toggle)
     (ansi-color-apply-on-region compilation-filter-start (point-max))
-    (toggle-read-only)))
+    (read-only-mode 'toggle)))
 
 (defun create-new-scratch-buffer ()
   (interactive)

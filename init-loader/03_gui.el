@@ -85,12 +85,14 @@
          (append default-frame-alist '((inhibit-double-buffering . t)))))
 
 (defun toracle/macos-glove80-keyboard-layout ()
+  (interactive)
   (setq mac-command-modifier 'control)
   (setq mac-option-modifier 'meta)
   (setq mac-control-modifier 'super)
   t)
 
 (defun toracle/macos-internal-keyboard-layout ()
+  (interactive)
   (setq mac-command-modifier 'meta)
   (setq mac-option-modifier 'super)
   (setq mac-control-modifier 'control)

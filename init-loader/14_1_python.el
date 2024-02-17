@@ -7,30 +7,34 @@
 (use-package epc
   :ensure t)
 
+
 (use-package python-environment
   :ensure t)
+
 
 (use-package pyvenv
   :ensure t)
 
-(use-package eglot
-  :ensure t)
 
 ;; (use-package flycheck-mypy
 ;;   :ensure t)
+
 
 (defun python/init-eldoc-mode ()
   "Setup eldoc."
   (eldoc-mode)
   (anaconda-eldoc-mode))
 
+
 (defun python/init-grep-find ()
   "Setup grep find."
   (add-to-list 'grep-find-ignored-directories "build"))
 
+
 (defun python/init-indent ()
   "Setup indentation."
   (setq indent-tabs-mode nil))
+
 
 (defun python/init-imenu ()
   "Setup imenu."
@@ -38,10 +42,12 @@
     (setq-local imenu-create-index-function
 		#'python-imenu-create-flat-index)))
 
+
 (defun python/init-misc ()
   "Setup misc stuffs."
   (subword-mode +1)
   (pyvenv-mode t))
+
 
 (defun python/init-flycheck ()
   "Setup flycheck."
@@ -51,21 +57,32 @@
   (flycheck-select-checker 'python-ruff)
   (flycheck-add-next-checker 'python-ruff 'python-mypy))
 
-(defun python/init-company ()
-  "Setup company."
-  (company-mode t))
+
+(defun python/install-lsp-server ()
+  "Install pylsp server"
+  (unless (executable-find "pylsp")
+    (shell-command "pip install python-lsp-server\\[all\\]")))
+
+
+;; (defun python/init-company ()
+;;   "Setup company."
+;;   (company-mode t))
 
 ;; (defun python/init-anaconda ()
 ;;   "Setup anaconda."
 ;;   (anaconda-mode t)
 ;;   (python/init-eldoc-mode))
 
+
 (defun python/eglot ()
-  "Setup eglot lsp server")
+  "Setup eglot lsp server"
+  (add-hook 'python-mode-hook 'eglot-ensure))
+
 
 (defun python/init-folding ()
   (hs-minor-mode t)
   (local-set-key (kbd "C-c C-;") 'hs-toggle-hiding))
+
 
 (use-package pytest
   :ensure t
@@ -80,15 +97,23 @@
                       (local-set-key (kbd "C-c t p m") 'pytest-pdb-module)
                       (local-set-key (kbd "C-c t p .") 'pytest-pdb-one))))
 
+
 (use-package flycheck
   :ensure t
-  :config (add-hook 'python-mode-hook 'python/init-flycheck))
+  )
 
-(use-package company
+
+(use-package python-mode
   :ensure t
-  :config (progn
-            (add-hook 'python-mode-hook 'python/init-company)
-            (add-hook 'lisp-mode-hook (lambda () (company-mode t)))))
+  :config (progn (add-hook 'python-mode-hook 'python/init-flycheck)))
+
+
+
+;; (use-package company
+;;   :ensure t
+;;   :config (progn
+;;             (add-hook 'python-mode-hook 'python/init-company)
+;;             (add-hook 'lisp-mode-hook (lambda () (company-mode t)))))
 
 ;; (use-package anaconda-mode
 ;;   :ensure t
@@ -116,11 +141,12 @@
   :ensure t
   :config (add-hook 'python-mode-hook (lambda () (python-docstring-mode t))))
 
-(add-hook 'python-mode-hook 'python/init-grep-find)
-(add-hook 'python-mode-hook 'python/init-indent)
-(add-hook 'python-mode-hook 'python/init-imenu)
-(add-hook 'python-mode-hook 'python/init-misc)
-(add-hook 'python-mode-hook 'python/init-folding)
+;; (add-hook 'python-mode-hook 'python/init-grep-find)
+;; (add-hook 'python-mode-hook 'python/init-indent)
+;; (add-hook 'python-mode-hook 'python/init-imenu)
+;; (add-hook 'python-mode-hook 'python/init-misc)
+;; (add-hook 'python-mode-hook 'python/init-folding)
+
 
 (use-package cov
   :ensure t
@@ -129,10 +155,6 @@
                                         (cov-mode t))))
 
 
-(require 'treesit)
-(if (treesit-available-p)
-    t)
-
-(provide '14_python)
+(provide '14_1_python)
 
 ;;; 14_python.el ends here

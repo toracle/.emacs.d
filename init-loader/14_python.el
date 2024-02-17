@@ -13,6 +13,9 @@
 (use-package pyvenv
   :ensure t)
 
+(use-package eglot
+  :ensure t)
+
 ;; (use-package flycheck-mypy
 ;;   :ensure t)
 
@@ -52,10 +55,13 @@
   "Setup company."
   (company-mode t))
 
-(defun python/init-anaconda ()
-  "Setup anaconda."
-  (anaconda-mode t)
-  (python/init-eldoc-mode))
+;; (defun python/init-anaconda ()
+;;   "Setup anaconda."
+;;   (anaconda-mode t)
+;;   (python/init-eldoc-mode))
+
+(defun python/eglot ()
+  "Setup eglot lsp server")
 
 (defun python/init-folding ()
   (hs-minor-mode t)
@@ -84,16 +90,16 @@
             (add-hook 'python-mode-hook 'python/init-company)
             (add-hook 'lisp-mode-hook (lambda () (company-mode t)))))
 
-(use-package anaconda-mode
-  :ensure t
-  :bind (:map anaconda-mode-map
-	      ("C-c C-d" . anaconda-mode-show-doc)
-	      ("M-?" . anaconda-mode-find-references))
-  :config (add-hook 'python-mode-hook 'python/init-anaconda))
+;; (use-package anaconda-mode
+;;   :ensure t
+;;   :bind (:map anaconda-mode-map
+;; 	      ("C-c C-d" . anaconda-mode-show-doc)
+;; 	      ("M-?" . anaconda-mode-find-references))
+;;   :config (add-hook 'python-mode-hook 'python/init-anaconda))
 
-(use-package company-anaconda
-  :ensure t
-  :config (add-to-list 'company-backends 'company-anaconda))
+;; (use-package company-anaconda
+;;   :ensure t
+;;   :config (add-to-list 'company-backends 'company-anaconda))
 
 ;; (use-package pip-requirements
 ;;   :ensure t)
@@ -121,6 +127,11 @@
   :config (add-hook 'python-mode-hook (lambda ()
                                         (setq cov-coverage-mode t)
                                         (cov-mode t))))
+
+
+(require 'treesit)
+(if (treesit-available-p)
+    t)
 
 (provide '14_python)
 

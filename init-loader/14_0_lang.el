@@ -28,4 +28,10 @@
 (use-package epc
   :ensure t)
 
+(use-package flycheck-inline
+  :ensure t)
+
+(use-package toml-mode
+  :ensure t)
+
 (provide '14_0_lang)

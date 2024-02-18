@@ -98,6 +98,12 @@
 ;; replaced company with corfu+cape
 ;; replaced anaconda-mode with pylsp+eglot
 
+;; Refer to
+;; [Emacs, Python, Treesitter and Eglot](https://gist.github.com/habamax/290cda0e0cdc6118eb9a06121b9bc0d7)
+;; [Eglot+Tree-Sitter in Emacs 29](https://www.adventuresinwhy.com/post/eglot/)
+;; [Setting up Eglot for Python](https://www.reddit.com/r/emacs/comments/ye18nd/setting_up_eglot_for_python/)
+
+
 (provide '14_1_python)
 
 ;;; 14_python.el ends here

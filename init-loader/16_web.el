@@ -1,6 +1,7 @@
 (use-package web-mode
   :ensure t
   :config (progn
+            (add-hook 'web-mode 'eglot-ensure)
 	    (add-to-list 'auto-mode-alist '("\\.html\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.phtml\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.tpl\\.php\\'" . web-mode))
@@ -12,8 +13,8 @@
 	    (add-to-list 'auto-mode-alist '("\\.css\\'" . web-mode))
 	    (add-to-list 'auto-mode-alist '("\\.scss\\'" . web-mode))))
 
-(use-package company-web
-  :ensure t)
+;; (use-package company-web
+;;   :ensure t)
 
 (defun my-web-mode-hook ()
   "Hooks for Web mode."

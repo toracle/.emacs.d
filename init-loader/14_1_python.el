@@ -4,20 +4,22 @@
 ;;; 
 ;;; Code:
 
+(add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
+
 (use-package python-environment
   :ensure t)
 
 (use-package python-docstring
   :ensure t
-  :config (add-hook 'python-mode-hook (lambda () (python-docstring-mode t))))
+  :config (add-hook 'python-ts-mode-hook (lambda () (python-docstring-mode t))))
 
 (use-package pyvenv
   :ensure t)
 
 (use-package pytest
   :ensure t
-  :config (add-hook 'python-mode-hook
-                    (lambda ()
+  :config (add-hook 'python-ts-mode-hook
+                    (progn
                       (local-set-key (kbd "C-c t a") 'pytest-all)
                       (local-set-key (kbd "C-c t m") 'pytest-module)
                       (local-set-key (kbd "C-c t .") 'pytest-one)
@@ -29,9 +31,9 @@
 
 (use-package cov
   :ensure t
-  :config (add-hook 'python-mode-hook (lambda ()
-                                        (setq cov-coverage-mode t)
-                                        (cov-mode t))))
+  :config (add-hook 'python-ts-mode-hook (progn
+                                           (setq cov-coverage-mode t)
+                                           (cov-mode t))))
 
 (use-package flycheck-mypy
   :ensure t)
@@ -39,8 +41,8 @@
 (use-package flycheck-pycheckers
   :ensure t
   :config (progn (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)
-                 (setq flycheck-pycheckers-max-line-length 200)
-                 (setq flycheck-pycheckers-checkers '(mypy3 python-ruff))))
+                 (setq flycheck-pycheckers-max-line-length 200
+                       flycheck-pycheckers-checkers '(mypy3 python-ruff))))
 
 (defun python/init-eldoc-mode ()
   "Setup eldoc."
@@ -57,11 +59,11 @@
 (defun python/init-imenu ()
   "Setup imenu."
   (when (fboundp #'python-imenu-create-flat-index)
-    (setq-local imenu-create-index-function
-		#'python-imenu-create-flat-index)))
+    (setq-local imenu-create-index-function #'python-imenu-create-flat-index)))
 
 (defun python/init-misc ()
   "Setup misc stuffs."
+  (local-set-key (kbd "C-c x r") 'eglot-rename)
   (subword-mode +1)
   (pyvenv-mode t))
 
@@ -86,14 +88,14 @@
 
 (python/install-lsp-server)
 
-(add-hook 'python-mode-hook 'eglot-ensure)
-(add-hook 'python-mode-hook 'python/init-eldoc-mode)
-(add-hook 'python-mode-hook 'python/init-grep-find)
-(add-hook 'python-mode-hook 'python/init-indent)
-(add-hook 'python-mode-hook 'python/init-imenu)
-(add-hook 'python-mode-hook 'python/init-misc)
-(add-hook 'python-mode-hook 'python/init-flycheck)
-(add-hook 'python-mode-hook 'python/init-folding)
+(add-hook 'python-ts-mode-hook 'eglot-ensure)
+(add-hook 'python-ts-mode-hook 'python/init-eldoc-mode)
+(add-hook 'python-ts-mode-hook 'python/init-grep-find)
+(add-hook 'python-ts-mode-hook 'python/init-indent)
+(add-hook 'python-ts-mode-hook 'python/init-imenu)
+(add-hook 'python-ts-mode-hook 'python/init-misc)
+(add-hook 'python-ts-mode-hook 'python/init-flycheck)
+(add-hook 'python-ts-mode-hook 'python/init-folding)
 
 ;; replaced company with corfu+cape
 ;; replaced anaconda-mode with pylsp+eglot
@@ -102,7 +104,6 @@
 ;; [Emacs, Python, Treesitter and Eglot](https://gist.github.com/habamax/290cda0e0cdc6118eb9a06121b9bc0d7)
 ;; [Eglot+Tree-Sitter in Emacs 29](https://www.adventuresinwhy.com/post/eglot/)
 ;; [Setting up Eglot for Python](https://www.reddit.com/r/emacs/comments/ye18nd/setting_up_eglot_for_python/)
-
 
 (provide '14_1_python)
 

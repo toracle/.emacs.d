@@ -32,8 +32,7 @@
   (setq company-tooltip-limit 20)
   (setq company-tooltop-align-annotation 't)
   (setq company-idle-delay .3)
-  (setq company-begin-commands '(self-insert-command))
-  (company-mode t))
+  (setq company-begin-commands '(self-insert-command)))
 
 (add-hook 'web-mode-hook  'my-web-mode-hook)
 (add-hook 'css-mode-hook  'my-web-mode-hook)
@@ -42,7 +41,9 @@
   (subword-mode +1))
 
 (use-package emmet-mode
-  :ensure t)
+  :ensure t
+  :config (progn (add-hook 'sgml-mode-hook 'emmet-mode)
+                 (add-hook 'css-mode-hook 'emmet-mode)))
 
 (use-package markdown-mode
   :config (setq markdown-code-face "D2Coding")
@@ -84,3 +85,5 @@
 (use-package company-restclient
   :ensure t
   :config 'toracle/init-company-restclient)
+
+(add-to-list 'eglot-server-programs '(web-mode . ("vscode-html-language-server" "--stdio")))

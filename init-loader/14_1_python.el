@@ -19,7 +19,7 @@
 (use-package pytest
   :ensure t
   :config (add-hook 'python-ts-mode-hook
-                    (progn
+                    (lambda ()
                       (local-set-key (kbd "C-c t a") 'pytest-all)
                       (local-set-key (kbd "C-c t m") 'pytest-module)
                       (local-set-key (kbd "C-c t .") 'pytest-one)
@@ -31,7 +31,7 @@
 
 (use-package cov
   :ensure t
-  :config (add-hook 'python-ts-mode-hook (progn
+  :config (add-hook 'python-ts-mode-hook (lambda ()
                                            (setq cov-coverage-mode t)
                                            (cov-mode t))))
 

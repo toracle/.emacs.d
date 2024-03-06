@@ -19,19 +19,6 @@
 
 (winner-mode 1)
 
-(defun toggle-window-dedicated ()
-  "Toggle whether the current active window is dedicated or not"
-  (interactive)
-  (message 
-   (if (let (window (get-buffer-window (current-buffer)))
-         (set-window-dedicated-p window 
-                                 (not (window-dedicated-p window))))
-       "Window '%s' is dedicated"
-     "Window '%s' is undedicated")
-   (current-buffer)))
-
-(global-set-key (kbd "C-c , .") 'toggle-window-dedicated)
-
 (defun purpose/init ()
   (add-to-list 'purpose-user-regexp-purposes '("magit:.*" . magit))
   (purpose-compile-user-configuration)

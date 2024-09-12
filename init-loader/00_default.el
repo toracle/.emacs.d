@@ -26,8 +26,9 @@
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
     (add-to-list 'exec-path "/usr/local/bin")))
 
-(use-package exec-path-from-shell :ensure t
-  :init (exec-path-from-shell-initialize))
+(when (eq system-type 'darwin)
+ (use-package exec-path-from-shell :ensure t
+   :init (exec-path-from-shell-initialize)))
 
 (defun init-loader-file-path (name)
   "Return a file path with NAME on init-loader directory."

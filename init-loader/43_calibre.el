@@ -17,4 +17,4 @@
             (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
             (setq calibredb-id-width 6))
             (when (eq system-type 'darwin)
-              (advice-add 'calibredb-find-file :around #'calibredb-find-file-with-cloud-file))))
+              (advice-add 'calibredb-find-file :around #'calibredb-find-file-with-cloud-file)))

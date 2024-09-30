@@ -6,7 +6,7 @@
 #acl -All:read AdminGroup:read,write,delete,revert,admin
 #format wiki
 #language en
-== $1 ==
+== ${1:`(datetime-format "%Y-%m-%d")` (`(datetime-format "%a")`)} ==
 
 $2
 

@@ -39,18 +39,10 @@
   :ensure t
   :config (dashboard-setup-startup-hook))
 
-(use-package smart-mode-line
-  :init (setq sml/no-confirm-load-theme t)
-  :config (sml/setup)
-  :ensure t)
-
-(use-package smart-mode-line-powerline-theme
+(use-package auto-dark
   :ensure t
-  :config (sml/apply-theme 'powerline))
-
-(use-package ample-theme
-  :ensure t
-  :config (ample-theme))
+  :custom (auto-dark-themes '((leuven-dark) (leuven)))
+  :init (auto-dark-mode t))
 
 (use-package zoom-window
   :ensure t

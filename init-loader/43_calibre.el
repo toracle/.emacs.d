@@ -13,7 +13,8 @@
                   (case system-type
                     ('darwin "~/OneDrive/Calibre Library")
                     ('windows-nt (let ((loc (getenv "OneDriveConsumer")))
-                                       (if loc loc "~/OneDrive/Calibre Library")))))
+                                       (if loc (expand-file-name "Calibre Library" loc)
+                                         "~/OneDrive/Calibre Library")))))
             (setq calibredb-db-dir (expand-file-name "metadata.db" calibredb-root-dir))
             (setq calibredb-id-width 6))
             (when (eq system-type 'darwin)

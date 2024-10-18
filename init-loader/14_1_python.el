@@ -35,9 +35,6 @@
                                            (setq cov-coverage-mode t)
                                            (cov-mode t))))
 
-(use-package flycheck-mypy
-  :ensure t)
-
 (use-package flycheck-pycheckers
   :ensure t
   :config (progn (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)

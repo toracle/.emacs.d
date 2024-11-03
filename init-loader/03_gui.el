@@ -70,34 +70,6 @@
     (insert-file-contents path)
     (buffer-string)))
 
-(defun wsl-system? ()
-  (and (string-equal "gnu/linux" system-type)
-       (s-contains? "Microsoft" (get-string-from-file "/proc/version"))))
-
-(defun windows-system? ()
-  (string-equal system-type "windows-nt"))
-
-(defun mac-system? ()
-  (string-equal system-type "darwin"))
-
-(defun disable-double-buffering ()
-  (setq default-frame-alist
-         (append default-frame-alist '((inhibit-double-buffering . t)))))
-
-(defun toracle/macos-glove80-keyboard-layout ()
-  (interactive)
-  (setq mac-command-modifier 'control)
-  (setq mac-option-modifier 'meta)
-  (setq mac-control-modifier 'super)
-  t)
-
-(defun toracle/macos-internal-keyboard-layout ()
-  (interactive)
-  (setq mac-command-modifier 'meta)
-  (setq mac-option-modifier 'super)
-  (setq mac-control-modifier 'control)
-  t)
-
 (when (display-graphic-p)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)

@@ -20,13 +20,41 @@
 (global-set-key (kbd "C-x C-o") 'other-frame)
 (global-set-key (kbd "S-SPC") 'toggle-input-method)
 
-(when (eq system-type 'darwin)
+(defun wsl-system? ()
+  (and (string-equal "gnu/linux" system-type)
+       (s-contains? "Microsoft" (get-string-from-file "/proc/version"))))
+
+(defun windows-system? ()
+  (string-equal system-type "windows-nt"))
+
+(defun mac-system? ()
+  (string-equal system-type "darwin"))
+
+(defun disable-double-buffering ()
+  (setq default-frame-alist
+         (append default-frame-alist '((inhibit-double-buffering . t)))))
+
+(defun toracle/macos-glove80-keyboard-layout ()
+  (interactive)
+  (setq mac-command-modifier 'control)
+  (setq mac-option-modifier 'meta)
+  (setq mac-control-modifier 'super)
+  t)
+
+(defun toracle/macos-internal-keyboard-layout ()
+  (interactive)
+  (setq mac-command-modifier 'meta)
+  (setq mac-option-modifier 'super)
+  (setq mac-control-modifier 'control)
+  t)
+
+(when (mac-system?)
   (setenv "LANG" "en_US.UTF-8")
   (when (file-exists-p "/usr/local/bin")
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
     (add-to-list 'exec-path "/usr/local/bin")))
 
-(when (eq system-type 'darwin)
+(when (mac-system?)
  (use-package exec-path-from-shell :ensure t
    :init (exec-path-from-shell-initialize)))
 
@@ -39,10 +67,12 @@
   :ensure t
   :config (dashboard-setup-startup-hook))
 
-(use-package auto-dark
-  :ensure t
-  :custom (auto-dark-themes '((leuven-dark) (leuven)))
-  :init (auto-dark-mode t))
+(if (wsl-system?)
+    (load-theme 'leuven-dark)
+  (use-package auto-dark
+    :ensure t
+    :custom (auto-dark-themes '((leuven-dark) (leuven)))
+    :init (auto-dark-mode t)))
 
 (use-package zoom-window
   :ensure t

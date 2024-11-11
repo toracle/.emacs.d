@@ -65,11 +65,6 @@
   (interactive)
   (setq line-spacing (1- line-spacing)))
 
-(defun get-string-from-file (path)
-  (with-temp-buffer
-    (insert-file-contents path)
-    (buffer-string)))
-
 (when (display-graphic-p)
   (tool-bar-mode -1)
   (scroll-bar-mode -1)

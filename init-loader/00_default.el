@@ -20,6 +20,15 @@
 (global-set-key (kbd "C-x C-o") 'other-frame)
 (global-set-key (kbd "S-SPC") 'toggle-input-method)
 
+
+(use-package s
+  :ensure t)
+
+(defun get-string-from-file (path)
+  (with-temp-buffer
+    (insert-file-contents path)
+    (buffer-string)))
+
 (defun wsl-system? ()
   (and (string-equal "gnu/linux" system-type)
        (s-contains? "Microsoft" (get-string-from-file "/proc/version"))))

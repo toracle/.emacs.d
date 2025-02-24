@@ -36,6 +36,12 @@
   :ensure t)
 
 
+(use-package ob-powershell
+  :ensure t
+  :config (when (eq system-type 'darwin)
+            (customize-set-variable 'org-babel-powershell-os-command "pwsh")))
+
+
 (use-package toc-org
   :ensure t)
 
@@ -68,6 +74,7 @@
                  (add-hook 'plantuml-mode-hook '(lambda () (setq tab-width 4)))))
 
 (setq org-log-done t)
+
 (defun toracle-babel-config ()
   (org-babel-do-load-languages 'org-babel-load-languages
 			       '((python . t)
@@ -85,7 +92,8 @@
 				 (plantuml . t)
 				 (sql . t)
 				 (ledger . t)
-                     (restclient . t)))
+                                 (powershell . t)
+                                 (restclient . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-plantuml-jar-path (get-init-loader-resource-path "plantuml.jar"))
   (setq org-ditaa-jar-path (get-init-loader-resource-path "ditaa0_9.jar"))

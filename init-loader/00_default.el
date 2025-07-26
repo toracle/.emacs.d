@@ -76,12 +76,9 @@
   :ensure t
   :config (dashboard-setup-startup-hook))
 
-(if (wsl-system?)
+(if (display-graphic-p)
     (load-theme 'leuven-dark)
-  (use-package auto-dark
-    :ensure t
-    :custom (auto-dark-themes '((leuven-dark) (leuven)))
-    :init (auto-dark-mode t)))
+  (load-theme 'tango-dark))
 
 (use-package zoom-window
   :ensure t

@@ -6,7 +6,11 @@
 
 (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
 
-(use-package pet :ensure t :config (add-hook 'python-base-mode-hook 'pet-mode -10))
+
+(if (executable-find "ruff")
+    (use-package pet :ensure t :config (add-hook 'python-base-mode-hook 'pet-mode -10))
+  (use-package pyvenv :ensure t))
+
 
 (use-package python-docstring
   :ensure t

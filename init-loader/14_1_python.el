@@ -69,7 +69,6 @@
   "Setup flycheck."
   (flymake-mode -1)
   (flycheck-mode t)
-  (require 'flycheck-ruff)
   (flycheck-select-checker 'python-ruff)
   (flycheck-add-next-checker 'python-ruff 'python-mypy))
 

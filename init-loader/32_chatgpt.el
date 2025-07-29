@@ -9,5 +9,6 @@
 (when (functionp 'use-package-vc-install)
   (use-package claude-code-ide
     :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :branch "main")
-    :bind ("C-c C-SPC" . claude-code-ide-menu)
+    :bind (("C-c C-SPC" . claude-code-ide-menu)
+           ("C-g" . claude-code-ide-send-escape))
     :config (claude-code-ide-emacs-tools-setup)))

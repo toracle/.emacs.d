@@ -2,6 +2,8 @@
 
 ;;; Code:
 
+(require 'cl-seq)
+
 (prefer-coding-system 'utf-8)
 
 (menu-bar-mode -1)
@@ -19,7 +21,6 @@
 
 (global-set-key (kbd "C-x C-o") 'other-frame)
 (global-set-key (kbd "S-SPC") 'toggle-input-method)
-
 
 (use-package s
   :ensure t)
@@ -39,9 +40,14 @@
 (defun mac-system? ()
   (string-equal system-type "darwin"))
 
+(unless (windows-system?)
+ (let ((current-path (s-split ":" (getenv "PATH"))))
+   (unless (cl-find "~/.local/bin" current-path :test 'string=)
+     (setenv "PATH" (s-join ":" (cons "~/.local/bin" current-path))))))
+
 (defun disable-double-buffering ()
   (setq default-frame-alist
-         (append default-frame-alist '((inhibit-double-buffering . t)))))
+        (append default-frame-alist '((inhibit-double-buffering . t)))))
 
 (defun toracle/macos-glove80-keyboard-layout ()
   (interactive)

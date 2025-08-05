@@ -54,6 +54,9 @@
   (setq mac-command-modifier 'control)
   (setq mac-option-modifier 'meta)
   (setq mac-control-modifier 'super)
+  (setq x-meta-keysym 'ctrl)
+  (setq x-alt-keysym 'meta)
+  (setq x-ctrl-keysym 'super)
   t)
 
 (defun toracle/macos-internal-keyboard-layout ()
@@ -61,6 +64,9 @@
   (setq mac-command-modifier 'meta)
   (setq mac-option-modifier 'super)
   (setq mac-control-modifier 'control)
+  (setq x-meta-keysym nil)
+  (setq x-alt-keysym nil)
+  (setq x-ctrl-keysym nil)
   t)
 
 (when (mac-system?)

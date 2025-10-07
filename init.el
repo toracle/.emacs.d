@@ -12,7 +12,7 @@
 (package-initialize)
 
 ;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
+(unless (or (package-installed-p 'use-package) (fboundp 'use-package))
   (package-refresh-contents)
   (package-install 'use-package))
 

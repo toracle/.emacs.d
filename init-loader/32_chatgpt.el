@@ -16,3 +16,6 @@
 (use-package gptel
   :ensure t)
 
+
+(use-package vterm
+  :ensure t)

@@ -60,9 +60,6 @@
 (use-package creole
   :ensure t)
 
-(use-package scss-mode
-  :ensure t)
-
 (use-package impatient-mode
   :ensure t)
 

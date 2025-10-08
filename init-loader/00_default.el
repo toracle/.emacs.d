@@ -75,7 +75,7 @@
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
     (add-to-list 'exec-path "/usr/local/bin")))
 
-(when (mac-system?)
+(when (or (mac-system?) (wsl-system?))
  (use-package exec-path-from-shell :ensure t
    :init (exec-path-from-shell-initialize)))
 

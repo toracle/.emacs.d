@@ -32,7 +32,7 @@
 
 (defun wsl-system? ()
   (and (string-equal "gnu/linux" system-type)
-       (s-contains? "Microsoft" (get-string-from-file "/proc/version"))))
+       (s-contains? "Microsoft" (get-string-from-file "/proc/version") t)))
 
 (defun windows-system? ()
   (string-equal system-type "windows-nt"))

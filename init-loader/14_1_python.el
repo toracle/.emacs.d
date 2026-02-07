@@ -6,15 +6,16 @@
 
 (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode))
 
-(use-package python-environment
-  :ensure t)
+
+(if (executable-find "ruff")
+    (use-package pet :ensure t :config (add-hook 'python-base-mode-hook 'pet-mode -10))
+  (use-package pyvenv :ensure t))
+
 
 (use-package python-docstring
   :ensure t
   :config (add-hook 'python-ts-mode-hook (lambda () (python-docstring-mode t))))
 
-(use-package pyvenv
-  :ensure t)
 
 (use-package pytest
   :ensure t
@@ -68,7 +69,6 @@
   "Setup flycheck."
   (flymake-mode -1)
   (flycheck-mode t)
-  (require 'flycheck-ruff)
   (flycheck-select-checker 'python-ruff)
   (flycheck-add-next-checker 'python-ruff 'python-mypy))
 

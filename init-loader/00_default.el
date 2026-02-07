@@ -2,6 +2,8 @@
 
 ;;; Code:
 
+(require 'cl-seq)
+
 (prefer-coding-system 'utf-8)
 
 (menu-bar-mode -1)
@@ -19,7 +21,6 @@
 
 (global-set-key (kbd "C-x C-o") 'other-frame)
 (global-set-key (kbd "S-SPC") 'toggle-input-method)
-
 
 (use-package s
   :ensure t)
@@ -39,15 +40,23 @@
 (defun mac-system? ()
   (string-equal system-type "darwin"))
 
+(unless (windows-system?)
+ (let ((current-path (s-split ":" (getenv "PATH"))))
+   (unless (cl-find "~/.local/bin" current-path :test 'string=)
+     (setenv "PATH" (s-join ":" (cons "~/.local/bin" current-path))))))
+
 (defun disable-double-buffering ()
   (setq default-frame-alist
-         (append default-frame-alist '((inhibit-double-buffering . t)))))
+        (append default-frame-alist '((inhibit-double-buffering . t)))))
 
 (defun toracle/macos-glove80-keyboard-layout ()
   (interactive)
   (setq mac-command-modifier 'control)
   (setq mac-option-modifier 'meta)
   (setq mac-control-modifier 'super)
+  (setq x-meta-keysym 'ctrl)
+  (setq x-alt-keysym 'meta)
+  (setq x-ctrl-keysym 'super)
   t)
 
 (defun toracle/macos-internal-keyboard-layout ()
@@ -55,6 +64,9 @@
   (setq mac-command-modifier 'meta)
   (setq mac-option-modifier 'super)
   (setq mac-control-modifier 'control)
+  (setq x-meta-keysym nil)
+  (setq x-alt-keysym nil)
+  (setq x-ctrl-keysym nil)
   t)
 
 (when (mac-system?)
@@ -63,7 +75,7 @@
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
     (add-to-list 'exec-path "/usr/local/bin")))
 
-(when (mac-system?)
+(when (or (mac-system?) (wsl-system?))
  (use-package exec-path-from-shell :ensure t
    :init (exec-path-from-shell-initialize)))
 
@@ -76,12 +88,9 @@
   :ensure t
   :config (dashboard-setup-startup-hook))
 
-(if (wsl-system?)
+(if (display-graphic-p)
     (load-theme 'leuven-dark)
-  (use-package auto-dark
-    :ensure t
-    :custom (auto-dark-themes '((leuven-dark) (leuven)))
-    :init (auto-dark-mode t)))
+  (load-theme 'tango-dark))
 
 (use-package zoom-window
   :ensure t

@@ -19,7 +19,3 @@
 
 (use-package helm-projectile
   :ensure t)
-
-(use-package flx-ido
-  :ensure t
-  :bind (("C-x C-f" . ido-find-file)))

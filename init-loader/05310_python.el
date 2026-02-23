@@ -1,4 +1,4 @@
-;;; 14_python.el --- python.el configuration
+;;; 05310_python.el --- python.el configuration
 ;;;
 ;;; Commentary:
 ;;; 
@@ -8,7 +8,7 @@
 
 
 (if (executable-find "ruff")
-    (use-package pet :ensure t :config (add-hook 'python-base-mode-hook 'pet-mode -10))
+    (use-package pet :ensure t :hook (python-ts-mode-hook  . pet-mode))
   (use-package pyvenv :ensure t))
 
 
@@ -40,7 +40,7 @@
   :ensure t
   :config (progn (add-hook 'flycheck-mode-hook #'flycheck-pycheckers-setup)
                  (setq flycheck-pycheckers-max-line-length 200
-                       flycheck-pycheckers-checkers '(mypy3 python-ruff))))
+                       flycheck-pycheckers-checkers '(python-mypy python-ruff))))
 
 (defun python/init-eldoc-mode ()
   "Setup eldoc."
@@ -78,12 +78,10 @@
 
 (defun python/install-lsp-server ()
   "Install pylsp server"
-  (unless (executable-find "pylsp")
-    (message "Installing python-lsp-server")
-    (shell-command "pip install python-lsp-server\\[all\\]")))
-
-
-(python/install-lsp-server)
+  (if (executable-find "pylsp")
+      (message "pylsp already installed")
+    (when (yes-or-no-p "Install python-lsp-server with pip now?")
+      (shell-command "pip install python-lsp-server\\[all\\]"))))
 
 (add-hook 'python-ts-mode-hook 'eglot-ensure)
 (add-hook 'python-ts-mode-hook 'python/init-eldoc-mode)
@@ -102,6 +100,6 @@
 ;; [Eglot+Tree-Sitter in Emacs 29](https://www.adventuresinwhy.com/post/eglot/)
 ;; [Setting up Eglot for Python](https://www.reddit.com/r/emacs/comments/ye18nd/setting_up_eglot_for_python/)
 
-(provide '14_1_python)
+(provide '05310_python)
 
 ;;; 14_python.el ends here

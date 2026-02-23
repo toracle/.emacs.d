@@ -128,17 +128,26 @@
 ;;     (ansi-color-apply-on-region compilation-filter-start (point-max))
 ;;     (read-only-mode 'toggle)))
 
-(defun create-new-scratch-buffer ()
-  (interactive)
-  (let ((buff (generate-new-buffer "*scratch*")))
-    (set-buffer buff)
-    (lisp-interaction-mode)
-    (insert ";; This buffer is for text that is not saved, and for Lisp evaluation.\n")
-    (insert ";; To create a file, visit it with C-x C-f and enter text in its buffer.\n")
-    (insert "\n")
-    (display-buffer buff)))
+(defvar toracle/scratch-default-name "*scratch*"
+  "Base name for new scratch buffers.")
 
-(global-set-key (kbd "C-x n RET") 'create-new-scratch-buffer)
+(defvar toracle/scratch-initial-message
+  ";; This buffer is for text that is not saved, and for Lisp evaluation.\n;; To create a file, visit it with C-x C-f and enter text in its buffer.\n\n")
+
+(defun toracle/new-scratch ()
+  "Create a new scratch buffer and switch to it."
+  (interactive)
+  (let* ((name (generate-new-buffer-name toracle/scratch-default-name))
+         (buf (generate-new-buffer name)))
+    (with-current-buffer buf
+      (lisp-interaction-mode)
+      (erase-buffer)
+      (insert toracle/scratch-initial-message)
+      (goto-char (point-max))
+      (setq buffer-offer-save nil))
+    (switch-to-buffer buf)))
+
+(global-set-key (kbd "C-x n RET") #'toracle/new-scratch)
 
 ;; (add-hook 'compilation-filter-hook 'spacemacs-ui-visual/compilation-buffer-apply-ansi-colors)
 ;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)

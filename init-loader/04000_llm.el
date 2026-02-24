@@ -22,12 +22,7 @@
     (use-package vterm
       :ensure t)
   (use-package eat
-    :ensure t)
-
-
-(defun toracle-llm/list-buffers ()
-  (apply 'concat (mapcar (lambda (buffer) (concat (buffer-name buffer) "\n"))
-                         (buffer-list))))
+    :ensure t))
 
 
 (defun toracle-llm/list-buffers ()

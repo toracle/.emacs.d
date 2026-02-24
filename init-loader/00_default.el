@@ -2,11 +2,16 @@
 
 ;;; Code:
 
+(require 'seq)
 (require 'cl-seq)
 
+(set-language-environment "UTF-8")
+(set-default-coding-systems 'utf-8)
 (prefer-coding-system 'utf-8)
 
+(tool-bar-mode -1)
 (menu-bar-mode -1)
+(scroll-bar-mode -1)
 (column-number-mode t)
 (xterm-mouse-mode t)
 
@@ -15,12 +20,13 @@
 (setq dired-dwim-target t)
 (setq backup-directory-alist `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms `((".*" ,temporary-file-directory t)))
+
 (setq default-input-method "korean-hangul390")
+(setq default-korean-keyboard "3")
 
 (setq-default indent-tabs-mode nil)
 
 (global-set-key (kbd "C-x C-o") 'other-frame)
-(global-set-key (kbd "S-SPC") 'toggle-input-method)
 
 (use-package s
   :ensure t)
@@ -45,9 +51,9 @@
    (unless (cl-find "~/.local/bin" current-path :test 'string=)
      (setenv "PATH" (s-join ":" (cons "~/.local/bin" current-path))))))
 
-(defun disable-double-buffering ()
-  (setq default-frame-alist
-        (append default-frame-alist '((inhibit-double-buffering . t)))))
+;; (defun disable-double-buffering ()
+;;   (setq default-frame-alist
+;;         (append default-frame-alist '((inhibit-double-buffering . t)))))
 
 (defun toracle/macos-glove80-keyboard-layout ()
   (interactive)
@@ -75,7 +81,7 @@
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
     (add-to-list 'exec-path "/usr/local/bin")))
 
-(when (mac-system?)
+(when (or (mac-system?) (wsl-system?))
  (use-package exec-path-from-shell :ensure t
    :init (exec-path-from-shell-initialize)))
 
@@ -88,97 +94,76 @@
   :ensure t
   :config (dashboard-setup-startup-hook))
 
-(if (display-graphic-p)
-    (load-theme 'leuven-dark)
-  (load-theme 'tango-dark))
 
-(use-package zoom-window
-  :ensure t
-  :bind (("C-x C-z" . zoom-window-zoom)))
-
-(use-package dedicated
-  :ensure t)
-
-(use-package ibuffer-vc
-  :ensure t)
-
-;; (use-package org-plus-contrib
+;; (use-package ibuffer-vc
 ;;   :ensure t)
 
-(use-package switch-window
-  :ensure t)
+;; (use-package switch-window
+;;   :ensure t)
 
-(use-package visual-regexp-steroids
-  :ensure t)
+;; (use-package visual-regexp-steroids
+;;   :ensure t)
 
-(use-package robe
-  :ensure t)
+;; (use-package robe
+;;   :ensure t)
 
-(use-package ess
-  :ensure t)
+;; (use-package ess
+;;   :ensure t)
 
-(use-package format-sql
-  :ensure t)
+;; (use-package format-sql
+;;   :ensure t)
 
-(use-package xml-rpc
-  :ensure t)
+;; (use-package xml-rpc
+;;   :ensure t)
 
-(use-package ledger-mode
-  :ensure t)
+;; (use-package ledger-mode
+;;   :ensure t)
 
-(use-package ag
-  :ensure t)
+;; (use-package ag
+;;   :ensure t)
 
-;; (use-package perspective
-;;   :ensure t
-;;   :config (persp-mode))
+;; (defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()
+;;   (let ((inhibit-read-only t))
+;;     (read-only-mode 'toggle)
+;;     (ansi-color-apply-on-region compilation-filter-start (point-max))
+;;     (read-only-mode 'toggle)))
 
+(defvar toracle/scratch-default-name "*scratch*"
+  "Base name for new scratch buffers.")
 
-(defun spacemacs-ui-visual/compilation-buffer-apply-ansi-colors ()
-  (let ((inhibit-read-only t))
-    (read-only-mode 'toggle)
-    (ansi-color-apply-on-region compilation-filter-start (point-max))
-    (read-only-mode 'toggle)))
+(defvar toracle/scratch-initial-message
+  ";; This buffer is for text that is not saved, and for Lisp evaluation.\n;; To create a file, visit it with C-x C-f and enter text in its buffer.\n\n")
 
-(defun create-new-scratch-buffer ()
+(defun toracle/new-scratch ()
+  "Create a new scratch buffer and switch to it."
   (interactive)
-  (let ((buff (generate-new-buffer "*scratch*")))
-    (set-buffer buff)
-    (lisp-interaction-mode)
-    (insert ";; This buffer is for text that is not saved, and for Lisp evaluation.\n")
-    (insert ";; To create a file, visit it with C-x C-f and enter text in its buffer.\n")
-    (insert "\n")
-    (display-buffer buff)))
+  (let* ((name (generate-new-buffer-name toracle/scratch-default-name))
+         (buf (generate-new-buffer name)))
+    (with-current-buffer buf
+      (lisp-interaction-mode)
+      (erase-buffer)
+      (insert toracle/scratch-initial-message)
+      (goto-char (point-max))
+      (setq buffer-offer-save nil))
+    (switch-to-buffer buf)))
 
-(global-set-key (kbd "C-x n RET") 'create-new-scratch-buffer)
+(global-set-key (kbd "C-x n RET") #'toracle/new-scratch)
 
-(add-hook 'compilation-filter-hook 'spacemacs-ui-visual/compilation-buffer-apply-ansi-colors)
-(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
-(add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
-(add-to-list 'Info-additional-directory-list (expand-file-name "~/texinfo"))
+;; (add-hook 'compilation-filter-hook 'spacemacs-ui-visual/compilation-buffer-apply-ansi-colors)
+;; (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+;; (add-to-list 'comint-output-filter-functions 'ansi-color-process-output)
+;; (add-to-list 'Info-additional-directory-list (expand-file-name "~/texinfo"))
 
-(add-hook 'yaml-mode-hook (lambda () (yafolding-mode t)))
+;; (add-hook 'yaml-mode-hook (lambda () (yafolding-mode t)))
 
-;; to prevent emacs crash when confronts emoji
-;; https://github.com/syl20bnr/spacemacs/issues/10695
-(add-to-list 'face-ignored-fonts "Noto Color Emoji")
+;; ;; to prevent emacs crash when confronts emoji
+;; ;; https://github.com/syl20bnr/spacemacs/issues/10695
+;; (add-to-list 'face-ignored-fonts "Noto Color Emoji")
 
-(setq epa-file-encrypt-to '("97F2043EC220D593"))
+;; (setq epa-file-encrypt-to '("97F2043EC220D593"))
 
-;; (use-package notmuch
-;;   :ensure t
-;;   :config (setq notmuch-search-oldest-first nil))
-
-;; (require 'mu4e)
-
-;; (setq mu4e-sent-folder   "/toracle/[Gmail]/Sent Mail"
-;;       mu4e-drafts-folder "/toracle/[Gmail]/Drafts"
-;;       mu4e-trash-folder  "/toracle/[Gmail]/Trash")
-
-(use-package w3m
-  :ensure t)
-
-;; (setq gnus-select-method '(nntp "reader443.eternal-september.org"))
+;; (use-package w3m
+;;   :ensure t)
 
 (provide '00_default)
 ;;; 00_default.el ends here

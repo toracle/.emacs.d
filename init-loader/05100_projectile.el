@@ -18,4 +18,5 @@
             (add-to-list 'projectile-globally-ignored-directories ".eggs")
             (add-to-list 'projectile-globally-ignored-directories ".mypy_cache")
             (add-to-list 'projectile-globally-ignored-directories "*.egg-info")
-	    (setq projectile-completion-system 'helm)))
+	    ;; (setq projectile-completion-system 'helm)
+            ))

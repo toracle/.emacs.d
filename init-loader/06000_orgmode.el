@@ -99,7 +99,5 @@
   (setq org-ditaa-jar-path (get-init-loader-resource-path "ditaa0_9.jar"))
   (local-set-key (kbd "C-c `") 'org-edit-src-code))
 
-
-
 (add-hook 'org-mode-hook 'toracle-babel-config)
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)

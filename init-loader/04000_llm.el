@@ -10,8 +10,15 @@
 (use-package gptel
   :custom (gptel-curl-coding-system 'utf-8)
   :config (modify-coding-system-alist 'process "curl" 'utf-8)
-  ;;      (setq gptel-use-curl nil)
   :ensure t)
+
+
+(gptel-make-openai "OpenRouter"
+  :host "openrouter.ai"
+  :endpoint "/api/v1/chat/completions"
+  :stream t
+  :key 'gptel-api-key-from-auth-source
+  :models '(openai/gpt-oss-120b))
 
 
 (use-package gptel-agent

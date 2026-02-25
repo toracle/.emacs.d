@@ -1,12 +1,5 @@
 ;;; begin
 
-(when (functionp 'use-package-vc-install)
-  (use-package claude-code-ide
-    :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :branch "main")
-    :bind (("C-c C-SPC" . claude-code-ide-menu))
-    :config (claude-code-ide-emacs-tools-setup)))
-
-
 (use-package gptel
   :custom (gptel-curl-coding-system 'utf-8)
   :config (modify-coding-system-alist 'process "curl" 'utf-8)
@@ -23,6 +16,18 @@
   :models '(openai/gpt-oss-120b))
 
 
+(defun toracle-llm/list-buffers ()
+  (buffer-list))
+
+
+(gptel-make-tool
+ :name "list-all-buffers"
+ :function 'toracle-llm/list-buffers
+ :description "list all open buffers in emacs, it can be used before calling other tools to understand and state of the system"
+ :args '()
+ :category "emacs")
+
+
 (use-package gptel-agent
   :ensure t)
 
@@ -34,15 +39,24 @@
     :ensure t))
 
 
-(defun toracle-llm/list-buffers ()
-  (buffer-list))
+(if (functionp 'use-package-vc-install)
+    (eval
+     '(use-package claude-code-ide
+        :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :branch "main")
+        :bind (("C-c C-SPC" . claude-code-ide-menu))
+        :config (claude-code-ide-emacs-tools-setup)))
+  (defun claude-code-ide-menu ()
+    (interactive)
+    (message "claude-code-ide package not installed.")))
 
 
-(gptel-make-tool
- :name "list-all-buffers"
- :function 'toracle-llm/list-buffers
- :description "list all open buffers in emacs, it can be used before calling other tools to understand and state of the system"
- :args '()
- :category "emacs")
+(defhydra hydra-llm (:hint t)
+  "llm"
+  ("c" claude-code-ide-menu "claude-code-ide")
+  ("g" gptel "gptel")
+  ("m" gptel-menu "gptel-menu")
+  ("a" gptel-agent "gptel-agent"))
+
+(global-set-key (kbd "C-c C-SPC") #'hydra-llm/body)
 
 ;;; ends

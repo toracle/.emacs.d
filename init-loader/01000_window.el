@@ -58,7 +58,7 @@
      "Window '%s' is undedicated")
    (current-buffer)))
 
-(defhydra hydra-windmove (global-map "C-x o")
+(defhydra hydra-windmove (:hint t)
   "windmove"
   ("j" windmove-left "left")
   ("l" windmove-right "right")
@@ -66,5 +66,7 @@
   ("k" windmove-down "down")
   ("o" other-window "other")
   ("." toggle-window-dedicated "dedicate"))
+
+(global-set-key (kbd "C-x o") #'hydra-windmove/body)
 
 ;;; 01_window.el ends here

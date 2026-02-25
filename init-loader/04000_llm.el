@@ -10,6 +10,8 @@
 (use-package gptel
   :custom (gptel-curl-coding-system 'utf-8)
   :config (modify-coding-system-alist 'process "curl" 'utf-8)
+  (setq gptel-include-reasoning nil
+        gptel-default-mode 'org-mode)
   :ensure t)
 
 

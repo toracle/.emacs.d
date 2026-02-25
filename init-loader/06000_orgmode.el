@@ -78,7 +78,6 @@
 (defun toracle-babel-config ()
   (org-babel-do-load-languages 'org-babel-load-languages
 			       '((python . t)
-                                 ;; (ipython . t)
 				 (emacs-lisp . t)
 				 (R . t)
 				 (ditaa . t)
@@ -91,7 +90,6 @@
 				 (sql . t)
 				 (plantuml . t)
 				 (sql . t)
-				 (ledger . t)
                                  (powershell . t)
                                  (restclient . t)))
   (setq org-confirm-babel-evaluate nil)

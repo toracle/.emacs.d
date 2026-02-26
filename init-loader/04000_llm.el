@@ -55,7 +55,8 @@
   ("c" claude-code-ide-menu "claude-code-ide")
   ("g" gptel "gptel")
   ("m" gptel-menu "gptel-menu")
-  ("a" gptel-agent "gptel-agent"))
+  ("a" gptel-agent "gptel-agent")
+  ("b" gptel-abort "gptel-abort"))
 
 (global-set-key (kbd "C-c C-SPC") #'hydra-llm/body)
 

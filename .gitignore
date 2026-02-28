@@ -29,3 +29,5 @@ session.*
 /.cache/
 /.dap-breakpoints
 /.lsp-session-v1
+/tree-sitter/
+/forge-database*.sqlite

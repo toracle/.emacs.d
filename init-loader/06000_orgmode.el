@@ -78,7 +78,6 @@
 (defun toracle-babel-config ()
   (org-babel-do-load-languages 'org-babel-load-languages
 			       '((python . t)
-                                 ;; (ipython . t)
 				 (emacs-lisp . t)
 				 (R . t)
 				 (ditaa . t)
@@ -91,15 +90,12 @@
 				 (sql . t)
 				 (plantuml . t)
 				 (sql . t)
-				 (ledger . t)
                                  (powershell . t)
                                  (restclient . t)))
   (setq org-confirm-babel-evaluate nil)
   (setq org-plantuml-jar-path (get-init-loader-resource-path "plantuml.jar"))
   (setq org-ditaa-jar-path (get-init-loader-resource-path "ditaa0_9.jar"))
   (local-set-key (kbd "C-c `") 'org-edit-src-code))
-
-
 
 (add-hook 'org-mode-hook 'toracle-babel-config)
 (add-hook 'org-babel-after-execute-hook 'org-display-inline-images 'append)

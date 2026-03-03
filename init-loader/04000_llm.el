@@ -13,19 +13,38 @@
   :endpoint "/api/v1/chat/completions"
   :stream t
   :key 'gptel-api-key-from-auth-source
-  :models '(openai/gpt-oss-120b))
+  :models '(openai/gpt-oss-120b google/gemma-3-27b-it google/gemini-3-flash-preview upstage/solar-pro-3:free))
 
 
-(defun toracle-llm/list-buffers ()
-  (buffer-list))
+;; (defun toracle-llm/list-buffers ()
+;;   (buffer-list))
 
 
-(gptel-make-tool
- :name "list-all-buffers"
- :function 'toracle-llm/list-buffers
- :description "list all open buffers in emacs, it can be used before calling other tools to understand and state of the system"
- :args '()
- :category "emacs")
+;; (gptel-make-tool
+;;  :name "list-all-buffers"
+;;  :function 'toracle-llm/list-buffers
+;;  :description "list all open buffers in emacs, it can be used before calling other tools to understand and state of the system"
+;;  :args '()
+;;  :category "emacs")
+
+
+;; (defun toracle-llm/get-buffer-content (buffer-name)
+;;   "Return a plist (:status STRING :content STRING) for buffer BUFFER-NAME.
+;; Never switches to the buffer or modifies it."
+;;   (let ((buf (get-buffer buffer-name)))
+;;     (if (not buf)
+;;         (list :status "error" :message (format "No such buffer: %s" buffer-name))
+;;       (with-current-buffer buf
+;;         (list :status "ok"
+;;               :content (buffer-substring-no-properties (point-min) (point-max)))))))
+    
+;; (gptel-make-tool
+;;  :name "get-buffer-content"
+;;  :description "Read the entire text of a specified buffer without side‑effects."
+;;  :parameters '(("buffer-name" string "Name of the buffer to read"))
+;;  :function #'toracle-llm/get-buffer-content
+;;  :args '((:name "buffer-name" :type string))
+;;  :category "emacs")
 
 
 (use-package gptel-agent

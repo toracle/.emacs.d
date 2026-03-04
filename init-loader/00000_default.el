@@ -23,6 +23,7 @@
 
 (setq default-input-method "korean-hangul390")
 (setq default-korean-keyboard "3")
+(global-set-key (kbd "S-SPC") 'toggle-input-method)
 
 (setq-default indent-tabs-mode nil)
 

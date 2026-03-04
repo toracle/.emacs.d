@@ -13,7 +13,7 @@
   :endpoint "/api/v1/chat/completions"
   :stream t
   :key 'gptel-api-key-from-auth-source
-  :models '(openai/gpt-oss-120b google/gemma-3-27b-it google/gemini-3-flash-preview upstage/solar-pro-3:free))
+  :models '(openai/gpt-oss-120b google/gemma-3-27b-it google/gemini-3-flash-preview upstage/solar-pro-3 qwen/qwen3.5-35b-a3b qwen/qwen3.5-122b-a10b qwen/qwen3.5-397b-a17b qwen/qwen3-coder-next))
 
 
 ;; (defun toracle-llm/list-buffers ()

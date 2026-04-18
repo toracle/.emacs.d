@@ -2,11 +2,14 @@
   :ensure t
   :config (progn
 	    (cond
-	     ((executable-find "ros")
-              (load (expand-file-name "~/.roswell/helper.el") 'noerror))
+	     ((executable-find "ros") (let ((helper-file (expand-file-name "~/.roswell/helper.el")))
+                                        (when (file-exists-p helper-file)
+                                          (load helper-file 'noerror)
+                                          (setq inferior-lisp-program "ros run"))))
 	     ((executable-find "sbcl") (setq inferior-lisp-program "sbcl"))
 	     ((executable-find "clisp") (setq inferior-lisp-program "clisp"))
 	     ((executable-find "ccl") (setq inferior-lisp-program "ccl"))
+             ((executable-find "ecl") (setq inferior-lisp-program "ecl"))
 	     ((executable-find "wx86cl64") (setq inferior-lisp-program "wx86cl64 -K utf-8")))
             (setq slime-contribs '(slime-fancy))
 	    (slime-setup)))

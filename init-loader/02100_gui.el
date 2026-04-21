@@ -100,3 +100,47 @@
 
 
 ;;; 05_gui.el ends here
+
+
+;; -- Safer font setter overrides -------------------------------------------------
+;; Replace runtime font switching to avoid fontconfig picking different TTC entries
+;; for Latin vs CJK. Use :font with font-spec and explicit fontset bindings.
+(defun toracle--set-font (fontname han-fontname size)
+  "Safer font setter: use :font and explicit fontset bindings."
+  (let ((fontspec (font-spec :family fontname :size size))
+        (hanspec  (font-spec :family han-fontname :size size)))
+    (ignore-errors (set-face-attribute 'default nil :font fontspec))
+    (ignore-errors (set-fontset-font t 'latin fontspec))
+    (ignore-errors (set-fontset-font t 'hangul hanspec))
+    (ignore-errors (set-fontset-font t 'han hanspec))
+    (ignore-errors (set-fontset-font t 'kana hanspec))
+    ;; keep rescale list stable so Emacs doesn't try to rescale one family
+    (setq face-font-rescale-alist
+          (list (cons (font-spec :family han-fontname) 1.0)
+                (cons (font-spec :family fontname) 1.0)
+                '("*" . 1.0)))
+    (minibuffer-message (format "Set frame-font to: %s %s %s" fontname han-fontname size))
+    (redisplay)) )
+
+(defun toracle--set-base-font (fontname han-fontname size)
+  "Remember base font settings and apply them using `toracle--set-font'."
+  (setq toracle--base-font-family fontname)
+  (setq toracle--base-han-font-family han-fontname)
+  (setq toracle--base-font-size size)
+  (toracle--set-font fontname han-fontname size))
+
+(defun toracle--increase-frame-font-size ()
+  (interactive)
+  (toracle--set-frame-font-size (+ (toracle--get-frame-font-size) 1))
+  (toracle--set-font toracle--base-font-family
+                     toracle--base-han-font-family
+                     (toracle--get-frame-font-size)))
+
+(defun toracle--decrease-frame-font-size ()
+  (interactive)
+  (toracle--set-frame-font-size (max (- (toracle--get-frame-font-size) 1) 10))
+  (toracle--set-font toracle--base-font-family
+                     toracle--base-han-font-family
+                     (toracle--get-frame-font-size)))
+
+;; -- end overrides ---------------------------------------------------------------

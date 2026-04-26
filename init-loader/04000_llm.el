@@ -1,11 +1,16 @@
 ;;; begin
 
+;; ---- gptel daemon void-variable guard ----
+(defvar gptel--tool-preview-alist nil)
+
 (use-package gptel
+  :ensure t
+  :demand t
   :custom (gptel-curl-coding-system 'utf-8)
   :config (modify-coding-system-alist 'process "curl" 'utf-8)
   (setq gptel-include-reasoning nil
         gptel-default-mode 'org-mode)
-  :ensure t)
+  (require 'gptel-transient))
 
 
 (gptel-make-openai "OpenRouter"

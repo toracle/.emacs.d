@@ -49,8 +49,8 @@
 
 (unless (windows-system?)
  (let ((current-path (s-split ":" (getenv "PATH"))))
-   (unless (cl-find "~/.local/bin" current-path :test 'string=)
-     (setenv "PATH" (s-join ":" (cons "~/.local/bin" current-path))))))
+   (unless (cl-find (expand-file-name "~/.local/bin") current-path :test 'string=)
+     (setenv "PATH" (s-join ":" (cons (expand-file-name "~/.local/bin") current-path))))))
 
 ;; (defun disable-double-buffering ()
 ;;   (setq default-frame-alist

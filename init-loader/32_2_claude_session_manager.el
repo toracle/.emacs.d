@@ -183,6 +183,11 @@ Each plist has :dir :session-id :buffer :title :status :branch :forge."
              claude-code-ide--processes)
     found))
 
+(defvar my/ccsm--master nil
+  "Working-dir of the designated master/orchestrator session, or nil.
+The master is a Claude session that drives the others through the
+orchestration MCP tools and receives forwarded worker events.")
+
 (defvar my/ccsm--waiting (make-hash-table :test 'equal)
   "Map a session working-dir -> float-time when it began awaiting user input.
 Sessions present here sort to the top of the list as an approval queue,
@@ -275,8 +280,13 @@ the rest keep their natural order (the sort is stable)."
               (branch (plist-get s :branch))
               (forge (plist-get s :forge)))
           (push (cons (plist-get s :dir) start) entries)
-          (let ((waiting (my/ccsm--waiting-p (plist-get s :dir))))
-            (insert (propertize (concat (if waiting "⏳ " "● ") title)
+          (let* ((d (plist-get s :dir))
+                 (waiting (my/ccsm--waiting-p d))
+                 (master (equal d my/ccsm--master)))
+            (insert (propertize (concat (cond (master "★ ")
+                                              (waiting "⏳ ")
+                                              (t "● "))
+                                        title)
                                 'face (if waiting 'warning 'bold))
                     "\n"))
           (unless (string-empty-p osc)

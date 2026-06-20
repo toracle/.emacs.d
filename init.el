@@ -27,6 +27,16 @@
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file 'noerror)
 
+;; Customize keeps re-saving claude-code-ide-cli-path with a literal "~".
+;; The ghostel backend spawns via execvp (no shell), so a literal tilde is
+;; never expanded -> claude exits instantly -> "Invalid buffer".  Normalize
+;; any tilde path after custom.el loads (custom.el loads after init-loader,
+;; so this must live here to win).  Bare commands (PATH lookup) are left alone.
+(when (and (boundp 'claude-code-ide-cli-path)
+           (stringp claude-code-ide-cli-path)
+           (string-prefix-p "~" claude-code-ide-cli-path))
+  (setq claude-code-ide-cli-path (expand-file-name claude-code-ide-cli-path)))
+
 (add-to-list 'load-path "~/.emacs.d/modules/")
 (put 'narrow-to-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

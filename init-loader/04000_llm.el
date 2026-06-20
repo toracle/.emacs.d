@@ -95,6 +95,7 @@
 (defhydra hydra-llm (:hint t)
   "llm"
   ("c" claude-code-ide-menu "claude-code-ide")
+  ("s" my/ccsm "cc-sessions")
   ("g" gptel "gptel")
   ("m" gptel-menu "gptel-menu")
   ("a" gptel-agent "gptel-agent")

@@ -183,6 +183,37 @@ Each plist has :dir :session-id :buffer :title :status :branch :forge."
              claude-code-ide--processes)
     found))
 
+(defvar my/ccsm--waiting (make-hash-table :test 'equal)
+  "Map a session working-dir -> float-time when it began awaiting user input.
+Sessions present here sort to the top of the list as an approval queue,
+oldest request first (FIFO); absence means the session is not waiting.")
+
+(defun my/ccsm--waiting-p (dir)
+  "Return the wait timestamp for DIR, or nil when it is not waiting."
+  (gethash dir my/ccsm--waiting))
+
+(defun my/ccsm--mark-waiting (dir)
+  "Record that session DIR began awaiting user input (keep the earliest time)."
+  (when (and dir (not (gethash dir my/ccsm--waiting)))
+    (puthash dir (float-time) my/ccsm--waiting)))
+
+(defun my/ccsm--clear-waiting (dir)
+  "Mark session DIR as no longer awaiting input."
+  (when dir (remhash dir my/ccsm--waiting)))
+
+(defun my/ccsm--ordered (sessions)
+  "Sort SESSIONS as an approval queue.
+Sessions awaiting user input come first, oldest request first (FIFO);
+the rest keep their natural order (the sort is stable)."
+  (sort (copy-sequence sessions)
+        (lambda (a b)
+          (let ((wa (my/ccsm--waiting-p (plist-get a :dir)))
+                (wb (my/ccsm--waiting-p (plist-get b :dir))))
+            (cond ((and wa wb) (< wa wb))
+                  (wa t)
+                  (wb nil)
+                  (t nil))))))
+
 ;;;; ------------------------------------------------------------------
 ;;;; List UI (multi-line entries in a sticky side window)
 ;;;; ------------------------------------------------------------------
@@ -228,7 +259,7 @@ Each plist has :dir :session-id :buffer :title :status :branch :forge."
 (defun my/ccsm--render ()
   "Render all live sessions as multi-line blocks in the current buffer."
   (let ((inhibit-read-only t)
-        (sessions (my/ccsm--sessions))
+        (sessions (my/ccsm--ordered (my/ccsm--sessions)))
         entries)
     (erase-buffer)
     (if (null sessions)
@@ -244,7 +275,10 @@ Each plist has :dir :session-id :buffer :title :status :branch :forge."
               (branch (plist-get s :branch))
               (forge (plist-get s :forge)))
           (push (cons (plist-get s :dir) start) entries)
-          (insert (propertize (concat "● " title) 'face 'bold) "\n")
+          (let ((waiting (my/ccsm--waiting-p (plist-get s :dir))))
+            (insert (propertize (concat (if waiting "⏳ " "● ") title)
+                                'face (if waiting 'warning 'bold))
+                    "\n"))
           (unless (string-empty-p osc)
             (insert "   " (propertize osc 'face 'italic) "\n"))
           (unless (string-empty-p status)
@@ -384,7 +418,16 @@ first."
          (with-current-buffer buffer
            (when (and (derived-mode-p 'ghostel-mode)
                       (fboundp 'ghostel--adjust-size))
-             (ignore-errors (ghostel--adjust-size window)))))))))
+             ;; Size the PTY to the LARGEST window showing the session (the
+             ;; preview), not the default smallest — otherwise a second,
+             ;; smaller window showing the same buffer shrinks the grid and
+             ;; clips the preview.  Restored immediately.
+             (let ((orig (default-value 'window-adjust-process-window-size-function)))
+               (setq-default window-adjust-process-window-size-function
+                             #'window-adjust-process-window-size-largest)
+               (unwind-protect
+                   (ignore-errors (ghostel--adjust-size window))
+                 (setq-default window-adjust-process-window-size-function orig))))))))))
 
 (defun my/ccsm-preview ()
   "Show the session at point in the main window, staying in the list."
@@ -416,11 +459,15 @@ first."
     (my/ccsm--goto-index (max (1- i) 0))))
 
 (defun my/ccsm-visit ()
-  "Preview the session at point and select its window."
+  "Preview the session at point, select its window, and clear it from the queue.
+Visiting a session means you are attending to it, so it leaves the
+input-waiting queue."
   (interactive)
+  (my/ccsm--clear-waiting (my/ccsm--dir-at-point))
   (my/ccsm-preview)
   (when (window-live-p (my/ccsm--main-win))
-    (select-window (my/ccsm--main-win))))
+    (select-window (my/ccsm--main-win)))
+  (my/ccsm--maybe-refresh))
 
 (defun my/ccsm-refresh ()
   "Refresh the session list and re-fetch forge info."

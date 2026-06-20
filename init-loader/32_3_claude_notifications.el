@@ -146,5 +146,21 @@ Runs asynchronously so a slow backend never blocks Emacs."
         (let ((proc (start-process-shell-command "ccsm-notify" nil cmd)))
           (set-process-query-on-exit-flag proc nil))))))
 
+;;;; ------------------------------------------------------------------
+;;;; Built-in listener: input-waiting approval queue
+;;;; ------------------------------------------------------------------
+
+;; A Claude session that posts a notification is asking for attention
+;; (a question, a permission prompt, "done").  Treat that as "awaiting
+;; user input" and bubble it to the top of the session list as a FIFO
+;; approval queue.  Visiting the session (RET) clears it from the queue.
+(defun my/ccsm--queue-on-notification (event)
+  "Enqueue the notifying session into the manager's input-waiting queue."
+  (when-let ((dir (plist-get event :session)))
+    (my/ccsm--mark-waiting dir)
+    (my/ccsm--maybe-refresh)))
+
+(add-hook 'my/ccsm-notification-functions #'my/ccsm--queue-on-notification)
+
 (provide '32_3_claude_notifications)
 ;;; 32_3_claude_notifications.el ends here

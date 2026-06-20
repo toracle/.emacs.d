@@ -58,7 +58,19 @@
 
 (if (not (windows-system?))
     (use-package ghostel
-      :ensure t)
+      :ensure t
+      ;; Full redraws are more robust with Claude Code's aggressive partial
+      ;; screen updates (per ghostel's own docs).
+      :custom (ghostel-full-redraw t)
+      :config
+      ;; ghostel defers terminal redraws to a coalescing timer but never calls
+      ;; `redisplay', so output arriving while Emacs is idle (e.g. a Claude
+      ;; session printing in a non-selected/preview window) updates the buffer
+      ;; yet does not repaint the window until the next keystroke.  Force a
+      ;; redisplay after each deferred redraw to close that gap.
+      (defun my/ghostel--redraw-redisplay (&rest _)
+        (redisplay))
+      (advice-add 'ghostel--redraw-now :after #'my/ghostel--redraw-redisplay))
   (use-package eat
     :ensure t))
 

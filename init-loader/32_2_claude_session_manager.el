@@ -368,6 +368,24 @@ removes it."
                 (and (window-live-p list-win)
                      (split-window list-win nil 'right)))))))
 
+(defun my/ccsm--terminal-resize (buffer window)
+  "Resize the ghostel terminal in BUFFER to fit WINDOW and redraw.
+`set-window-buffer' does not run `window-size-change-functions', so
+ghostel never resizes the PTY to the preview window; without this, claude
+keeps rendering at its previous grid size and the preview shows stale or
+clipped output.  Deferred so the buffer-change hook anchors the window
+first."
+  (when (and (buffer-live-p buffer) (window-live-p window))
+    (run-at-time
+     0 nil
+     (lambda ()
+       (when (and (buffer-live-p buffer) (window-live-p window)
+                  (eq (window-buffer window) buffer))
+         (with-current-buffer buffer
+           (when (and (derived-mode-p 'ghostel-mode)
+                      (fboundp 'ghostel--adjust-size))
+             (ignore-errors (ghostel--adjust-size window)))))))))
+
 (defun my/ccsm-preview ()
   "Show the session at point in the main window, staying in the list."
   (interactive)
@@ -375,7 +393,8 @@ removes it."
          (buf (and dir (get-buffer (claude-code-ide--get-buffer-name dir))))
          (win (my/ccsm--main-win)))
     (when (and (buffer-live-p buf) (window-live-p win))
-      (set-window-buffer win buf))))
+      (set-window-buffer win buf)
+      (my/ccsm--terminal-resize buf win))))
 
 (defun my/ccsm--goto-index (i)
   "Move to entry I, highlight it and preview its session."

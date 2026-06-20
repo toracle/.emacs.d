@@ -57,7 +57,7 @@
 
 
 (if (not (windows-system?))
-    (use-package vterm
+    (use-package ghostel
       :ensure t)
   (use-package eat
     :ensure t))
@@ -66,12 +66,30 @@
 (if (functionp 'use-package-vc-install)
     (eval
      '(use-package claude-code-ide
-        :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :branch "main")
+        :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :branch "main" :rev :newest)
         :bind (("C-c C-SPC" . claude-code-ide-menu))
-        :config (claude-code-ide-emacs-tools-setup)))
+        :config (claude-code-ide-emacs-tools-setup) (setq claude-code-ide-terminal-backend 'ghostel)))
   (defun claude-code-ide-menu ()
     (interactive)
     (message "claude-code-ide package not installed.")))
+
+
+;; Resolve the Claude CLI to an absolute, tilde-free path.
+;; The ghostel backend spawns the program directly via execvp (no shell),
+;; so a literal "~/..." is never expanded and the process dies instantly,
+;; surfacing as a bare "Invalid buffer" error.  Detect across environments
+;; (Linux, WSL, macOS, native Windows): prefer a PATH lookup, then fall back
+;; to known install locations.  Leave the default untouched when none exist.
+(let ((claude-bin
+       (or (executable-find "claude")
+           (seq-find #'file-executable-p
+                     (mapcar #'expand-file-name
+                             '("~/.local/bin/claude"
+                               "~/.claude/local/claude"
+                               "/opt/homebrew/bin/claude"
+                               "/usr/local/bin/claude"))))))
+  (when claude-bin
+    (setq claude-code-ide-cli-path claude-bin)))
 
 
 (defhydra hydra-llm (:hint t)

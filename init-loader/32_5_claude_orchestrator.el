@@ -53,12 +53,16 @@
           (string-trim (buffer-substring-no-properties start (point-max))))))))
 
 (defun my/ccsm--send-input (dir text &optional submit)
-  "Type TEXT into session DIR's terminal; when SUBMIT, also press Return."
-  (let ((buf (get-buffer (claude-code-ide--get-buffer-name dir))))
+  "Type TEXT into session DIR's terminal; when SUBMIT, also press Return.
+Embedded newlines in TEXT are sent as raw LF (Ctrl-J), which Claude's
+input treats as a new line rather than a submit; carriage returns are
+normalized to LF so the only thing that submits is the final Return."
+  (let ((buf (get-buffer (claude-code-ide--get-buffer-name dir)))
+        (body (replace-regexp-in-string "\r\n?" "\n" (or text ""))))
     (unless (buffer-live-p buf)
       (error "No live terminal for session %s" dir))
     (with-current-buffer buf
-      (claude-code-ide--terminal-send-string text)
+      (claude-code-ide--terminal-send-string body)
       (when submit (claude-code-ide--terminal-send-return)))
     t))
 
@@ -189,13 +193,13 @@ submit  -> type the summary and submit it, so the master reacts at once"
 (claude-code-ide-make-tool
  :function #'my/ccsm-tool-send-session
  :name "send_to_session"
- :description "Type a prompt/answer into another Claude session by name and submit it (press Enter), to direct that worker. Use to answer a worker's question, give it a task, or unblock it. You cannot send to yourself."
+ :description "Type a prompt/answer into another Claude session by name and submit it (press Enter), to direct that worker. Use to answer a worker's question, give it a task, or unblock it. You cannot send to yourself. Multi-line is supported: put literal newlines in text — each becomes a new line (Ctrl-J) in the worker's input, and Enter is pressed only once, at the end, to submit."
  :args '((:name "name"
                 :type string
                 :description "Target session name from list_claude_sessions.")
          (:name "text"
                 :type string
-                :description "The text to type into that session before submitting.")))
+                :description "The text to type into that session before submitting. May contain newlines for a multi-line prompt; only the final submit presses Enter.")))
 
 (provide '32_5_claude_orchestrator)
 ;;; 32_5_claude_orchestrator.el ends here

@@ -52,13 +52,22 @@
                                       (line-beginning-position))))
           (string-trim (buffer-substring-no-properties start (point-max))))))))
 
+(defcustom my/ccsm-submit-delay 0.1
+  "Seconds to wait after sending text before the submitting Return.
+The worker's input must settle before Enter or the Return is dropped and
+nothing submits (the same delay `claude-code-ide-send-prompt' uses)."
+  :type 'number
+  :group 'claude-code-ide)
+
 (defun my/ccsm--send-input (dir text &optional submit)
   "Type TEXT into session DIR's terminal; when SUBMIT, also press Return.
 Claude treats a raw LF as a submit, so multi-line TEXT is delivered as a
 bracketed paste (\\e[200~..\\e[201~) — Claude enables paste mode, which
 keeps the embedded newlines literal so only the final Return submits.
 Carriage returns are normalized to LF and stray ESC bytes are stripped so
-the body cannot break out of the paste or submit mid-prompt."
+the body cannot break out of the paste or submit mid-prompt.  A short
+settle delay precedes the Return so it is not dropped before the input is
+processed."
   (let* ((buf (get-buffer (claude-code-ide--get-buffer-name dir)))
          (body (replace-regexp-in-string
                 "\e" ""
@@ -69,7 +78,9 @@ the body cannot break out of the paste or submit mid-prompt."
       (if (string-search "\n" body)
           (claude-code-ide--terminal-send-string (concat "\e[200~" body "\e[201~"))
         (claude-code-ide--terminal-send-string body))
-      (when submit (claude-code-ide--terminal-send-return)))
+      (when submit
+        (sleep-for my/ccsm-submit-delay)
+        (claude-code-ide--terminal-send-return)))
     t))
 
 ;;;; ------------------------------------------------------------------
@@ -114,14 +125,12 @@ submit  -> type the summary and submit it, so the master reacts at once"
               ((not (equal dir master)))
               (mbuf (get-buffer (claude-code-ide--get-buffer-name master)))
               ((buffer-live-p mbuf)))
-    (let ((line (format "[ccsm] Worker \"%s\" needs attention: %s"
-                        (my/ccsm--display-name dir)
-                        (or (plist-get event :body)
-                            (plist-get event :title) ""))))
-      (with-current-buffer mbuf
-        (claude-code-ide--terminal-send-string line)
-        (when (eq mode 'submit)
-          (claude-code-ide--terminal-send-return))))))
+    (my/ccsm--send-input
+     master
+     (format "[ccsm] Worker \"%s\" needs attention: %s"
+             (my/ccsm--display-name dir)
+             (or (plist-get event :body) (plist-get event :title) ""))
+     (eq mode 'submit))))
 
 (add-hook 'my/ccsm-notification-functions #'my/ccsm--forward-to-master)
 

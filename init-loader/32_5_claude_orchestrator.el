@@ -104,6 +104,20 @@ processed."
     (define-key my/ccsm-mode-map "b" #'my/ccsm-set-butler)))
 
 ;;;; ------------------------------------------------------------------
+;;;; Launch a session joined to the CCSM channel
+;;;; ------------------------------------------------------------------
+
+;;;###autoload
+(defun my/ccsm-launch-with-channel ()
+  "Start a Claude session in the current project with the CCSM channel.
+Requires `my/ccsm-channel-args' to be set (the `--channels' /
+`--dangerously-load-development-channels' flag for your channel server)."
+  (interactive)
+  (when (string-empty-p (string-trim (or my/ccsm-channel-args "")))
+    (user-error "Set `my/ccsm-channel-args' to a channel launch flag first"))
+  (my/ccsm--with-channel (claude-code-ide)))
+
+;;;; ------------------------------------------------------------------
 ;;;; PUSH: forward worker events to the butler
 ;;;; ------------------------------------------------------------------
 
@@ -179,13 +193,36 @@ submit  -> type the summary and submit it, so the butler reacts at once"
       (my/ccsm--maybe-refresh)
       (format "Sent to %s and submitted." name)))))
 
+(defun my/ccsm-tool-inbox ()
+  "MCP tool: return and clear the butler's pending worker events.
+This is the pull side of the bus: worker notifications (needs input /
+done) are queued in Emacs and drained here, so the butler gets them
+without anything being typed into its input box."
+  (if (null my/ccsm--inbox)
+      "No pending worker events."
+    (let ((events (reverse my/ccsm--inbox)))
+      (setq my/ccsm--inbox nil)
+      (mapconcat (lambda (e)
+                   (format "- [%s] %s: %s"
+                           (format-time-string "%H:%M" (plist-get e :time))
+                           (plist-get e :name)
+                           (plist-get e :body)))
+                 events "\n"))))
+
 ;; Idempotent (re)registration: drop prior copies before adding.
 (setq claude-code-ide-mcp-server-tools
       (seq-remove
        (lambda (spec)
          (member (plist-get (claude-code-ide--normalize-tool-spec spec) :name)
-                 '("list_claude_sessions" "read_session_output" "send_to_session")))
+                 '("list_claude_sessions" "read_session_output"
+                   "send_to_session" "pending_events")))
        claude-code-ide-mcp-server-tools))
+
+(claude-code-ide-make-tool
+ :function #'my/ccsm-tool-inbox
+ :name "pending_events"
+ :description "Drain the butler's inbox: pending events from worker sessions that need attention (a worker asked a question, finished, or hit a prompt), newest last. Each line is a timestamped worker name and message. Call this at the start of each turn (and whenever you are nudged) to learn what changed without anything being typed into your input box. Returns the events and clears them."
+ :args nil)
 
 (claude-code-ide-make-tool
  :function #'my/ccsm-tool-list-sessions

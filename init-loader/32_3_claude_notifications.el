@@ -155,9 +155,11 @@ Runs asynchronously so a slow backend never blocks Emacs."
 ;; user input" and bubble it to the top of the session list as a FIFO
 ;; approval queue.  Visiting the session (RET) clears it from the queue.
 (defun my/ccsm--queue-on-notification (event)
-  "Enqueue the notifying session into the manager's input-waiting queue."
+  "Enqueue the notifying session: mark it waiting and record it in the inbox."
   (when-let ((dir (plist-get event :session)))
     (my/ccsm--mark-waiting dir)
+    (my/ccsm--inbox-push dir (or (plist-get event :body)
+                                 (plist-get event :title) ""))
     (my/ccsm--maybe-refresh)))
 
 (add-hook 'my/ccsm-notification-functions #'my/ccsm--queue-on-notification)

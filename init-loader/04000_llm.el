@@ -107,6 +107,7 @@
 (defhydra hydra-llm (:hint t)
   "llm"
   ("c" claude-code-ide-menu "claude-code-ide")
+  ("C" my/ccsm-launch-with-channel "cc+channel")
   ("s" my/ccsm "cc-sessions")
   ("t" my/ccsm-new-topic "cc-new-topic")
   ("g" gptel "gptel")

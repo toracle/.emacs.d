@@ -75,9 +75,10 @@ Existing files are never clobbered."
     topic-dir))
 
 (defun my/ccsm--start-session-in (dir)
-  "Start a Claude session with DIR as the working directory."
+  "Start a Claude session with DIR as the working directory.
+Honors `my/ccsm-channel-args' so topic sessions can join the CCSM channel."
   (let ((default-directory (file-name-as-directory (expand-file-name dir))))
-    (claude-code-ide)))
+    (my/ccsm--with-channel (claude-code-ide))))
 
 (defun my/ccsm--clone-repos (topic-dir repos done-fn)
   "Clone REPOS into TOPIC-DIR sequentially and asynchronously.

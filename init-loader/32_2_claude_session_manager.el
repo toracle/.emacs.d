@@ -21,6 +21,26 @@
 (require 'seq)
 
 ;;;; ------------------------------------------------------------------
+;;;; Channel launch flag (shared by the topic/session launchers)
+;;;; ------------------------------------------------------------------
+
+(defcustom my/ccsm-channel-args ""
+  "Extra `claude' CLI args appended when launching a CCSM session.
+Use to enable a CCSM channel, e.g.
+  \"--dangerously-load-development-channels server:ccsmtest\"
+An empty string adds nothing."
+  :type 'string
+  :group 'claude-code-ide)
+
+(defmacro my/ccsm--with-channel (&rest body)
+  "Run BODY with `claude-code-ide-cli-extra-flags' augmented by `my/ccsm-channel-args'."
+  (declare (indent 0))
+  `(let ((claude-code-ide-cli-extra-flags
+          (string-trim (concat (or claude-code-ide-cli-extra-flags "")
+                               " " my/ccsm-channel-args))))
+     ,@body))
+
+;;;; ------------------------------------------------------------------
 ;;;; Display naming: nearest ancestor holding `.projectile'
 ;;;; ------------------------------------------------------------------
 
@@ -206,6 +226,19 @@ oldest request first (FIFO); absence means the session is not waiting.")
 (defun my/ccsm--clear-waiting (dir)
   "Mark session DIR as no longer awaiting input."
   (when dir (remhash dir my/ccsm--waiting)))
+
+(defvar my/ccsm--inbox nil
+  "Pending worker events for the butler to pull (newest pushed to the front).
+Each entry is a plist (:time :dir :name :body).  Drained by the
+`pending_events' MCP tool.")
+
+(defun my/ccsm--inbox-push (dir body)
+  "Record a worker event from session DIR with BODY into the butler inbox."
+  (push (list :time (current-time)
+              :dir dir
+              :name (my/ccsm--display-name dir)
+              :body (or body ""))
+        my/ccsm--inbox))
 
 (defun my/ccsm--ordered (sessions)
   "Sort SESSIONS for display.

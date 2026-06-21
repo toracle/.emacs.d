@@ -183,10 +183,11 @@ Each plist has :dir :session-id :buffer :title :status :branch :forge."
              claude-code-ide--processes)
     found))
 
-(defvar my/ccsm--master nil
-  "Working-dir of the designated master/orchestrator session, or nil.
-The master is a Claude session that drives the others through the
-orchestration MCP tools and receives forwarded worker events.")
+(defvar my/ccsm--butler nil
+  "Working-dir of the designated butler session, or nil.
+The butler is a special Claude session that interfaces with the human and
+drives the worker sessions through the orchestration MCP tools, receiving
+forwarded worker events.  It is pinned to the top of the list.")
 
 (defvar my/ccsm--waiting (make-hash-table :test 'equal)
   "Map a session working-dir -> float-time when it began awaiting user input.
@@ -207,17 +208,23 @@ oldest request first (FIFO); absence means the session is not waiting.")
   (when dir (remhash dir my/ccsm--waiting)))
 
 (defun my/ccsm--ordered (sessions)
-  "Sort SESSIONS as an approval queue.
-Sessions awaiting user input come first, oldest request first (FIFO);
-the rest keep their natural order (the sort is stable)."
+  "Sort SESSIONS for display.
+The butler session is pinned to the very top.  Then sessions awaiting
+user input (FIFO, oldest request first) form an approval queue, and the
+rest keep their natural order (the sort is stable)."
   (sort (copy-sequence sessions)
         (lambda (a b)
-          (let ((wa (my/ccsm--waiting-p (plist-get a :dir)))
-                (wb (my/ccsm--waiting-p (plist-get b :dir))))
-            (cond ((and wa wb) (< wa wb))
-                  (wa t)
-                  (wb nil)
-                  (t nil))))))
+          (let ((butler-a (equal (plist-get a :dir) my/ccsm--butler))
+                (butler-b (equal (plist-get b :dir) my/ccsm--butler)))
+            (cond
+             (butler-a t)
+             (butler-b nil)
+             (t (let ((wa (my/ccsm--waiting-p (plist-get a :dir)))
+                      (wb (my/ccsm--waiting-p (plist-get b :dir))))
+                  (cond ((and wa wb) (< wa wb))
+                        (wa t)
+                        (wb nil)
+                        (t nil)))))))))
 
 ;;;; ------------------------------------------------------------------
 ;;;; List UI (multi-line entries in a sticky side window)
@@ -282,12 +289,14 @@ the rest keep their natural order (the sort is stable)."
           (push (cons (plist-get s :dir) start) entries)
           (let* ((d (plist-get s :dir))
                  (waiting (my/ccsm--waiting-p d))
-                 (master (equal d my/ccsm--master)))
-            (insert (propertize (concat (cond (master "★ ")
+                 (butler (equal d my/ccsm--butler)))
+            (insert (propertize (concat (cond (butler "★ ")
                                               (waiting "⏳ ")
                                               (t "● "))
                                         title)
-                                'face (if waiting 'warning 'bold))
+                                'face (cond (butler 'font-lock-keyword-face)
+                                            (waiting 'warning)
+                                            (t 'bold)))
                     "\n"))
           (unless (string-empty-p osc)
             (insert "   " (propertize osc 'face 'italic) "\n"))

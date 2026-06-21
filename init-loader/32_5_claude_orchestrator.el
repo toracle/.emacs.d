@@ -1,23 +1,23 @@
-;;; 32_5_claude_orchestrator.el --- Master/worker orchestration for CCSM  -*- lexical-binding: t; -*-
+;;; 32_5_claude_orchestrator.el --- Butler/worker orchestration for CCSM  -*- lexical-binding: t; -*-
 
-;; Turns the session manager into a control plane: a designated *master*
+;; Turns the session manager into a control plane: a designated *butler*
 ;; Claude session drives the *worker* sessions through Emacs.  Emacs is the
 ;; bus — workers are reached through their ghostel shells.
 ;;
 ;; Two directions:
 ;;
-;;   PULL  — the master actively inspects and commands workers via three MCP
+;;   PULL  — the butler actively inspects and commands workers via three MCP
 ;;           tools it can call:
 ;;             list_claude_sessions   what's running, who's waiting, branches
 ;;             read_session_output    a worker's current screen
 ;;             send_to_session        type a prompt into a worker and submit
 ;;
 ;;   PUSH  — when a worker posts a notification (needs input / done), the event
-;;           is forwarded into the master's terminal so it can aggregate and
+;;           is forwarded into the butler's terminal so it can aggregate and
 ;;           proactively report to you over its own remote-control channel.
 ;;
-;; You remote-control ONE session (the master) from your phone; it becomes the
-;; situation room for the rest.  Designate it with `m' in the manager buffer.
+;; You remote-control ONE session (the butler) from your phone; it becomes the
+;; situation room for the rest.  Designate it with `b' in the manager buffer.
 
 (require '32_2_claude_session_manager)
 (require '32_3_claude_notifications)
@@ -84,62 +84,62 @@ processed."
     t))
 
 ;;;; ------------------------------------------------------------------
-;;;; Master designation
+;;;; Butler designation
 ;;;; ------------------------------------------------------------------
 
-(defun my/ccsm-set-master ()
-  "Designate the session at point as the master/orchestrator (toggle)."
+(defun my/ccsm-set-butler ()
+  "Designate the session at point as the butler (toggle)."
   (interactive)
   (let ((dir (my/ccsm--dir-at-point)))
     (unless dir (user-error "No session at point"))
-    (setq my/ccsm--master (unless (equal dir my/ccsm--master) dir))
-    (message "ccsm: master %s"
-             (if my/ccsm--master
-                 (format "set to %s" (my/ccsm--display-name my/ccsm--master))
+    (setq my/ccsm--butler (unless (equal dir my/ccsm--butler) dir))
+    (message "ccsm: butler %s"
+             (if my/ccsm--butler
+                 (format "set to %s" (my/ccsm--display-name my/ccsm--butler))
                "cleared"))
     (my/ccsm--maybe-refresh)))
 
 (with-eval-after-load '32_2_claude_session_manager
   (when (boundp 'my/ccsm-mode-map)
-    (define-key my/ccsm-mode-map "m" #'my/ccsm-set-master)))
+    (define-key my/ccsm-mode-map "b" #'my/ccsm-set-butler)))
 
 ;;;; ------------------------------------------------------------------
-;;;; PUSH: forward worker events to the master
+;;;; PUSH: forward worker events to the butler
 ;;;; ------------------------------------------------------------------
 
-(defcustom my/ccsm-master-forward 'submit
-  "How worker notifications are forwarded to the master session.
+(defcustom my/ccsm-butler-forward 'submit
+  "How worker notifications are forwarded to the butler session.
 nil     -> do not forward
-notify  -> type a one-line summary into the master, do NOT submit
-submit  -> type the summary and submit it, so the master reacts at once"
+notify  -> type a one-line summary into the butler, do NOT submit
+submit  -> type the summary and submit it, so the butler reacts at once"
   :type '(choice (const :tag "Off" nil)
                  (const :tag "Type only" notify)
                  (const :tag "Type and submit" submit))
   :group 'claude-code-ide)
 
-(defun my/ccsm--forward-to-master (event)
-  "Forward a worker EVENT into the master session's terminal."
-  (when-let* ((mode my/ccsm-master-forward)
-              (master my/ccsm--master)
+(defun my/ccsm--forward-to-butler (event)
+  "Forward a worker EVENT into the butler session's terminal."
+  (when-let* ((mode my/ccsm-butler-forward)
+              (butler my/ccsm--butler)
               (dir (plist-get event :session))
-              ((not (equal dir master)))
-              (mbuf (get-buffer (claude-code-ide--get-buffer-name master)))
+              ((not (equal dir butler)))
+              (mbuf (get-buffer (claude-code-ide--get-buffer-name butler)))
               ((buffer-live-p mbuf)))
     (my/ccsm--send-input
-     master
+     butler
      (format "[ccsm] Worker \"%s\" needs attention: %s"
              (my/ccsm--display-name dir)
              (or (plist-get event :body) (plist-get event :title) ""))
      (eq mode 'submit))))
 
-(add-hook 'my/ccsm-notification-functions #'my/ccsm--forward-to-master)
+(add-hook 'my/ccsm-notification-functions #'my/ccsm--forward-to-butler)
 
 ;;;; ------------------------------------------------------------------
-;;;; MCP tools (the master's hands)
+;;;; MCP tools (the butler's hands)
 ;;;; ------------------------------------------------------------------
 
 (defun my/ccsm-tool-list-sessions ()
-  "MCP tool: list the live Claude sessions for the orchestrator."
+  "MCP tool: list the live Claude sessions for the butler."
   (let ((self (my/ccsm--caller-dir))
         (rows '()))
     (dolist (s (my/ccsm--sessions))
@@ -147,7 +147,7 @@ submit  -> type the summary and submit it, so the master reacts at once"
         (push (format "- %s%s | %s | branch:%s%s | %s"
                       (my/ccsm--display-name dir)
                       (cond ((equal dir self) " (you)")
-                            ((equal dir my/ccsm--master) " (master)")
+                            ((equal dir my/ccsm--butler) " (butler)")
                             (t ""))
                       (if (my/ccsm--waiting-p dir) "WAITING-FOR-INPUT" "running")
                       (let ((b (plist-get s :branch))) (if (string-empty-p b) "-" b))

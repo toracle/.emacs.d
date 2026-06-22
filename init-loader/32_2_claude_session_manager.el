@@ -232,13 +232,59 @@ oldest request first (FIFO); absence means the session is not waiting.")
 Each entry is a plist (:time :dir :name :body).  Drained by the
 `pending_events' MCP tool.")
 
+;;;; Identity + butler<->worker message log
+
+(defun my/ccsm--session-id (dir)
+  "Return the claude-code-ide session id for DIR, or nil."
+  (gethash dir claude-code-ide--session-ids))
+
+(defun my/ccsm--who (name id)
+  "Format a session label from NAME and session ID."
+  (if (and id (stringp id) (not (string-empty-p id)))
+      (format "%s (%s)" name id)
+    (or name "?")))
+
+(defun my/ccsm--who-dir (dir)
+  "Format the session label (name + id) for session DIR."
+  (my/ccsm--who (my/ccsm--display-name dir) (my/ccsm--session-id dir)))
+
+(defcustom my/ccsm-log-buffer-name "*ccsm-log*"
+  "Name of the CCSM message-log buffer that tees butler<->worker traffic."
+  :type 'string
+  :group 'claude-code-ide)
+
+(define-derived-mode my/ccsm-log-mode special-mode "CCSM-Log"
+  "Major mode for the CCSM butler<->worker message log.")
+
+(defun my/ccsm--log (fmt &rest args)
+  "Append a timestamped FMT/ARGS line to `my/ccsm-log-buffer-name'."
+  (let ((buf (get-buffer-create my/ccsm-log-buffer-name)))
+    (with-current-buffer buf
+      (unless (derived-mode-p 'my/ccsm-log-mode) (my/ccsm-log-mode))
+      (let ((inhibit-read-only t))
+        (save-excursion
+          (goto-char (point-max))
+          (insert (format-time-string "[%H:%M:%S] ")
+                  (apply #'format fmt args) "\n")))
+      (dolist (w (get-buffer-window-list buf nil t))
+        (set-window-point w (point-max))))))
+
+(defun my/ccsm-show-log ()
+  "Pop to the CCSM message-log buffer."
+  (interactive)
+  (pop-to-buffer (get-buffer-create my/ccsm-log-buffer-name)))
+
 (defun my/ccsm--inbox-push (dir body)
-  "Record a worker event from session DIR with BODY into the butler inbox."
+  "Record a worker event from session DIR with BODY into the butler inbox.
+The worker's name and session id are attached, and the event is teed to
+the CCSM log."
   (push (list :time (current-time)
               :dir dir
               :name (my/ccsm--display-name dir)
+              :id (my/ccsm--session-id dir)
               :body (or body ""))
-        my/ccsm--inbox))
+        my/ccsm--inbox)
+  (my/ccsm--log "%s → butler │ %s" (my/ccsm--who-dir dir) (or body "")))
 
 (defun my/ccsm--ordered (sessions)
   "Sort SESSIONS for display.
@@ -292,6 +338,7 @@ rest keep their natural order (the sort is stable)."
   "SPC"      #'my/ccsm-preview
   "g"        #'my/ccsm-refresh
   "c"        #'my/ccsm-new-session
+  "l"        #'my/ccsm-show-log
   "q"        #'my/ccsm-quit)
 
 (define-derived-mode my/ccsm-mode special-mode "CC-Sessions"

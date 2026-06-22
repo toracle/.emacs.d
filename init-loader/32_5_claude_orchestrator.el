@@ -141,8 +141,8 @@ submit  -> type the summary and submit it, so the butler reacts at once"
               ((buffer-live-p mbuf)))
     (my/ccsm--send-input
      butler
-     (format "[ccsm] Worker \"%s\" needs attention: %s"
-             (my/ccsm--display-name dir)
+     (format "[ccsm] Worker %s needs attention: %s"
+             (my/ccsm--who-dir dir)
              (or (plist-get event :body) (plist-get event :title) ""))
      (eq mode 'submit))))
 
@@ -190,8 +190,21 @@ submit  -> type the summary and submit it, so the butler reacts at once"
      (t
       (my/ccsm--send-input dir text t)
       (my/ccsm--clear-waiting dir)       ; commanding a worker attends to it
+      (my/ccsm--log "%s → %s │ %s" (my/ccsm--who-dir self) (my/ccsm--who-dir dir) text)
       (my/ccsm--maybe-refresh)
       (format "Sent to %s and submitted." name)))))
+
+(defun my/ccsm-tool-report-to-butler (text)
+  "MCP tool: a worker reports TEXT up to the butler.
+The caller's session name and id are attached automatically, so the
+butler always knows which worker reported.  The report lands in the
+butler's inbox (drained by `pending_events') and is teed to the log."
+  (let ((self (my/ccsm--caller-dir)))
+    (unless self
+      (error "No calling session context for this report"))
+    (my/ccsm--inbox-push self (concat "[report] " (or text "")))
+    (my/ccsm--maybe-refresh)
+    (format "Reported to the butler as %s." (my/ccsm--who-dir self))))
 
 (defun my/ccsm-tool-inbox ()
   "MCP tool: return and clear the butler's pending worker events.
@@ -205,7 +218,7 @@ without anything being typed into its input box."
       (mapconcat (lambda (e)
                    (format "- [%s] %s: %s"
                            (format-time-string "%H:%M" (plist-get e :time))
-                           (plist-get e :name)
+                           (my/ccsm--who (plist-get e :name) (plist-get e :id))
                            (plist-get e :body)))
                  events "\n"))))
 
@@ -215,14 +228,22 @@ without anything being typed into its input box."
        (lambda (spec)
          (member (plist-get (claude-code-ide--normalize-tool-spec spec) :name)
                  '("list_claude_sessions" "read_session_output"
-                   "send_to_session" "pending_events")))
+                   "send_to_session" "pending_events" "report_to_butler")))
        claude-code-ide-mcp-server-tools))
 
 (claude-code-ide-make-tool
  :function #'my/ccsm-tool-inbox
  :name "pending_events"
- :description "Drain the butler's inbox: pending events from worker sessions that need attention (a worker asked a question, finished, or hit a prompt), newest last. Each line is a timestamped worker name and message. Call this at the start of each turn (and whenever you are nudged) to learn what changed without anything being typed into your input box. Returns the events and clears them."
+ :description "Drain the butler's inbox: pending events from worker sessions that need attention (a worker asked a question, finished, reported, or hit a prompt), newest last. Each line is a timestamped worker name (with its session id) and message. Call this at the start of each turn (and whenever you are nudged) to learn what changed without anything being typed into your input box. Returns the events and clears them."
  :args nil)
+
+(claude-code-ide-make-tool
+ :function #'my/ccsm-tool-report-to-butler
+ :name "report_to_butler"
+ :description "Report a message up to the butler/orchestrator session (worker -> butler), e.g. progress, a result, a blocker, or that you are waiting for the user. Your own session name and id are attached automatically, so the butler knows who reported. The butler picks it up via its inbox. Use this when you want to surface something to the butler rather than (or in addition to) printing it locally."
+ :args '((:name "text"
+                :type string
+                :description "The message to report to the butler.")))
 
 (claude-code-ide-make-tool
  :function #'my/ccsm-tool-list-sessions

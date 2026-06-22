@@ -194,17 +194,24 @@ submit  -> type the summary and submit it, so the butler reacts at once"
       (my/ccsm--maybe-refresh)
       (format "Sent to %s and submitted." name)))))
 
-(defun my/ccsm-tool-report-to-butler (text)
-  "MCP tool: a worker reports TEXT up to the butler.
-The caller's session name and id are attached automatically, so the
-butler always knows which worker reported.  The report lands in the
-butler's inbox (drained by `pending_events') and is teed to the log."
+(defun my/ccsm-tool-report-to-butler (summary &optional status needs)
+  "MCP tool: a worker reports to the butler with real content.
+SUMMARY is what happened / what was done, STATUS the current state, and
+NEEDS what the worker needs from the human (all teed to the inbox and
+log).  The caller's session name and id are attached automatically."
   (let ((self (my/ccsm--caller-dir)))
     (unless self
       (error "No calling session context for this report"))
-    (my/ccsm--inbox-push self (concat "[report] " (or text "")))
-    (my/ccsm--maybe-refresh)
-    (format "Reported to the butler as %s." (my/ccsm--who-dir self))))
+    (let* ((parts (delq nil
+                        (list (and (stringp summary) (not (string-empty-p summary)) summary)
+                              (and (stringp status) (not (string-empty-p status))
+                                   (concat "status: " status))
+                              (and (stringp needs) (not (string-empty-p needs))
+                                   (concat "needs: " needs)))))
+           (msg (if parts (string-join parts " · ") "(empty report)")))
+      (my/ccsm--inbox-push self msg)
+      (my/ccsm--maybe-refresh)
+      (format "Reported to the butler as %s." (my/ccsm--who-dir self)))))
 
 (defun my/ccsm-tool-inbox ()
   "MCP tool: return and clear the butler's pending worker events.
@@ -240,10 +247,18 @@ without anything being typed into its input box."
 (claude-code-ide-make-tool
  :function #'my/ccsm-tool-report-to-butler
  :name "report_to_butler"
- :description "Report a message up to the butler/orchestrator session (worker -> butler), e.g. progress, a result, a blocker, or that you are waiting for the user. Your own session name and id are attached automatically, so the butler knows who reported. The butler picks it up via its inbox. Use this when you want to surface something to the butler rather than (or in addition to) printing it locally."
- :args '((:name "text"
+ :description "Report up to the butler/orchestrator with real content — not just 'I need attention'. State WHAT happened / what you did, the current STATE, and exactly what you NEED from the human (a decision, input, or nothing). Your session name and id are attached automatically; the butler reads it from its inbox and relays a summary to the human. Call it when you finish, get blocked, or need a decision."
+ :args '((:name "summary"
                 :type string
-                :description "The message to report to the butler.")))
+                :description "What happened or what you did — the substance of the report (e.g. 'implemented invoice PDF rendering, all tests pass').")
+         (:name "status"
+                :type string
+                :description "Current state, e.g. 'PR #42 open, CI green' or 'blocked on the DB migration'. Optional."
+                :optional t)
+         (:name "needs"
+                :type string
+                :description "What you need from the human/butler to proceed, e.g. 'approve the merge' or 'which auth method to use'. Omit (or 'nothing') if you are only informing. Optional."
+                :optional t)))
 
 (claude-code-ide-make-tool
  :function #'my/ccsm-tool-list-sessions

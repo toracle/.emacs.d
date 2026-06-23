@@ -41,10 +41,25 @@
   "Return the working-dir of the session that invoked the current MCP tool."
   (plist-get (claude-code-ide-mcp-server-get-session-context) :project-dir))
 
+(defun my/ccsm--refresh-terminal-text (buffer)
+  "Force BUFFER's text to be re-synced from the live ghostel grid.
+ghostel only repaints a buffer that is displayed in a window; a
+background session buffer is never redisplayed, so its text can be a
+stale frame.  Drive a full `ghostel--redraw' directly (the same call
+ghostel makes on config changes) so the text reflects the current frame
+without needing a window."
+  (with-current-buffer buffer
+    (when (and (boundp 'ghostel--term) ghostel--term (fboundp 'ghostel--redraw))
+      (let ((inhibit-read-only t))
+        (ignore-errors (ghostel--redraw ghostel--term t))))))
+
 (defun my/ccsm--read-output (dir &optional lines)
-  "Return the last LINES (default 40) of session DIR's terminal screen."
+  "Return the last LINES (default 40) of session DIR's terminal screen.
+The terminal text is force-refreshed first so the capture is always the
+current frame, even for a background (non-displayed) buffer."
   (let ((buf (get-buffer (claude-code-ide--get-buffer-name dir))))
     (when (buffer-live-p buf)
+      (my/ccsm--refresh-terminal-text buf)
       (with-current-buffer buf
         (let* ((n (max 1 (or lines 40)))
                (start (save-excursion (goto-char (point-max))

@@ -528,6 +528,12 @@ first."
                    (ignore-errors (ghostel--adjust-size window))
                  (setq-default window-adjust-process-window-size-function orig))))))))))
 
+(defvar my/ccsm-after-preview-functions nil
+  "Abnormal hook run after a session terminal is shown in the main window.
+Each function receives (DIR MAIN-WINDOW).  The document-panel module
+(`32_6_claude_doc_panel') rides this to add or tear down the per-session
+document split *before* the terminal is resized to its final width.")
+
 (defun my/ccsm-preview ()
   "Show the session at point in the main window, staying in the list."
   (interactive)
@@ -536,6 +542,7 @@ first."
          (win (my/ccsm--main-win)))
     (when (and (buffer-live-p buf) (window-live-p win))
       (set-window-buffer win buf)
+      (run-hook-with-args 'my/ccsm-after-preview-functions dir win)
       (my/ccsm--terminal-resize buf win))))
 
 (defun my/ccsm--goto-index (i)

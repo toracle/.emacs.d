@@ -1,0 +1,644 @@
+;;; 32_6_claude_doc_panel.el --- Per-session document panel for CCSM  -*- lexical-binding: t; -*-
+
+;; A Claude Code session is a stream of TUI output that scrolls away — hard to
+;; refer back to, and poor for holding the *context* a task needs (the PR under
+;; review, the issue it closes, the CI run that just failed, a design doc).
+;;
+;; This module gives each session its own *document panel*: a right-hand
+;; vertical split, child of that session's area, holding one or more rendered
+;; documents.  The split nests inside the existing CCSM layout:
+;;
+;;   +----------+-------------------------------+
+;;   | sessions |  terminal      |   document   |   <- per-session child split
+;;   |  list    |  (the session) |    panel     |
+;;   +----------+-------------------------------+
+;;
+;; The panel is *bound to the session*: its document set is keyed by the
+;; session's working-dir, so switching to another session and back restores the
+;; same documents.  The running Claude opens documents into its own panel by
+;; calling the `show_document' MCP tool; the human can also drive it from the
+;; session list (see the keymap below).
+;;
+;; Documents are fetched on demand with the `gh' CLI (PRs, issues, workflow
+;; runs) and rendered read-only, or opened straight from a local file.
+
+(require '32_2_claude_session_manager)
+(require 'claude-code-ide)
+(require 'seq)
+(require 'subr-x)
+
+;;;; ------------------------------------------------------------------
+;;;; Per-session document state
+;;;; ------------------------------------------------------------------
+
+(defvar my/ccsm--docs (make-hash-table :test 'equal)
+  "Map a session working-dir to its document-panel state plist.
+Keys: :items  -- ordered list of document descriptors (see below);
+      :current -- index into :items of the visible document;
+      :open   -- whether the panel is shown when the session is previewed.
+
+A document descriptor is a plist:
+  :kind  one of the symbols `pr' `issue' `run' `file'
+  :ref   the reference string (PR/issue/run number, or a file path)
+  :label a short human label for the cycler/echo
+  :buffer the buffer rendering the document
+  :owned  non-nil when CCSM created the buffer (so it may kill it).")
+
+(defvar my/ccsm--doc-window nil
+  "The live window showing the current session's document, or nil.
+Always a split to the right of `my/ccsm--main-window'; never that window
+itself, so tearing the panel down never disturbs the terminal.")
+
+(defun my/ccsm--doc-state (dir)
+  "Return the document-panel state for session DIR, or nil."
+  (gethash dir my/ccsm--docs))
+
+(defun my/ccsm--current-doc (dir)
+  "Return the currently-selected document descriptor for DIR, or nil."
+  (let* ((state (my/ccsm--doc-state dir))
+         (items (and state (plist-get state :items)))
+         (idx (and state (plist-get state :current))))
+    (and items (nth (min (max 0 (or idx 0)) (1- (length items))) items))))
+
+(defun my/ccsm--current-doc-buffer (dir)
+  "Return the buffer of DIR's currently-selected document, or nil."
+  (let ((doc (my/ccsm--current-doc dir)))
+    (and doc (buffer-live-p (plist-get doc :buffer)) (plist-get doc :buffer))))
+
+(defun my/ccsm--visible-dir ()
+  "Return the session working-dir whose terminal occupies the main window."
+  (and (window-live-p my/ccsm--main-window)
+       (my/ccsm--dir-for-buffer (window-buffer my/ccsm--main-window))))
+
+;;;; ------------------------------------------------------------------
+;;;; Document buffers + rendering
+;;;; ------------------------------------------------------------------
+
+(define-derived-mode my/ccsm-doc-mode special-mode "CCSM-Doc"
+  "Major mode for a CCSM document buffer (read-only rendered text)."
+  (setq-local truncate-lines nil)
+  ;; The panel is a side-by-side (partial-width) window; without this, a
+  ;; window narrower than `truncate-partial-width-windows' (default 50)
+  ;; truncates long lines — e.g. wide table rows — regardless of
+  ;; `truncate-lines'.  nil makes wrapping unconditional so nothing is cut.
+  (setq-local truncate-partial-width-windows nil)
+  (setq-local word-wrap t)
+  (setq-local header-line-format
+              (concat " " (propertize "[" 'face 'bold) "/"
+                      (propertize "]" 'face 'bold) " cycle  "
+                      (propertize "g" 'face 'bold) " refresh  "
+                      (propertize "C-c C-n" 'face 'bold) " comment  "
+                      (propertize "w" 'face 'bold) " web  "
+                      (propertize "q" 'face 'bold) " close")))
+
+(defun my/ccsm--doc-label (kind ref)
+  "Return a short human label for a KIND/REF document."
+  (pcase kind
+    ('pr    (format "PR #%s" ref))
+    ('issue (format "issue #%s" ref))
+    ('run   (format "run %s" ref))
+    ('file  (file-name-nondirectory ref))
+    (_      (format "%s %s" kind ref))))
+
+(defun my/ccsm--doc-command (kind ref)
+  "Return the `gh' argument list that renders a KIND/REF document, or nil."
+  (pcase kind
+    ('pr    (list "gh" "pr" "view" ref "--comments"))
+    ('issue (list "gh" "issue" "view" ref "--comments"))
+    ('run   (list "gh" "run" "view" ref))
+    (_      nil)))
+
+(defun my/ccsm--child-repos (dir)
+  "Return the immediate child directories of DIR that are git repos."
+  (when (file-directory-p dir)
+    (seq-filter (lambda (p)
+                  (and (file-directory-p p)
+                       (file-directory-p (expand-file-name ".git" p))))
+                (directory-files dir t "\\`[^.]"))))
+
+(defun my/ccsm--doc-git-dir (dir repo)
+  "Resolve the git working directory for a gh document in session DIR.
+A topic-workspace root is not itself a repo; the repos live in child
+directories.  REPO (a child-repo basename) is honored when given.
+Returns one of: (:dir D), (:ambiguous (NAMES...)), or (:badrepo NAME)."
+  (cond
+   ((and repo (not (string-empty-p repo)))
+    (let ((p (file-name-as-directory (expand-file-name repo dir))))
+      (if (file-directory-p (expand-file-name ".git" p))
+          (list :dir p)
+        (list :badrepo repo))))
+   ((locate-dominating-file dir ".git")
+    (list :dir (file-name-as-directory (locate-dominating-file dir ".git"))))
+   (t (let ((kids (my/ccsm--child-repos dir)))
+        (cond
+         ((= (length kids) 1) (list :dir (file-name-as-directory (car kids))))
+         (kids (list :ambiguous
+                     (mapcar (lambda (p)
+                               (file-name-nondirectory (directory-file-name p)))
+                             kids)))
+         ;; No repo anywhere — let gh run in DIR and report its own error.
+         (t (list :dir (file-name-as-directory dir))))))))
+
+(defun my/ccsm--doc-make-buffer (name kind ref)
+  "Create (or reuse) a `my/ccsm-doc-mode' buffer for session NAME / KIND / REF."
+  (let ((buf (get-buffer-create (format "*ccsm-doc:%s:%s-%s*" name kind ref))))
+    (with-current-buffer buf
+      (unless (derived-mode-p 'my/ccsm-doc-mode) (my/ccsm-doc-mode)))
+    buf))
+
+;; Context carried by each gh document buffer, so its action commands
+;; (comment / browse / refresh) know what they are acting on.
+(defvar-local my/ccsm--doc-buffer-kind nil "This doc buffer's kind symbol.")
+(defvar-local my/ccsm--doc-buffer-ref nil  "This doc buffer's reference string.")
+(defvar-local my/ccsm--doc-buffer-cwd nil  "Git working dir gh runs in for this doc.")
+
+(defun my/ccsm--strip-ansi (s)
+  "Remove ANSI/terminal control sequences (e.g. gh's spinner) from S."
+  (let* ((s (replace-regexp-in-string "\x1b\\[[0-9;?]*[A-Za-z]" "" s))
+         (s (replace-regexp-in-string "\x1b[][()#][0-9;]*[A-Za-z]?" "" s))
+         (s (replace-regexp-in-string "[\x00-\x08\x0b\x0c\x0e-\x1f]" "" s)))
+    (replace-regexp-in-string "\r" "" s)))
+
+(defun my/ccsm--doc-render (doc dir)
+  "Fetch DOC's content (run in DOC's :cwd or DIR) asynchronously into its buffer.
+Only meaningful for `gh'-backed kinds; `file' documents are real file
+buffers and are not rendered here.  stdout and stderr are captured
+separately so the spinner on stderr never pollutes a successful render;
+on failure stderr is shown so the error is still visible."
+  (let* ((kind (plist-get doc :kind))
+         (ref (plist-get doc :ref))
+         (buf (plist-get doc :buffer))
+         (cmd (my/ccsm--doc-command kind ref)))
+    (when (and cmd (buffer-live-p buf))
+      (with-current-buffer buf
+        (setq my/ccsm--doc-buffer-kind kind
+              my/ccsm--doc-buffer-ref ref
+              my/ccsm--doc-buffer-cwd (file-name-as-directory
+                                       (or (plist-get doc :cwd) dir)))
+        (let ((inhibit-read-only t))
+          (erase-buffer)
+          (insert (format "Loading %s…\n" (plist-get doc :label)))))
+      (let ((default-directory (file-name-as-directory
+                                (or (plist-get doc :cwd) dir)))
+            (errbuf (generate-new-buffer " *ccsm-doc-err*")))
+        (ignore-errors
+          (make-process
+           :name "ccsm-doc"
+           :buffer (generate-new-buffer " *ccsm-doc-fetch*")
+           :stderr errbuf
+           :command cmd
+           :noquery t
+           :sentinel
+           (lambda (proc _event)
+             (when (memq (process-status proc) '(exit signal))
+               (let* ((code (process-exit-status proc))
+                      (out (with-current-buffer (process-buffer proc)
+                             (buffer-string)))
+                      (err (and (buffer-live-p errbuf)
+                                (with-current-buffer errbuf (buffer-string))))
+                      (clean (my/ccsm--strip-ansi (or out "")))
+                      (text (cond
+                             ((and (eq code 0) (not (string-empty-p (string-trim clean))))
+                              clean)
+                             ((and err (not (string-empty-p (string-trim
+                                                             (my/ccsm--strip-ansi err)))))
+                              (concat clean (my/ccsm--strip-ansi err)))
+                             (t (if (string-empty-p (string-trim clean))
+                                    "(no output)" clean)))))
+                 (when (buffer-live-p (process-buffer proc))
+                   (kill-buffer (process-buffer proc)))
+                 (when (buffer-live-p errbuf) (kill-buffer errbuf))
+                 (when (buffer-live-p buf)
+                   (with-current-buffer buf
+                     (let ((inhibit-read-only t))
+                       (erase-buffer)
+                       (insert text)
+                       (goto-char (point-min))))))))))))))
+
+(defvar my/ccsm-doc-file-mode-map
+  (let ((m (make-sparse-keymap)))
+    (define-key m (kbd "C-c C-e") #'my/ccsm-doc-file-toggle-edit)
+    (define-key m (kbd "C-c C-q") #'my/ccsm-doc-hide)
+    m)
+  "Keymap active in file documents shown in the panel.")
+
+(define-minor-mode my/ccsm-doc-file-mode
+  "Minor mode for a local file shown in a CCSM document panel.
+The file opens read-only (forge-style); `C-c C-e' toggles editability."
+  :lighter " CCSM-Doc"
+  :keymap my/ccsm-doc-file-mode-map
+  (when my/ccsm-doc-file-mode
+    (setq buffer-read-only t)
+    ;; Wrap unconditionally in the narrow side panel (see `my/ccsm-doc-mode').
+    (setq-local truncate-lines nil)
+    (setq-local truncate-partial-width-windows nil)
+    (setq-local header-line-format
+                (concat " " (propertize "C-c C-e" 'face 'bold) " edit  "
+                        (propertize "C-c d" 'face 'bold) " panel  "
+                        (propertize "C-c C-q" 'face 'bold) " close+zoom"))))
+
+(defun my/ccsm-doc-file-toggle-edit ()
+  "Toggle read-only on a file document so you can edit it in place."
+  (interactive)
+  (setq buffer-read-only (not buffer-read-only))
+  (message "ccsm doc: %s" (if buffer-read-only "read-only" "editable")))
+
+(defun my/ccsm--doc-file-buffer (dir ref)
+  "Return a buffer visiting file REF (relative to DIR), or an error buffer.
+The file opens read-only via `my/ccsm-doc-file-mode'."
+  (let ((path (expand-file-name ref (file-name-as-directory dir))))
+    (if (file-readable-p path)
+        (let ((buf (find-file-noselect path)))
+          (with-current-buffer buf (my/ccsm-doc-file-mode 1))
+          buf)
+      (let ((buf (get-buffer-create (format "*ccsm-doc:%s*" ref))))
+        (with-current-buffer buf
+          (unless (derived-mode-p 'my/ccsm-doc-mode) (my/ccsm-doc-mode))
+          (let ((inhibit-read-only t))
+            (erase-buffer)
+            (insert (format "Cannot read file: %s\n" path))))
+        buf))))
+
+;;;; ------------------------------------------------------------------
+;;;; Mutating the document set
+;;;; ------------------------------------------------------------------
+
+(defun my/ccsm--doc-add (dir kind ref &optional cwd)
+  "Add (or re-select) a KIND/REF document in session DIR's panel.
+CWD, when given, is the git working directory gh runs in (for gh kinds in
+a multi-repo topic workspace).  Returns the updated state plist; opens the
+panel.  A document already present is re-selected (and gh kinds re-fetched)
+rather than duplicated."
+  (let* ((name (my/ccsm--display-name dir))
+         (state (or (my/ccsm--doc-state dir) (list :items nil :current 0 :open t)))
+         (items (plist-get state :items))
+         (existing (seq-find (lambda (d)
+                               (and (eq (plist-get d :kind) kind)
+                                    (equal (plist-get d :ref) ref)))
+                             items)))
+    (if existing
+        (progn
+          (when cwd (setq existing (plist-put existing :cwd cwd)))
+          (unless (eq kind 'file) (my/ccsm--doc-render existing dir))
+          (setq state (plist-put state :current (seq-position items existing))))
+      (let* ((buf (if (eq kind 'file)
+                      (my/ccsm--doc-file-buffer dir ref)
+                    (my/ccsm--doc-make-buffer name kind ref)))
+             (doc (list :kind kind :ref ref
+                        :label (my/ccsm--doc-label kind ref)
+                        :cwd cwd
+                        :buffer buf :owned (not (eq kind 'file)))))
+        (unless (eq kind 'file) (my/ccsm--doc-render doc dir))
+        (setq items (append items (list doc)))
+        (setq state (plist-put (plist-put state :items items)
+                               :current (1- (length items))))))
+    (setq state (plist-put state :open t))
+    (puthash dir state my/ccsm--docs)
+    state))
+
+;;;; ------------------------------------------------------------------
+;;;; Layout: nest the document split inside the session's main area
+;;;; ------------------------------------------------------------------
+
+(defcustom my/ccsm-doc-width nil
+  "Width, in columns, of the document panel; nil splits the area in half."
+  :type '(choice (const :tag "Half" nil) integer)
+  :group 'claude-code-ide)
+
+(defun my/ccsm--apply-doc-layout (dir main-win)
+  "Reconcile the document split for session DIR around terminal MAIN-WIN.
+Show a doc window to the right iff DIR has an open, non-empty panel; tear
+it down otherwise.  Bound to `my/ccsm-after-preview-functions', so every
+preview rebuilds the layout for the session it shows."
+  (let* ((state (my/ccsm--doc-state dir))
+         (open (and state (plist-get state :open) (plist-get state :items)))
+         (docbuf (and open (my/ccsm--current-doc-buffer dir))))
+    (if (not (and open docbuf (window-live-p main-win)))
+        (when (window-live-p my/ccsm--doc-window)
+          (delete-window my/ccsm--doc-window)
+          (setq my/ccsm--doc-window nil))
+      (unless (and (window-live-p my/ccsm--doc-window)
+                   (not (eq my/ccsm--doc-window main-win)))
+        (setq my/ccsm--doc-window
+              (ignore-errors
+                (split-window main-win
+                              (and my/ccsm-doc-width (- my/ccsm-doc-width))
+                              'right))))
+      (when (window-live-p my/ccsm--doc-window)
+        (set-window-buffer my/ccsm--doc-window docbuf)))))
+
+(add-hook 'my/ccsm-after-preview-functions #'my/ccsm--apply-doc-layout)
+
+(defun my/ccsm--doc-refresh-layout (dir)
+  "Rebuild DIR's document split if DIR is the session currently on screen.
+Resizes the terminal afterward, since adding/removing the doc window
+changes the terminal window's width."
+  (when (and dir (equal dir (my/ccsm--visible-dir))
+             (window-live-p my/ccsm--main-window))
+    (my/ccsm--apply-doc-layout dir my/ccsm--main-window)
+    (my/ccsm--terminal-resize (window-buffer my/ccsm--main-window)
+                              my/ccsm--main-window)))
+
+;;;; ------------------------------------------------------------------
+;;;; Interactive commands (driven from the session list or a doc buffer)
+;;;; ------------------------------------------------------------------
+
+(defun my/ccsm--doc-target-dir ()
+  "Return the session to act on: the list entry at point, else the visible one."
+  (or (and (derived-mode-p 'my/ccsm-mode) (my/ccsm--dir-at-point))
+      (my/ccsm--visible-dir)))
+
+(defun my/ccsm--doc-step (dir delta)
+  "Move DIR's current document by DELTA (wrapping) and reflect it on screen."
+  (let* ((state (my/ccsm--doc-state dir))
+         (items (and state (plist-get state :items))))
+    (if (not (and items (cdr items)))
+        (message "ccsm: no other documents for this session")
+      (let* ((n (length items))
+             (idx (mod (+ (or (plist-get state :current) 0) delta) n)))
+        (setq state (plist-put (plist-put state :current idx) :open t))
+        (puthash dir state my/ccsm--docs)
+        (my/ccsm--doc-refresh-layout dir)
+        (message "ccsm doc: %s" (plist-get (nth idx items) :label))))))
+
+(defun my/ccsm-doc-next ()
+  "Show the next document in the selected session's panel."
+  (interactive)
+  (when-let ((dir (my/ccsm--doc-target-dir))) (my/ccsm--doc-step dir 1)))
+
+(defun my/ccsm-doc-prev ()
+  "Show the previous document in the selected session's panel."
+  (interactive)
+  (when-let ((dir (my/ccsm--doc-target-dir))) (my/ccsm--doc-step dir -1)))
+
+(defun my/ccsm-doc-toggle ()
+  "Toggle whether the selected session's document panel is shown."
+  (interactive)
+  (let* ((dir (my/ccsm--doc-target-dir))
+         (state (and dir (my/ccsm--doc-state dir))))
+    (if (not (and state (plist-get state :items)))
+        (message "ccsm: no documents for this session")
+      (puthash dir (plist-put state :open (not (plist-get state :open)))
+               my/ccsm--docs)
+      (my/ccsm--doc-refresh-layout dir))))
+
+(defun my/ccsm-doc-hide ()
+  "Hide the visible session's document panel and zoom into its terminal."
+  (interactive)
+  (let ((dir (my/ccsm--visible-dir)))
+    (when-let ((state (and dir (my/ccsm--doc-state dir))))
+      (puthash dir (plist-put state :open nil) my/ccsm--docs)
+      (my/ccsm--doc-refresh-layout dir))
+    (when (window-live-p my/ccsm--main-window)
+      (select-window my/ccsm--main-window))))
+
+(defun my/ccsm-doc-remove ()
+  "Drop the current document from the selected session's panel.
+CCSM-owned buffers (gh documents) are killed; visited files are only
+unlinked from the panel."
+  (interactive)
+  (let* ((dir (my/ccsm--doc-target-dir))
+         (state (and dir (my/ccsm--doc-state dir))))
+    (when-let* ((state state)
+                (items (plist-get state :items))
+                (idx (or (plist-get state :current) 0))
+                (doc (nth idx items)))
+      (when (and (plist-get doc :owned) (buffer-live-p (plist-get doc :buffer)))
+        (kill-buffer (plist-get doc :buffer)))
+      (setq items (delq doc items))
+      (setq state (plist-put state :items items))
+      (setq state (plist-put state :current (min idx (max 0 (1- (length items))))))
+      (unless items (setq state (plist-put state :open nil)))
+      (puthash dir state my/ccsm--docs)
+      (my/ccsm--doc-refresh-layout dir)
+      (message "ccsm doc: removed %s" (plist-get doc :label)))))
+
+(defun my/ccsm-doc-revert ()
+  "Re-fetch the current gh document.
+Prefers the doc buffer's own context (when called from a doc buffer),
+else the visible session's current document."
+  (interactive)
+  (if my/ccsm--doc-buffer-kind
+      (my/ccsm--doc-render
+       (list :kind my/ccsm--doc-buffer-kind :ref my/ccsm--doc-buffer-ref
+             :cwd my/ccsm--doc-buffer-cwd :buffer (current-buffer)
+             :label (my/ccsm--doc-label my/ccsm--doc-buffer-kind
+                                        my/ccsm--doc-buffer-ref))
+       my/ccsm--doc-buffer-cwd)
+    (let* ((dir (my/ccsm--visible-dir))
+           (doc (and dir (my/ccsm--current-doc dir))))
+      (when (and doc (not (eq (plist-get doc :kind) 'file)))
+        (my/ccsm--doc-render doc dir)
+        (message "ccsm doc: refreshing %s" (plist-get doc :label))))))
+
+;;;; gh action commands (forge-style: read-only view, explicit actions)
+
+(defun my/ccsm--doc-sub (kind)
+  "Return the `gh' subcommand string for KIND (`pr'/`issue'/`run')."
+  (pcase kind ('pr "pr") ('issue "issue") ('run "run")))
+
+(defun my/ccsm-doc-browse ()
+  "Open the current gh document on the web (`gh ... view REF --web')."
+  (interactive)
+  (let ((kind my/ccsm--doc-buffer-kind)
+        (ref my/ccsm--doc-buffer-ref)
+        (default-directory (or my/ccsm--doc-buffer-cwd default-directory)))
+    (unless (and kind (my/ccsm--doc-sub kind))
+      (user-error "Not in a CCSM gh document"))
+    (start-process "ccsm-doc-web" nil "gh" (my/ccsm--doc-sub kind)
+                   "view" ref "--web")
+    (message "ccsm doc: opening %s on the web" (my/ccsm--doc-label kind ref))))
+
+(define-derived-mode my/ccsm-doc-compose-mode text-mode "CCSM-Compose"
+  "Major mode for composing a comment on a CCSM gh document."
+  (setq-local header-line-format
+              (concat " " (propertize "C-c C-c" 'face 'bold) " post   "
+                      (propertize "C-c C-k" 'face 'bold) " cancel")))
+
+(defvar-local my/ccsm--compose-target nil
+  "Plist (:kind :ref :cwd :doc-buffer) the compose buffer posts to.")
+
+(defun my/ccsm-doc-comment ()
+  "Compose a comment on the current PR/issue document (post with C-c C-c)."
+  (interactive)
+  (let ((kind my/ccsm--doc-buffer-kind)
+        (ref my/ccsm--doc-buffer-ref)
+        (cwd my/ccsm--doc-buffer-cwd)
+        (doc-buf (current-buffer)))
+    (unless (memq kind '(pr issue))
+      (user-error "Comments apply to pr/issue documents only"))
+    (let ((buf (get-buffer-create (format "*ccsm-comment:%s-%s*" kind ref))))
+      (with-current-buffer buf
+        (my/ccsm-doc-compose-mode)
+        (erase-buffer)
+        (setq my/ccsm--compose-target
+              (list :kind kind :ref ref :cwd cwd :doc-buffer doc-buf)))
+      (pop-to-buffer buf)
+      (message "Write your comment, then C-c C-c to post (C-c C-k cancels)"))))
+
+(defun my/ccsm-doc-compose-send ()
+  "Post the composed comment via `gh ... comment REF --body-file'."
+  (interactive)
+  (let* ((tgt my/ccsm--compose-target)
+         (body (string-trim (buffer-substring-no-properties (point-min) (point-max)))))
+    (unless tgt (user-error "No comment target"))
+    (when (string-empty-p body) (user-error "Empty comment; nothing to post"))
+    (let* ((kind (plist-get tgt :kind))
+           (ref (plist-get tgt :ref))
+           (doc-buf (plist-get tgt :doc-buffer))
+           (default-directory (or (plist-get tgt :cwd) default-directory))
+           (tmp (make-temp-file "ccsm-comment"))
+           (compose-buf (current-buffer)))
+      (write-region body nil tmp nil 'silent)
+      (make-process
+       :name "ccsm-doc-comment"
+       :buffer (generate-new-buffer " *ccsm-comment-out*")
+       :command (list "gh" (my/ccsm--doc-sub kind) "comment" ref "--body-file" tmp)
+       :noquery t
+       :sentinel
+       (lambda (proc _event)
+         (when (memq (process-status proc) '(exit signal))
+           (let ((out (with-current-buffer (process-buffer proc) (buffer-string))))
+             (ignore-errors (delete-file tmp))
+             (when (buffer-live-p (process-buffer proc))
+               (kill-buffer (process-buffer proc)))
+             (if (eq (process-exit-status proc) 0)
+                 (progn
+                   (when (buffer-live-p compose-buf) (kill-buffer compose-buf))
+                   (message "ccsm doc: comment posted")
+                   ;; refresh the underlying document so the new comment shows
+                   (when (buffer-live-p doc-buf)
+                     (with-current-buffer doc-buf
+                       (when (fboundp 'my/ccsm-doc-revert) (my/ccsm-doc-revert)))))
+               (message "ccsm doc: comment failed — %s" (string-trim out))))))))))
+
+(defun my/ccsm-doc-compose-cancel ()
+  "Abandon the comment being composed."
+  (interactive)
+  (when (eq major-mode 'my/ccsm-doc-compose-mode)
+    (kill-buffer (current-buffer))
+    (message "ccsm doc: comment cancelled")))
+
+(define-key my/ccsm-doc-compose-mode-map (kbd "C-c C-c") #'my/ccsm-doc-compose-send)
+(define-key my/ccsm-doc-compose-mode-map (kbd "C-c C-k") #'my/ccsm-doc-compose-cancel)
+
+(defun my/ccsm-doc-open ()
+  "Prompt for a document and open it in the selected session's panel."
+  (interactive)
+  (let ((dir (my/ccsm--doc-target-dir)))
+    (unless dir (user-error "No session selected"))
+    (let* ((kind (intern (completing-read "Document kind: "
+                                          '("pr" "issue" "run" "file") nil t)))
+           (ref (if (eq kind 'file)
+                    (file-relative-name
+                     (read-file-name "File: " (file-name-as-directory dir))
+                     dir)
+                  (string-trim (read-string (format "%s ref: " kind)))))
+           (cwd (unless (eq kind 'file)
+                  (pcase (my/ccsm--doc-git-dir dir nil)
+                    (`(:dir ,d) d)
+                    (`(:ambiguous ,names)
+                     (file-name-as-directory
+                      (expand-file-name
+                       (completing-read "Repo: " names nil t) dir)))
+                    (_ nil)))))
+      (my/ccsm--doc-add dir kind ref cwd)
+      (my/ccsm--doc-refresh-layout dir))))
+
+;;;; Keybindings
+
+(with-eval-after-load '32_2_claude_session_manager
+  (when (boundp 'my/ccsm-mode-map)
+    (define-key my/ccsm-mode-map "]" #'my/ccsm-doc-next)
+    (define-key my/ccsm-mode-map "[" #'my/ccsm-doc-prev)
+    (define-key my/ccsm-mode-map "d" #'my/ccsm-doc-toggle)
+    (define-key my/ccsm-mode-map "D" #'my/ccsm-doc-remove)
+    (define-key my/ccsm-mode-map "o" #'my/ccsm-doc-open)))
+
+(define-key my/ccsm-doc-mode-map "]" #'my/ccsm-doc-next)
+(define-key my/ccsm-doc-mode-map "[" #'my/ccsm-doc-prev)
+(define-key my/ccsm-doc-mode-map "g" #'my/ccsm-doc-revert)
+(define-key my/ccsm-doc-mode-map "k" #'my/ccsm-doc-remove)
+(define-key my/ccsm-doc-mode-map "q" #'my/ccsm-doc-hide)
+(define-key my/ccsm-doc-mode-map "w" #'my/ccsm-doc-browse)
+(define-key my/ccsm-doc-mode-map (kbd "C-c C-n") #'my/ccsm-doc-comment)
+(define-key my/ccsm-doc-mode-map (kbd "C-c C-o") #'my/ccsm-doc-browse)
+
+;; A global prefix so the panel is controllable from the session terminal
+;; (or anywhere), not only from the session list.
+(defvar my/ccsm-doc-prefix-map
+  (let ((m (make-sparse-keymap)))
+    (define-key m "]" #'my/ccsm-doc-next)
+    (define-key m "[" #'my/ccsm-doc-prev)
+    (define-key m "d" #'my/ccsm-doc-toggle)
+    (define-key m "z" #'my/ccsm-doc-hide)
+    (define-key m "o" #'my/ccsm-doc-open)
+    (define-key m "g" #'my/ccsm-doc-revert)
+    (define-key m "k" #'my/ccsm-doc-remove)
+    m)
+  "Keymap for CCSM document-panel commands, bound under a global prefix.")
+
+(global-set-key (kbd "C-c d") my/ccsm-doc-prefix-map)
+
+;;;; ------------------------------------------------------------------
+;;;; MCP tool: a session opens a document into its own panel
+;;;; ------------------------------------------------------------------
+
+(defun my/ccsm-tool-show-document (kind ref &optional repo)
+  "MCP tool: open a KIND/REF document in the calling session's panel.
+REPO names a child repo for gh kinds in a multi-repo topic workspace."
+  (let ((dir (plist-get (claude-code-ide-mcp-server-get-session-context)
+                        :project-dir)))
+    (unless dir
+      (error "No active Claude session context for this request"))
+    (let ((k (intern (downcase (string-trim (or kind ""))))))
+      (unless (memq k '(pr issue run file))
+        (error "Unknown document kind %S (use pr, issue, run, or file)" kind))
+      (when (or (null ref) (string-empty-p (string-trim ref)))
+        (error "A document reference is required"))
+      (let ((cwd nil))
+        ;; gh kinds need a git repo; a topic-workspace root is not one.
+        (unless (eq k 'file)
+          (let ((g (my/ccsm--doc-git-dir dir (and repo (string-trim repo)))))
+            (pcase g
+              (`(:dir ,d) (setq cwd d))
+              (`(:badrepo ,name)
+               (error "No git repo %S under this workspace; pass a valid `repo'" name))
+              (`(:ambiguous ,names)
+               (error "This workspace holds several repos (%s). Re-call show_document with `repo' set to the one this %s belongs to."
+                      (mapconcat #'identity names ", ") k)))))
+        (my/ccsm--doc-add dir k (string-trim ref) cwd)
+        (my/ccsm--doc-refresh-layout dir)
+        (my/ccsm--maybe-refresh)
+        (format "Opened %s%s in the document panel for session '%s'."
+                (my/ccsm--doc-label k (string-trim ref))
+                (if cwd (format " (repo %s)"
+                                (file-name-nondirectory (directory-file-name cwd)))
+                  "")
+                (my/ccsm--display-name dir))))))
+
+;; Idempotent (re)registration.
+(setq claude-code-ide-mcp-server-tools
+      (seq-remove
+       (lambda (spec)
+         (equal "show_document"
+                (plist-get (claude-code-ide--normalize-tool-spec spec) :name)))
+       claude-code-ide-mcp-server-tools))
+
+(claude-code-ide-make-tool
+ :function #'my/ccsm-tool-show-document
+ :name "show_document"
+ :description "Open a reference document in THIS session's side document panel in the Emacs session manager, so the human can read it next to your terminal (and it stays pinned to this session when they switch away and back). Use it to surface the PR under review, the issue you are working, a failing CI run, or a design/markdown file. You can open several; they accumulate and the human can cycle through them. The panel persists per session."
+ :args '((:name "kind"
+                :type string
+                :description "Document type: 'pr' (pull request), 'issue', 'run' (GitHub Actions workflow run), or 'file' (a local file in the working tree).")
+         (:name "ref"
+                :type string
+                :description "The reference: a PR/issue/run NUMBER for pr/issue/run (e.g. '42'), or a file path relative to the working directory for 'file' (e.g. 'docs/DESIGN.md').")
+         (:name "repo"
+                :type string
+                :description "For pr/issue/run only: the child repo this reference belongs to, when the session's workspace holds several repos (e.g. 'monocle', 'stark'). Omit for a single-repo session; if the workspace is multi-repo and this is omitted, the tool returns the list of repos to choose from."
+                :optional t)))
+
+(provide '32_6_claude_doc_panel)
+;;; 32_6_claude_doc_panel.el ends here

@@ -20,8 +20,8 @@ make external
 
 ## Documentation
 
-- [CCSM — Claude Code Session Manager](docs/CCSM.md): a cmux-like manager for
-  running many concurrent `claude-code-ide` sessions, with a butler/worker
-  control plane. Implemented in [`init-loader/32_*`](init-loader/).
-- [cc-butler — worklog & roadmap](docs/cc-butler-worklog.md): running journal of
-  turning CCSM into the standalone `cc-butler` package.
+- [cc-butler](cc-butler/README.md): a cmux-like manager for running many
+  concurrent `claude-code-ide` sessions, with a butler/worker control plane, a
+  per-session document panel, and a self-maintained document repository. A
+  standalone package under [`cc-butler/`](cc-butler/), loaded from `init.el`.
+  - [Reference](docs/cc-butler-reference.md) · [worklog & roadmap](docs/cc-butler-worklog.md)

@@ -74,6 +74,40 @@ Gave the butler a durable, programmatically-maintained doc repo.
     itself.
 - View with `V` in the manager, or `show_document file docs/dashboard.org`.
 
+## 2026-07-02 (later) — extracted to a standalone `cc-butler` package
+
+Decoupled from init-loader. The `init-loader/32_2..32_7` "CCSM" drop-ins moved
+to a package directory `cc-butler/` and were renamed:
+
+| Old | New | Feature |
+|-----|-----|---------|
+| `32_2_claude_session_manager` | `cc-butler-session.el` | `cc-butler-session` |
+| `32_3_claude_notifications` | `cc-butler-notifications.el` | `cc-butler-notifications` |
+| `32_4_claude_workspace` | `cc-butler-workspace.el` | `cc-butler-workspace` |
+| `32_5_claude_orchestrator` | `cc-butler-orchestrator.el` | `cc-butler-orchestrator` |
+| `32_6_claude_doc_panel` | `cc-butler-doc-panel.el` | `cc-butler-doc-panel` |
+| `32_7_claude_butler_docs` | `cc-butler-docs.el` | `cc-butler-docs` |
+
+- Symbols renamed `my/ccsm-*` → `cc-butler-*` (and the `my/ccsm-butler-*`
+  sub-namespace collapsed to `cc-butler-*`); entry command `my/ccsm` →
+  `cc-butler`. **MCP tool names are unchanged** (`set_session_info`,
+  `show_document`, `butler_log`, …) so the running butler/worker contract holds.
+- New package files: `cc-butler.el` (entry: `cc-butler` group + `require`s) and
+  `README.md`. `Package-Requires: ((emacs "29.1") (claude-code-ide "0.2.7"))`.
+- Loaded from `init.el` via `add-to-list 'load-path` + `(require 'cc-butler)`
+  (next to the existing `modules/` add) — no longer through init-loader. The
+  hydra in `init-loader/04000_llm.el` was updated to the new command names.
+- `32_1_claude_custom_tools.el` (generic buffer tools) intentionally **stays**
+  in init-loader — not cc-butler.
+- Verified: whole package byte-compiles clean and `(require 'cc-butler)` loads
+  in a fresh `emacs -Q` (commands + `show_document` tool present). The **live
+  daemon was not hot-reloaded** (it keeps the old code until the next restart,
+  to avoid double-registered advice/tools while ~20 workers run).
+- Docs: `docs/CCSM.md` → `docs/cc-butler-reference.md` (names swept).
+
+Still **inside** `~/.emacs.d/` for now; moving the package out of the emacs.d
+tree is a later, separate decision.
+
 ## 2026-07-02
 
 ### Doc panel: tab line, header line removed (`32_6`)

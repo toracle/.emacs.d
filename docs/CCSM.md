@@ -126,6 +126,7 @@ The list re-renders itself (debounced 0.3s, only when visible) on:
 | `g` | `my/ccsm-refresh` | Re-render + re-fetch forge info |
 | `c` | `my/ccsm-new-session` | Start a session in a chosen directory |
 | `N` | `my/ccsm-new-topic` | Create a **topic workspace** (§6) |
+| `K` | `my/ccsm-close-topic` | Safely close a topic: vet, kill session, delete workspace (§6) |
 | `b` | `my/ccsm-set-butler` | Toggle the session at point as **butler** (§7) |
 | `l` | `my/ccsm-show-log` | Pop to the `*ccsm-log*` message log |
 | `q` | `my/ccsm-quit` | Close the side window |
@@ -176,6 +177,19 @@ project is just another entry. `M-x my/ccsm-new-topic` (or `N`) prompts for a
 template (or `arbitrary`, which falls back to `my/ccsm-new-session`) and a
 topic name, clones the repos **async/sequentially** (skipping present ones),
 scaffolds the markers, and launches the session.
+
+### Closing a topic (`my/ccsm-close-topic`, `K`)
+The inverse of `new-topic`. Pick a live session; before removing anything it
+**proves no local work would be lost** — every git clone in the workspace must
+have no local-only commits (`git log --branches --not --remotes`), a clean
+working tree (`git status --porcelain`), and no stashes (`git stash list`),
+checked with real `git` (a git error also counts as unsafe). If **any** clone
+fails **any** check, nothing is killed or deleted and the reasons are reported.
+On pass + confirmation it kills the session (terminal process + buffers,
+`claude-code-ide--cleanup-on-exit`, clears waiting/docs/butler state),
+**re-runs the audit immediately before deletion** (drift guard), then deletes
+the workspace (home/root/shallow paths refused). `C-u` forces (skips safety).
+Scope: local-loss prevention only — prod/remote state is out of scope.
 
 ---
 
@@ -235,6 +249,18 @@ always a split to the **right of `my/ccsm--main-window`** (tracked as
 the split iff the session has an open, non-empty panel; tear it down otherwise.
 Because the split narrows the terminal window, the PTY is resized afterward.
 
+The panel's open documents appear as a **tab line** at the top of the doc
+window — one clickable tab per document (labeled by `:label`), the active tab
+being the shown one, and a close button removing it. The tab line is attached
+to the doc *window* via its `tab-line-format` window parameter (not
+`tab-line-mode`, which is buffer-local and would leak the tabs into any other
+window showing the same file); it reuses tab-line's built-in
+renderer/mouse/close, driven by buffer-local `tab-line-tabs-function` etc. on
+each doc buffer, with `my/ccsm--doc-sync-current` (on
+`window-buffer-change-functions`) keeping `:current` in step when a tab is
+clicked. There is **no header line** — navigation is the tab line, actions are
+`C-c d`.
+
 **Documents** are fetched on demand:
 
 | Kind | Source |
@@ -281,18 +307,19 @@ global **`C-c d`** prefix:
 
 | Key | Command | Action |
 |-----|---------|--------|
+| tab click / `]` `[` | `my/ccsm-doc-next` / `-prev` | Select / cycle documents |
+| tab `×` / `k` `D` | `my/ccsm-doc-remove` | Drop a document (kills gh buffers; only unlinks files) |
 | `o` | `my/ccsm-doc-open` | Prompt for kind/ref (and repo if needed), open into the selected session |
-| `]` / `[` | `my/ccsm-doc-next` / `-prev` | Cycle documents |
 | `d` | `my/ccsm-doc-toggle` | Show/hide the panel |
 | `z` *(C-c d)* / `q` *(doc buf)* | `my/ccsm-doc-hide` | Hide the panel and **zoom** into the terminal |
-| `D` / `k` | `my/ccsm-doc-remove` | Drop the current document (kills gh buffers; only unlinks files) |
 | `g` | `my/ccsm-doc-revert` | Re-fetch the current gh doc |
 | `w` | `my/ccsm-doc-browse` | Open the current gh doc on the web |
-| `C-c C-n` | `my/ccsm-doc-comment` | Compose a comment on the current PR/issue |
+| `n` *(C-c d)* / `C-c C-n` | `my/ccsm-doc-comment` | Compose a comment on the current PR/issue |
 
-The list keymap binds `o ] [ d D`; the doc buffer additionally binds
-`q w k g C-c C-n C-c C-o`; `C-c d` is the global prefix (`d z ] [ o g k`).
-`my/ccsm-doc-width` (default `nil` = half) sets the panel width.
+Documents are navigated/closed via the **tab line**; panel and gh actions via
+the global **`C-c d`** prefix (`d z ] [ o g k n w`) — no header line. `n`/`w`
+from `C-c d` act on the visible session's current document, so they work from
+the terminal too. `my/ccsm-doc-width` (default `nil` = half) sets the width.
 
 ---
 

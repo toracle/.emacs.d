@@ -74,6 +74,27 @@ Gave the butler a durable, programmatically-maintained doc repo.
     itself.
 - View with `V` in the manager, or `show_document file docs/dashboard.org`.
 
+## 2026-07-02
+
+### Doc panel: tab line, header line removed (`32_6`)
+- Multi-doc UI is now a **tab line** on the doc window (window-parameter, not
+  buffer-local `tab-line-mode` → no leak), reusing tab-line's renderer/mouse/
+  close; `my/ccsm--doc-sync-current` keeps `:current` in step on tab click.
+- **Header line removed** (user decision): navigation = tab line, actions =
+  `C-c d` (which now also carries `n` comment / `w` browse, acting on the
+  visible session's current doc so they work from the terminal too).
+
+### `my/ccsm-close-topic` — safe topic teardown (`32_4`, `K`)
+- Inverse of `new-topic`. Safety gate per git clone (no local-only commits /
+  clean tree / no stash, real `git`, git-error = unsafe); abort-on-any-unsafe,
+  nothing touched. Kills session, **re-audits immediately before deletion**
+  (drift guard), deletes workspace (home/root/shallow guarded). `C-u` forces.
+- Verified against throwaway temp repos incl. the drift case.
+
+### Decisions locked
+- Package name **cc-butler**; `ccsm→cc-butler` rename **deferred to the package
+  extraction** (avoid user-facing churn now).
+
 ---
 
 ## Next / open

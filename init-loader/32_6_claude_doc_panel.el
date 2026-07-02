@@ -26,6 +26,7 @@
 (require 'claude-code-ide)
 (require 'seq)
 (require 'subr-x)
+(require 'tab-line)
 
 ;;;; ------------------------------------------------------------------
 ;;;; Per-session document state
@@ -82,14 +83,7 @@ itself, so tearing the panel down never disturbs the terminal.")
   ;; truncates long lines — e.g. wide table rows — regardless of
   ;; `truncate-lines'.  nil makes wrapping unconditional so nothing is cut.
   (setq-local truncate-partial-width-windows nil)
-  (setq-local word-wrap t)
-  (setq-local header-line-format
-              (concat " " (propertize "[" 'face 'bold) "/"
-                      (propertize "]" 'face 'bold) " cycle  "
-                      (propertize "g" 'face 'bold) " refresh  "
-                      (propertize "C-c C-n" 'face 'bold) " comment  "
-                      (propertize "w" 'face 'bold) " web  "
-                      (propertize "q" 'face 'bold) " close")))
+  (setq-local word-wrap t))
 
 (defun my/ccsm--doc-label (kind ref)
   "Return a short human label for a KIND/REF document."
@@ -231,11 +225,7 @@ The file opens read-only (forge-style); `C-c C-e' toggles editability."
     (setq buffer-read-only t)
     ;; Wrap unconditionally in the narrow side panel (see `my/ccsm-doc-mode').
     (setq-local truncate-lines nil)
-    (setq-local truncate-partial-width-windows nil)
-    (setq-local header-line-format
-                (concat " " (propertize "C-c C-e" 'face 'bold) " edit  "
-                        (propertize "C-c d" 'face 'bold) " panel  "
-                        (propertize "C-c C-q" 'face 'bold) " close+zoom"))))
+    (setq-local truncate-partial-width-windows nil)))
 
 (defun my/ccsm-doc-file-toggle-edit ()
   "Toggle read-only on a file document so you can edit it in place."
@@ -294,7 +284,97 @@ rather than duplicated."
                                :current (1- (length items))))))
     (setq state (plist-put state :open t))
     (puthash dir state my/ccsm--docs)
+    (my/ccsm--doc-setup-buffer
+     (or (and existing (plist-get existing :buffer))
+         (my/ccsm--current-doc-buffer dir))
+     dir)
     state))
+
+;;;; ------------------------------------------------------------------
+;;;; Tab line: the session's documents as clickable tabs
+;;;; ------------------------------------------------------------------
+;;
+;; The tab line is attached to the *document window* via its `tab-line-format'
+;; window parameter (not `tab-line-mode', which is buffer-local and would leak
+;; the tabs into any other window showing the same file).  We reuse tab-line's
+;; own renderer/mouse/close machinery by pointing the parameter at
+;; `(tab-line-format)', and drive it with buffer-local tab functions set on each
+;; document buffer.
+
+(defvar-local my/ccsm--doc-session-dir nil
+  "The session working-dir a document buffer belongs to (for its tab line).")
+
+(defun my/ccsm--doc-tabs ()
+  "`tab-line-tabs-function': the current session's ordered document buffers."
+  (when-let* ((dir my/ccsm--doc-session-dir)
+              (items (plist-get (my/ccsm--doc-state dir) :items)))
+    (seq-filter #'buffer-live-p
+                (mapcar (lambda (d) (plist-get d :buffer)) items))))
+
+(defun my/ccsm--doc-tab-name (buffer &optional _buffers)
+  "`tab-line-tab-name-function': label a document BUFFER by its :label."
+  (let* ((dir (buffer-local-value 'my/ccsm--doc-session-dir buffer))
+         (doc (and dir (seq-find (lambda (d) (eq (plist-get d :buffer) buffer))
+                                 (plist-get (my/ccsm--doc-state dir) :items)))))
+    (format " %s " (or (and doc (plist-get doc :label)) (buffer-name buffer)))))
+
+(defun my/ccsm--doc-index-of-buffer (items buffer)
+  "Return the index of the doc whose :buffer is BUFFER in ITEMS, or nil."
+  (let ((i 0) found)
+    (dolist (d items)
+      (when (and (not found) (eq (plist-get d :buffer) buffer)) (setq found i))
+      (setq i (1+ i)))
+    found))
+
+(defun my/ccsm--doc-remove-buffer (dir buffer)
+  "Drop the document whose buffer is BUFFER from session DIR's panel."
+  (let* ((state (my/ccsm--doc-state dir))
+         (items (plist-get state :items))
+         (idx (my/ccsm--doc-index-of-buffer items buffer))
+         (doc (and idx (nth idx items))))
+    (when doc
+      (when (and (plist-get doc :owned) (buffer-live-p buffer)) (kill-buffer buffer))
+      (setq items (delq doc items))
+      (setq state (plist-put state :items items))
+      (setq state (plist-put state :current
+                             (min (or (plist-get state :current) 0)
+                                  (max 0 (1- (length items))))))
+      (unless items (setq state (plist-put state :open nil)))
+      (puthash dir state my/ccsm--docs)
+      (my/ccsm--doc-refresh-layout dir)
+      (message "ccsm doc: removed %s" (plist-get doc :label)))))
+
+(defun my/ccsm--doc-tab-close (tab &optional _)
+  "`tab-line-close-tab-function': remove the clicked document TAB (a buffer)."
+  (let* ((buf (if (bufferp tab) tab (cdr (assq 'buffer tab))))
+         (dir (and (buffer-live-p buf)
+                   (buffer-local-value 'my/ccsm--doc-session-dir buf))))
+    (when dir (my/ccsm--doc-remove-buffer dir buf))))
+
+(defun my/ccsm--doc-setup-buffer (buffer dir)
+  "Prepare document BUFFER of session DIR to render a tab line when shown."
+  (when (buffer-live-p buffer)
+    (with-current-buffer buffer
+      (setq-local my/ccsm--doc-session-dir dir
+                  tab-line-tabs-function #'my/ccsm--doc-tabs
+                  tab-line-tab-name-function #'my/ccsm--doc-tab-name
+                  tab-line-close-tab-function #'my/ccsm--doc-tab-close))))
+
+(defun my/ccsm--doc-sync-current (&rest _)
+  "Keep a session's :current in step with whatever its panel now shows.
+Runs on `window-buffer-change-functions' so selecting a tab (which switches
+the doc window's buffer) updates our stored selection."
+  (when (window-live-p my/ccsm--doc-window)
+    (let* ((buf (window-buffer my/ccsm--doc-window))
+           (dir (and (buffer-live-p buf)
+                     (buffer-local-value 'my/ccsm--doc-session-dir buf))))
+      (when dir
+        (let* ((state (my/ccsm--doc-state dir))
+               (idx (my/ccsm--doc-index-of-buffer (plist-get state :items) buf)))
+          (when (and idx (not (equal idx (plist-get state :current))))
+            (puthash dir (plist-put state :current idx) my/ccsm--docs)))))))
+
+(add-hook 'window-buffer-change-functions #'my/ccsm--doc-sync-current)
 
 ;;;; ------------------------------------------------------------------
 ;;;; Layout: nest the document split inside the session's main area
@@ -325,6 +405,10 @@ preview rebuilds the layout for the session it shows."
                               (and my/ccsm-doc-width (- my/ccsm-doc-width))
                               'right))))
       (when (window-live-p my/ccsm--doc-window)
+        ;; Attach the tab line to the window (not the buffer): it appears only
+        ;; in the panel, and reuses tab-line's own renderer/mouse/close.
+        (set-window-parameter my/ccsm--doc-window 'tab-line-format
+                              '(:eval (tab-line-format)))
         (set-window-buffer my/ccsm--doc-window docbuf)))))
 
 (add-hook 'my/ccsm-after-preview-functions #'my/ccsm--apply-doc-layout)
@@ -398,20 +482,8 @@ CCSM-owned buffers (gh documents) are killed; visited files are only
 unlinked from the panel."
   (interactive)
   (let* ((dir (my/ccsm--doc-target-dir))
-         (state (and dir (my/ccsm--doc-state dir))))
-    (when-let* ((state state)
-                (items (plist-get state :items))
-                (idx (or (plist-get state :current) 0))
-                (doc (nth idx items)))
-      (when (and (plist-get doc :owned) (buffer-live-p (plist-get doc :buffer)))
-        (kill-buffer (plist-get doc :buffer)))
-      (setq items (delq doc items))
-      (setq state (plist-put state :items items))
-      (setq state (plist-put state :current (min idx (max 0 (1- (length items))))))
-      (unless items (setq state (plist-put state :open nil)))
-      (puthash dir state my/ccsm--docs)
-      (my/ccsm--doc-refresh-layout dir)
-      (message "ccsm doc: removed %s" (plist-get doc :label)))))
+         (buf (and dir (my/ccsm--current-doc-buffer dir))))
+    (when (and dir buf) (my/ccsm--doc-remove-buffer dir buf))))
 
 (defun my/ccsm-doc-revert ()
   "Re-fetch the current gh document.
@@ -437,17 +509,31 @@ else the visible session's current document."
   "Return the `gh' subcommand string for KIND (`pr'/`issue'/`run')."
   (pcase kind ('pr "pr") ('issue "issue") ('run "run")))
 
+(defun my/ccsm--doc-action-buffer ()
+  "Return the gh document buffer to act on.
+This buffer when it is a gh document, else the visible session's current
+document — so the actions work both in the panel and from the `C-c d'
+prefix elsewhere."
+  (if my/ccsm--doc-buffer-kind
+      (current-buffer)
+    (when-let ((dir (my/ccsm--visible-dir)))
+      (my/ccsm--current-doc-buffer dir))))
+
 (defun my/ccsm-doc-browse ()
   "Open the current gh document on the web (`gh ... view REF --web')."
   (interactive)
-  (let ((kind my/ccsm--doc-buffer-kind)
-        (ref my/ccsm--doc-buffer-ref)
-        (default-directory (or my/ccsm--doc-buffer-cwd default-directory)))
-    (unless (and kind (my/ccsm--doc-sub kind))
-      (user-error "Not in a CCSM gh document"))
-    (start-process "ccsm-doc-web" nil "gh" (my/ccsm--doc-sub kind)
-                   "view" ref "--web")
-    (message "ccsm doc: opening %s on the web" (my/ccsm--doc-label kind ref))))
+  (let ((buf (my/ccsm--doc-action-buffer)))
+    (unless (buffer-live-p buf) (user-error "No document to act on"))
+    (with-current-buffer buf
+      (let ((kind my/ccsm--doc-buffer-kind)
+            (ref my/ccsm--doc-buffer-ref)
+            (default-directory (or my/ccsm--doc-buffer-cwd default-directory)))
+        (unless (and kind (my/ccsm--doc-sub kind))
+          (user-error "Current document is not a gh document"))
+        (start-process "ccsm-doc-web" nil "gh" (my/ccsm--doc-sub kind)
+                       "view" ref "--web")
+        (message "ccsm doc: opening %s on the web"
+                 (my/ccsm--doc-label kind ref))))))
 
 (define-derived-mode my/ccsm-doc-compose-mode text-mode "CCSM-Compose"
   "Major mode for composing a comment on a CCSM gh document."
@@ -461,10 +547,11 @@ else the visible session's current document."
 (defun my/ccsm-doc-comment ()
   "Compose a comment on the current PR/issue document (post with C-c C-c)."
   (interactive)
-  (let ((kind my/ccsm--doc-buffer-kind)
-        (ref my/ccsm--doc-buffer-ref)
-        (cwd my/ccsm--doc-buffer-cwd)
-        (doc-buf (current-buffer)))
+  (let ((doc-buf (my/ccsm--doc-action-buffer)))
+    (unless (buffer-live-p doc-buf) (user-error "No document to act on"))
+    (let ((kind (buffer-local-value 'my/ccsm--doc-buffer-kind doc-buf))
+          (ref (buffer-local-value 'my/ccsm--doc-buffer-ref doc-buf))
+          (cwd (buffer-local-value 'my/ccsm--doc-buffer-cwd doc-buf)))
     (unless (memq kind '(pr issue))
       (user-error "Comments apply to pr/issue documents only"))
     (let ((buf (get-buffer-create (format "*ccsm-comment:%s-%s*" kind ref))))
@@ -474,7 +561,7 @@ else the visible session's current document."
         (setq my/ccsm--compose-target
               (list :kind kind :ref ref :cwd cwd :doc-buffer doc-buf)))
       (pop-to-buffer buf)
-      (message "Write your comment, then C-c C-c to post (C-c C-k cancels)"))))
+      (message "Write your comment, then C-c C-c to post (C-c C-k cancels)")))))
 
 (defun my/ccsm-doc-compose-send ()
   "Post the composed comment via `gh ... comment REF --body-file'."
@@ -575,6 +662,8 @@ else the visible session's current document."
     (define-key m "o" #'my/ccsm-doc-open)
     (define-key m "g" #'my/ccsm-doc-revert)
     (define-key m "k" #'my/ccsm-doc-remove)
+    (define-key m "n" #'my/ccsm-doc-comment)
+    (define-key m "w" #'my/ccsm-doc-browse)
     m)
   "Keymap for CCSM document-panel commands, bound under a global prefix.")
 

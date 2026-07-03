@@ -74,6 +74,31 @@ Gave the butler a durable, programmatically-maintained doc repo.
     itself.
 - View with `V` in the manager, or `show_document file docs/dashboard.org`.
 
+## 2026-07-03 (later) — butler/steward role split (built, activation pending)
+
+SDD: [cc-butler-role-split-sdd.md](cc-butler-role-split-sdd.md). Names **final**:
+butler (front-of-house) / steward (below-stairs ops). Built as one optional,
+backward-compatible mode (cc-butler repo local commit `518bf72`, unpushed):
+
+- `cc-butler--ops-dir = (or steward butler)` drives all firehose routing;
+  `cc-butler--forward-to-ops` targets the steward when set, else the butler
+  (single mode unchanged). Steward drains `pending_events`.
+- Quiet butler channel: `cc-butler--butler-inbox` + tools `escalate_to_butler`
+  (steward→butler; also appends a shared `decisions.org` + one non-submitted
+  nudge) and `pending_decisions` (butler drains). Butler relays down with the
+  existing `send_to_session`.
+- `cc-butler-start-steward` (`S`) + `cc-butler-steward-home`; role `CLAUDE.md`
+  generators state the household metaphor. Shared docs stay under the butler home.
+- Verified with mocks (routing single/split, forward→steward, escalate round-trip,
+  role docs, S binding, tools registered); compiles clean.
+
+**Cutover decided: `.ccsm` → butler; spawn fresh steward** (reloads orchestration
+state from dashboard/log/roster/memory files). **Activation is gated behind a
+handshake**: build done → report "ready to activate" → the (current) butler
+captures in-flight dispatch state into the dashboard + a handoff note → then
+activate (hot-load new code [neutral in single mode] → update `.ccsm/CLAUDE.md`
+to the butler role → `cc-butler-start-steward`, which retargets the firehose).
+
 ## 2026-07-03 (later) — public repo + butler-launch bootstrap
 
 - **Public GitHub repo**: [github.com/toracle/cc-butler](https://github.com/toracle/cc-butler)

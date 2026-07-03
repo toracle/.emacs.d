@@ -84,14 +84,20 @@ Gave the butler a durable, programmatically-maintained doc repo.
   with a `.projectile` marker + a bootstrap role `CLAUDE.md`, launches a Claude
   session there, and designates it butler (idempotent). Replaces the
   "mark-an-arbitrary-session" flow as the primary path (`b` remains a fallback).
-- **Queued (awaiting one decision)**: file-based **session-list persistence**
-  for daemon-crash resilience (the mosh pipe-backpressure death that lost the
-  roster). Snapshot `(:dir :name :title :status :branch :butler)` to
-  `<home>/sessions.eld`; on open, show dead-but-recorded sessions as restorable.
-  Open fork: restore = re-launch fresh vs `claude --resume` vs list-only.
-- **Open decisions** (were mid-answer when the human stepped away): butler-home
-  default (reuse `~/.ccsm` vs fresh `~/.emacs.d/cc-butler`), and the restore
-  semantics above.
+- **Session-roster persistence** (`cc-butler-persist.el`, local commit
+  `7bf6524`, **unpushed — push gated**): snapshot the roster
+  (`:dir :name :title :status :branch :butler`) to `cc-butler-roster-file`
+  (default `~/.emacs.d/cc-butler-sessions.eld`), debounced on session
+  add/remove + butler change. After a daemon crash + restart,
+  `cc-butler-restore-sessions` (`R`) relaunches each recorded-but-dead session
+  in its dir with `cc-butler-resume-args` (default **`--continue`** = restore
+  last conversation non-interactively; `--resume` needs a conversation id we
+  don't persist) and restores the butler flag. Restore semantics decided by the
+  human: resume last state as-is. Mock-verified (round-trip + `--continue`
+  flags + butler restore); no real sessions launched, daemon untouched.
+- **Open decision**: `cc-butler-home` default — reuse `~/.ccsm` vs fresh
+  `~/.emacs.d/cc-butler` (home stays at the current defcustom default until
+  answered). **Gated**: pushing further commits, renaming `~/.ccsm`.
 
 ## 2026-07-03 — split into its own repo `~/projects/cc-butler`
 

@@ -1,6 +1,8 @@
 # cc-butler — maildir message bus (SDD)
 
-Status: **design draft, for approval before build.**
+Status: core mechanics detail. The top-level unified design (one core +
+per-recipient adapters, incl. the human decision-doc adapter) is
+[cc-butler-decision-workflow-sdd.md](cc-butler-decision-workflow-sdd.md).
 
 ## 1. Problem
 
@@ -13,10 +15,18 @@ Inter-session messaging in cc-butler is currently three ad-hoc mechanisms:
 - **in-memory queues** (`cc-butler--inbox`, `cc-butler--butler-inbox`) — lost on
   a daemon crash, not auditable, not visible across restarts.
 - **no down inbox** — messages to a worker can only be typed at it.
+- **no return path** *(real bug hit in production)* — when the butler asks a
+  worker something (`send_to_session`), the worker's answer does **not** come
+  back to the butler. `report_to_butler` now routes to the *steward*, and a
+  worker that simply answers in its buffer is only seen if the butler *manually
+  polls* `read_session_output`. Result: "the worker answered but we (the
+  butler) never received it." A query needs a **reply that returns to the
+  asker**.
 
 We want **one** durable, lock-free, auditable message bus, borrowing the Unix
 **maildir** pattern, with the audit trail falling out as a byproduct (a core
-boss requirement).
+boss requirement), and with **request/response correlation** so a reply reaches
+whoever asked.
 
 ## 2. Maildir, and its known issues (research)
 

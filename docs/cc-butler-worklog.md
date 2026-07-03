@@ -74,6 +74,22 @@ Gave the butler a durable, programmatically-maintained doc repo.
     itself.
 - View with `V` in the manager, or `show_document file docs/dashboard.org`.
 
+## 2026-07-03 — split into its own repo `~/projects/cc-butler`
+
+- Moved the `cc-butler/*.el` + README out of `~/.emacs.d/` into a standalone
+  git repo at **`~/projects/cc-butler`** (`git init`, `.gitignore` for
+  `*.elc`/`*.eln`). `~/.emacs.d/init.el` now adds `~/projects/cc-butler` to
+  `load-path` and `(require 'cc-butler)` from there.
+- Verified: byte-compiles clean and `(require 'cc-butler)` loads from the new
+  path in a fresh `emacs -Q`. **Live daemon untouched** (cc-butler was already
+  loaded into it earlier today; moving the source files doesn't affect the
+  in-memory code — the new path only matters on the next restart).
+- Local + reversible only. **Gated (need approval):** creating/pushing a
+  GitHub repo, and renaming the on-disk butler home `~/.ccsm/`.
+- Detail docs (`docs/cc-butler-reference.md`, this worklog) still live under
+  `~/.emacs.d/docs/` for now — consolidating them into the package repo is a
+  later step.
+
 ## 2026-07-02 (later) — extracted to a standalone `cc-butler` package
 
 Decoupled from init-loader. The `init-loader/32_2..32_7` "CCSM" drop-ins moved

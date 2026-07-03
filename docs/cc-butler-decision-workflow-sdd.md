@@ -95,6 +95,35 @@ back to the originating session with the correlation id.
   **`reply`** on the decision's correlation → routed to the originating session
   → the file moves to `done/`. Reuses the core's reply routing; no new system.
 
+### 4a. Message kinds in 정수님's inbox (proposed, for §6)
+
+정수님's inbox receives more than decisions — a steward may relay a plain
+**note** (informational: "worker X finished", "CI green"). If everything became
+an answerable document the directory would clog with things that need no answer.
+So the human adapter **renders by `:kind`** (the core already carries it):
+
+| kind | render | interaction |
+|------|--------|-------------|
+| `decision` | an **answerable** document (options + answer region) | `C-c C-c` submits a reply |
+| `note` / `relay` | a **read-only notification** (no answer region) | mark seen → straight to `done/` |
+
+Only `decision` messages become answerable files; notes render read-only, so the
+answerable queue stays exactly the open decisions. Both are the same durable
+messages under one audit trail.
+
+### 4b. Decision-text integrity in the edit buffer (proposed, for §6)
+
+Only the **answer region** may be edited or parsed; the decision text and
+options above it are preserved. Proposed mechanism (Emacs-native):
+
+- Put a **`read-only` text property** on the decision/options region (and the
+  `do-not-edit` footer) while the answer region is left writable. The buffer is
+  editable, but only the answer region accepts input — the top physically can't
+  be changed. (Simpler than region-narrowing; standard Emacs affordance.)
+- On `C-c C-c`, **parse only the answer region** (between its start marker and
+  the footer), and **validate** the top is byte-identical to the source message
+  before routing — a belt-and-suspenders integrity check.
+
 ## 5. Extension point — C (worker DOWN), later, no redesign
 
 Because the core is uniform, the deferred worker down-direction is **just
@@ -110,6 +139,13 @@ now** (north star; no worker touched); the SDD only marks the seam.
 2. **Human-adapter submit UX** — parse trigger: explicit `C-c C-c`
    *(recommended, safe)* vs auto-on-save; marking form: org checkbox `[X]` vs a
    `Decision:` line vs a TODO keyword (all support option-pick + free-form).
+3. **Message-kind rendering** (§4a) — confirm: `decision` → answerable document,
+   `note`/`relay` → read-only notification, so the answerable queue is exactly
+   the open decisions. Any other kinds to distinguish?
+4. **Answer-region integrity** (§4b) — confirm the mechanism: a `read-only`
+   text property on the decision/options + footer, parse only the answer region,
+   validate the top unchanged on submit. Acceptable, or prefer narrowing to the
+   answer region?
 
 *Resolved (was open):* **butler-relay coexistence** — the butler **is** the human
 adapter (§4), not something the document workflow bypasses. Rendering 정수님's

@@ -74,6 +74,25 @@ Gave the butler a durable, programmatically-maintained doc repo.
     itself.
 - View with `V` in the manager, or `show_document file docs/dashboard.org`.
 
+## 2026-07-03 (later) — public repo + butler-launch bootstrap
+
+- **Public GitHub repo**: [github.com/toracle/cc-butler](https://github.com/toracle/cc-butler)
+  (PUBLIC, `main`). README rewritten as **`README.org`** with the dependency
+  list (claude-code-ide.el, ghostel, Claude Code CLI).
+- **Butler as a first-class session** (`fdd515b`): `cc-butler-start-butler`
+  (`B`) creates `cc-butler-home` (defcustom, default `~/.emacs.d/cc-butler`)
+  with a `.projectile` marker + a bootstrap role `CLAUDE.md`, launches a Claude
+  session there, and designates it butler (idempotent). Replaces the
+  "mark-an-arbitrary-session" flow as the primary path (`b` remains a fallback).
+- **Queued (awaiting one decision)**: file-based **session-list persistence**
+  for daemon-crash resilience (the mosh pipe-backpressure death that lost the
+  roster). Snapshot `(:dir :name :title :status :branch :butler)` to
+  `<home>/sessions.eld`; on open, show dead-but-recorded sessions as restorable.
+  Open fork: restore = re-launch fresh vs `claude --resume` vs list-only.
+- **Open decisions** (were mid-answer when the human stepped away): butler-home
+  default (reuse `~/.ccsm` vs fresh `~/.emacs.d/cc-butler`), and the restore
+  semantics above.
+
 ## 2026-07-03 — split into its own repo `~/projects/cc-butler`
 
 - Moved the `cc-butler/*.el` + README out of `~/.emacs.d/` into a standalone

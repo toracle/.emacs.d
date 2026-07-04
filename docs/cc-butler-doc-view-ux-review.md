@@ -47,6 +47,31 @@ Each guarantee is a *user-observable* promise, not an internal detail.
      never a silent panel close. *(Bug ④ is this class: navigation onto a
      dead-buffer document closes the panel instead of recovering.)*
 
+7. **Destructive-action & mode safety.** *(added — a real data-loss incident:
+   typing "OK" fired `k`=kill, closing the view and losing the comment.)*
+   - A bare single-key **destructive** action (`k`) **never fires while
+     composing** an answer/comment. *(Shipped as a hotfix: the answer region's
+     command letters self-insert; only `C-c C-c` submits.)*
+   - The current **mode is always visible** — command (bare keys act) vs compose
+     (keys type) — so the user is never surprised about what a keystroke does.
+   - **Entering compose is discoverable** (via `?` hydra + a signal), and `k`
+     **removes a document without closing the panel** (stay on a neighbour;
+     same family as the `p`/bug④ delete-window fault).
+
+## 1b. Surface & authoring rules (from the same incident)
+
+- **Answerable vs reference.** A document that **needs an answer** (a
+  product-gate decision, anything the boss must decide) must be rendered through
+  the **human adapter / channel** (answer region + `C-c C-c`, correlation reply)
+  — never as a plain `show_document`. `show_document` is for **briefing /
+  reference** only. Rule for the surface unification: *needs-answer → channel;
+  reference → show_document*. (The incident: a hand-`show_document`'d doc looked
+  answerable but wasn't.)
+- **Authoring style.** A rendered decision (or butler briefing) is written
+  **RFC / narrative** style — background, rationale, options, the reasoning
+  behind the recommendation, enough simulation — per the refined
+  `decision-proposal-format`. Not a bare question.
+
 ## 2. Faithful-fake harness (non-tautological)
 
 **Principle (정수님):** the parts that touch Emacs (buffers, windows, mode-line)

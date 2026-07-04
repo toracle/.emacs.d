@@ -49,14 +49,30 @@ Each guarantee is a *user-observable* promise, not an internal detail.
 
 7. **Destructive-action & mode safety.** *(added — a real data-loss incident:
    typing "OK" fired `k`=kill, closing the view and losing the comment.)*
-   - A bare single-key **destructive** action (`k`) **never fires while
-     composing** an answer/comment. *(Shipped as a hotfix: the answer region's
-     command letters self-insert; only `C-c C-c` submits.)*
-   - The current **mode is always visible** — command (bare keys act) vs compose
-     (keys type) — so the user is never surprised about what a keystroke does.
-   - **Entering compose is discoverable** (via `?` hydra + a signal), and `k`
-     **removes a document without closing the panel** (stay on a neighbour;
-     same family as the `p`/bug④ delete-window fault).
+   - **The fundamental fix (정수님): compose is a *dedicated buffer*, not inline.**
+     Like `org-edit-special` (`C-c '`) / magit: the viewer stays a **pure
+     command-mode** read-only surface; to answer, `c` opens a **separate compose
+     buffer** (its own major mode / template) where you write freely; committing
+     returns the text into the doc's answer region. Because there is **no inline
+     editing in the viewer at all**, mode-confusion and destructive-key misfire
+     are *structurally impossible* — a stronger guarantee than the inline guard.
+   - **Safety net (already live):** the inline char-property guard (answer-region
+     letters self-insert, only `C-c C-c` submits) stays, so even inline editing
+     can't lose text. Dedicated-buffer compose supersedes it as the primary UX.
+   - The current **mode is always visible** — viewer (command) vs a compose
+     buffer (its own mode-line) — so a keystroke is never a surprise.
+   - **Entering compose is discoverable** (`?` hydra + a signal), and `k`
+     **removes a document without closing the panel** (stay on a neighbour; same
+     family as the `p`/bug④ delete-window fault).
+
+   **Compose mechanism (design):** the answer region is treated like a source
+   block. `c` → a dedicated compose buffer (reuse `org-edit-special` if the
+   answer region is modelled as a block, else a parallel implementation — TBD).
+   **Commit** (`C-c '`) writes the text back into the doc's answer region — the
+   answer still lives there for **record / audit**, integrity of the decision
+   text + options preserved. **Submit** then routes it down the channel to the
+   asker. Whether commit (record) and submit (send) are one step or two is a
+   design question (below).
 
 ## 1b. Surface & authoring rules (from the same incident)
 
@@ -136,6 +152,26 @@ port-level `visible-p`/`shown` fact the fake exposes.
   via the channel — same scenario green on the fake and the real adapter.
 - **discoverability:** Given the viewer, When `?`, Then the menu lists r/c/k/n/p/
   g/q **and v (reopen)**.
+- **compose is a dedicated buffer (guarantee 7):** Given a decision in the
+  viewer, When the user presses `c`, Then a **separate compose buffer** opens and
+  the viewer buffer accepts **no inline edits** (it stays read-only command-mode);
+  When the user commits (`C-c '`), Then the text is in the doc's answer region and
+  the viewer is command-only again — and a destructive key in the viewer while a
+  compose buffer is open still cannot touch the composed text.
+- **compose → record → submit:** Given a committed answer in the doc's answer
+  region, When submitted, Then it routes to the origin session via the channel
+  (same scenario on the fake and real transport), and the answer remains recorded
+  in the doc for audit.
+
+### Design questions (compose) for 정수님
+
+- Reuse `org-edit-special` (model the answer region as an Org source block) vs a
+  parallel dedicated-buffer implementation?
+- **Commit vs submit**: one step (`C-c '` writes back *and* sends) or two (commit
+  records into the answer region; a separate `C-c C-c` submits to the channel)?
+  Two steps lets the boss draft, review the recorded answer, then send.
+- Compose buffer's major mode / template (plain text, org, an RFC template per
+  `decision-proposal-format`)?
 
 ## 4. Coverage (guide, not goal)
 

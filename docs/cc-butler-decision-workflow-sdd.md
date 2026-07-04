@@ -124,6 +124,32 @@ options above it are preserved. Proposed mechanism (Emacs-native):
   the footer), and **validate** the top is byte-identical to the source message
   before routing — a belt-and-suspenders integrity check.
 
+### 4c. The doc inbox is 정수님's *general* inbox — butler-authored briefings
+
+정수님's insight: the doc inbox is not only for *worker-originated* messages
+(decision/note relayed up). It is 정수님's **general durable inbox for everything
+정수님-facing**, and that includes the **butler proactively briefing 정수님 — as a
+document, not as chat.**
+
+- **Principle:** *durable 정수님-facing comms → the doc inbox; chat → ephemeral
+  only.* A chat briefing scrolls away; a status/briefing/explanation 정수님 will
+  want to keep and reference must be a **durable document** in the inbox. So the
+  butler writes briefings **into the inbox**, not into the conversation.
+- **Briefing = a note-like message** (informational, no answer). It renders
+  read-only like a `note` and is **closed by the read-receipt `r`** (see the
+  read-receipt SDD) — decisions close by `C-c C-c`, informational/briefings by
+  `r`.
+- **Mechanism — reuse maildir B.** A briefing is a maildir message delivered to
+  정수님's inbox; the arrival watcher renders it; `r` closes it and sends the
+  read-receipt back to the butler. This needs a **butler briefing-author path**:
+  a note-like send to 정수님's inbox, **symmetric with `escalate_to_butler`**
+  (which sends a `decision`). Everything durable 정수님 should see thus converges
+  in the one inbox; global-consistency holds (same lifecycle, one audit trail).
+
+Design judgment (in §6): is a briefing a **new `:kind briefing`**, or just a
+`note` with **author = butler** (SPT)? And the **butler author affordance** — an
+MCP tool (e.g. `brief_the_boss(title, body)`) or a command.
+
 ## 5. Extension point — C (worker DOWN), later, no redesign
 
 Because the core is uniform, the deferred worker down-direction is **just
@@ -146,6 +172,11 @@ now** (north star; no worker touched); the SDD only marks the seam.
    text property on the decision/options + footer, parse only the answer region,
    validate the top unchanged on submit. Acceptable, or prefer narrowing to the
    answer region?
+5. **Briefing kind** (§4c) — a butler briefing: new `:kind briefing`, or a
+   `note` with `author = butler` (SPT)? (Distinct rendering wanted, or is the
+   note read-only + `r` close enough?)
+6. **Butler author affordance** (§4c) — the shape of the briefing-author path:
+   an MCP tool like `brief_the_boss(title, body)`, and/or an interactive command?
 
 *Resolved (was open):* **butler-relay coexistence** — the butler **is** the human
 adapter (§4), not something the document workflow bypasses. Rendering 정수님's

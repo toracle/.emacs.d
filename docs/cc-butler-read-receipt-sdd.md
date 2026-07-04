@@ -32,8 +32,9 @@ signal (you can't answer what you didn't read). Informational messages
 | `decision` | `C-c C-c` (answer) | yes (answering = reading) |
 | `note` / `relay` | **`r` (mark read)** | yes (this is its purpose) |
 
-`r` is also available on a `decision` as "seen, will answer later" (a read
-receipt without an answer) — optional, secondary to the note/relay use.
+`r` is also available on a `decision` as "seen, will answer later" — it emits a
+read receipt **without an answer and without closing** the decision (it stays in
+`open/`; only `C-c C-c` closes it — see §4). Optional, secondary to note/relay.
 
 ## 3. Lifecycle & the single source of truth (global-consistency)
 
@@ -58,9 +59,14 @@ new/  →  (arrival watcher renders)  →  open/  →  (close)  →  done/
 
 ## 4. Affordance
 
-- **`r`** in the doc view marks the current document read → emits the receipt →
-  moves the doc `open/ → done/` → refreshes the ⚖ indicator. (Bound in
-  `cc-butler-decision-mode`, alongside `C-c C-c`.)
+- **`r`** in the doc view marks the current document read, emits the receipt,
+  and refreshes the ⚖ indicator. (Bound in `cc-butler-decision-mode`, alongside
+  `C-c C-c`.) Whether it **closes** the doc depends on kind:
+  - **`note`/`relay`** — `r` closes it: `open/ → done/` (read *is* its close).
+  - **`decision`** — `r` emits a read-receipt only and **keeps the decision in
+    `open/`**. A decision is closed **only** by its `C-c C-c` answer, never by
+    `r` — so an unanswered decision can never be archived out of the queue and
+    lost. (This is the "seen, will answer later" receipt of §2.)
 - Non-destructive and consistent with the read-only viewer: `r` records a read,
   it never edits or deletes the underlying message (which is already archived).
 
@@ -104,4 +110,6 @@ of `done/`, and (c) the sender-footer check that gates propagation.
   receipt.
 - Audit: the read is recoverable from the archived message + receipt.
 - Symmetry: a decision's `C-c C-c` still both answers and closes (no double
-  receipt); `r` on a decision emits a read receipt without an answer.
+  receipt); `r` on a decision emits a read receipt without an answer **and leaves
+  it in `open/`** (only `C-c C-c` closes a decision — an unanswered decision is
+  never lost).

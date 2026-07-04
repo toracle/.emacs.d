@@ -65,14 +65,18 @@ Each guarantee is a *user-observable* promise, not an internal detail.
      **removes a document without closing the panel** (stay on a neighbour; same
      family as the `p`/bug④ delete-window fault).
 
-   **Compose mechanism (design):** the answer region is treated like a source
-   block. `c` → a dedicated compose buffer (reuse `org-edit-special` if the
-   answer region is modelled as a block, else a parallel implementation — TBD).
-   **Commit** (`C-c '`) writes the text back into the doc's answer region — the
-   answer still lives there for **record / audit**, integrity of the decision
-   text + options preserved. **Submit** then routes it down the channel to the
-   asker. Whether commit (record) and submit (send) are one step or two is a
-   design question (below).
+   **Compose mechanism (정수님-confirmed):**
+   - `c` → a dedicated compose buffer opened as a **bottom split below the doc**
+     (`org-edit-special` pattern; the answer region modelled as a source block —
+     reuse if clean, else a parallel impl).
+   - **Commit (`C-c '`) does both** (simplified, per 정수님): it writes the answer
+     back into the doc's answer region (**record / audit** — decision text +
+     options stay read-only) **and** pushes it down the channel to the asker.
+     One step; no separate submit.
+   - **Sign & next:** on commit the doc is **archived (open/ → done/), removed
+     from the view, and the next open decision opens automatically** (or the
+     inbox list returns) — "sign, next; sign, next", never a manual kill-buffer.
+   - Compose buffer mode: org / an RFC template per `decision-proposal-format`.
 
 ## 1b. Surface & authoring rules (from the same incident)
 
@@ -87,6 +91,26 @@ Each guarantee is a *user-observable* promise, not an internal detail.
   **RFC / narrative** style — background, rationale, options, the reasoning
   behind the recommendation, enough simulation — per the refined
   `decision-proposal-format`. Not a bare question.
+
+## 1c. Inbox model — list-first (정수님)
+
+"One surface" = **one umbrella = one inbox**. The doc-view IS 정수님's inbox: a
+durable **list** you browse, not windows that pop at you. Concretizes the earlier
+"surface unification": auto-popup → a *browsable* inbox.
+
+- **List, not popups.** Decisions, notes, briefings appear as a durable list of
+  items (open + recently done), sorted; you *look at the list*.
+- **Unread count in the sidebar** — next to the butler in the Claude session
+  list, like an email unread badge (the ⚖ count).
+- **Keys:** `i` → enter the inbox list · `n`/`p` → move within the list · `Enter`
+  → open the item's detail · answer via the compose bottom-split · then **return
+  to the list** (sign & next). One umbrella; one addressing scheme.
+- **Email-client feel but simpler — NOT Gnus** (정수님 explicit: too complex).
+- **Consistent with guarantee 4 / arrival-no-disturb:** an arrival updates the
+  *list + unread count only*, never the view you're in.
+- Storage stays two dirs (adapter `decisions/` + manual `~/.ccsm/docs/`); the
+  *view* is one browsable list across both (global-consistency: one view, two
+  homes).
 
 ## 2. Faithful-fake harness (non-tautological)
 
@@ -163,15 +187,16 @@ port-level `visible-p`/`shown` fact the fake exposes.
   (same scenario on the fake and real transport), and the answer remains recorded
   in the doc for audit.
 
-### Design questions (compose) for 정수님
+### Compose — resolved (정수님)
 
-- Reuse `org-edit-special` (model the answer region as an Org source block) vs a
-  parallel dedicated-buffer implementation?
-- **Commit vs submit**: one step (`C-c '` writes back *and* sends) or two (commit
-  records into the answer region; a separate `C-c C-c` submits to the channel)?
-  Two steps lets the boss draft, review the recorded answer, then send.
-- Compose buffer's major mode / template (plain text, org, an RFC template per
-  `decision-proposal-format`)?
+- **Reuse `org-edit-special`** (model the answer region as an Org source block);
+  parallel impl only if reuse is unclean. *(SPT.)*
+- Compose buffer opens as a **bottom split below the doc**.
+- **One step:** `C-c '` (commit) writes the answer back into the doc **and**
+  pushes it down the channel — no separate submit.
+- **Sign & next:** commit archives the doc (open/→done/), removes it from the
+  view, and opens the next open decision (or returns to the inbox list).
+- Compose buffer mode: **org / an RFC template** per `decision-proposal-format`.
 
 ## 4. Coverage (guide, not goal)
 

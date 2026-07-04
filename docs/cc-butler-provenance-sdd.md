@@ -95,3 +95,53 @@ carry digest + reference + appendix. The only real additions are the three of §
   verbatim answer and the originating decision.
 - Progressive disclosure: the worker acts on the digest without resolving; it
   resolves only when it chooses to.
+
+## 8. From = origin (not the last hop) + the inbox as a bidirectional bus
+
+### The failure this fixes
+The envelope's `From` currently = the sender of THIS message (the last hop). When
+the steward relays 정수님's decision to a worker, From=steward and the worker
+loses that 정수님 is the origin; symmetrically upward. That is the §1 provenance
+loss surfacing in the envelope field itself.
+
+### Principle — From = origin author; the relay-path travels alongside
+- **From = the ORIGINAL author.** A worker's own message → From=worker; 정수님's
+  document → From=정수님. **Never overwrite From with the last relayer.**
+- **Via = the relay-path** (who forwarded it), carried SEPARATELY — the envelope
+  shows both origin (`From`) and path (`Via: steward`), not one clobbering the
+  other.
+- **Re = the reference to the origin document** (the provenance link, §3).
+
+### The inbox is a bidirectional bus, not a down-only queue
+- **DOWN** (built): decisions/requests → 정수님's inbox.
+- **UP** (new): worker **deliverables → 정수님's inbox** as first-class items,
+  `From=worker` (origin) — so 정수님 sees the worker's own work, not a steward
+  digest of it.
+- The same envelope + document-graph (§4) carries both directions; the inbox is
+  the shared **bus** — decisions flow down, results flow up through it.
+
+### Down-enrich carries 정수님's original along
+When the steward dispatches a 정수님-authored decision downward, it MAY add
+"do this, by when" execution context — but 정수님's original text travels with it
+as `Re`/appendix (the verbatim reference, §3), so the worker acts on the enriched
+digest AND can resolve 정수님's exact words. (§3's provenance-verbatim, applied
+downward.)
+
+### Envelope, expanded
+`From` (origin) · `Via` (relay-path) · `To` · `When` · `Kind` · `Re` (origin
+reference). The provenance-bearing fields now express **origin + relay-path +
+reference in BOTH directions**.
+
+### Open questions (GATING → 정수님's inbox)
+1. **Relay-path representation** — a single `Via: steward`, or the full hop chain
+   (정수님 → butler → steward → worker)?
+2. **Up-direction rendering** — do worker deliverables render as a distinct
+   `Kind` (e.g. `result`/`briefing`) in 정수님's inbox, and are they answerable
+   (comment back) or read-only?
+3. **Down-enrich appendix** — 정수님's original inline vs `Re`-link (reuse §5's
+   inline-if-short / link-if-long)?
+
+### SPT
+Reuse the envelope (From/Via/Re) + the document-graph + resolve_reference. The
+only additions: don't clobber `From` on relay, add a `Via` field, and let items
+flow **up** as well as down. No new transport.

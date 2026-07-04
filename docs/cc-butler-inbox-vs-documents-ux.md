@@ -109,3 +109,28 @@ only), the compose bottom-split + one-step commit + sign & next, the 7
 guarantees, and the doc-view bug fixes (④⑤) — all proceed on the harness. This
 review only decides **how the inbox and documents coexist**, i.e. Option C:
 *one reader, a pending queue feeding it, done stays readable.*
+
+## 8. List-layout extensibility (design; the 1-line SPT stays for now)
+
+Today each item is **one line**: `⚖ decide  <title>`. That is the right SPT
+while the only per-item signal is the title. But the envelope now carries
+From / When / Kind / Re, and 정수님's dogfood flagged that as this metadata grows
+a single line gets cramped. So the render should be **extensibility-ready**
+without building the richer layout yet.
+
+**Design (not built): a per-item renderer that can grow from 1 line to 2.**
+- Keep the item plist as the data (`:file :title :kind :answerable`), and add
+  the envelope fields to it (`:from :when :re`) so the renderer has them.
+- Route every item through a single `cc-butler--inbox-format-item` that today
+  returns one line and can later return two:
+  - line 1: `<kind-badge>  <title>`
+  - line 2 (future): `    <from> · <when> · <kind>` (dim face), e.g. a column or
+    an indented meta line — a `defcustom cc-butler-inbox-item-lines` (1|2) picks.
+- The list stays a plain read-only buffer with the `cc-butler-inbox-file`
+  text-property on the item's first line, so navigation (n/p) and RET are
+  unaffected whether an item is 1 or 2 lines.
+
+**Why now (design only):** committing to the one renderer seam now means the
+2-line/column upgrade is a localized change (one function + a defcustom), not a
+rewrite — think-globally (the metadata will grow), act-locally (keep 1 line).
+Build it when the 1-line cramping actually bites, not before (SPT).

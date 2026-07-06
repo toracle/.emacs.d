@@ -47,6 +47,9 @@
 (defun mac-system? ()
   (string-equal system-type "darwin"))
 
+(defun linux-system? ()
+  (string-equal system-type "gnu/linux"))
+
 (unless (windows-system?)
  (let ((current-path (s-split ":" (getenv "PATH"))))
    (unless (cl-find (expand-file-name "~/.local/bin") current-path :test 'string=)
@@ -82,7 +85,7 @@
     (setenv "PATH" (concat (getenv "PATH") ":/usr/local/bin"))
     (add-to-list 'exec-path "/usr/local/bin")))
 
-(when (or (mac-system?) (wsl-system?))
+(when (or (mac-system?) (wsl-system?) (linux-system?))
  (use-package exec-path-from-shell :ensure t
    :init (exec-path-from-shell-initialize)))
 

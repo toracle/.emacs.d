@@ -86,6 +86,21 @@
     (message "claude-code-ide package not installed.")))
 
 
+;; cc-butler: multi-session Claude Code manager + butler control plane
+;; (https://github.com/toracle/cc-butler).  Depends on claude-code-ide (above)
+;; + hydra.  Same Emacs-30 `:vc' guard as the block above; on older Emacs it
+;; no-ops.  NOTE: this loads from GitHub, not the local ~/projects/cc-butler
+;; checkout -- run `M-x package-vc-upgrade cc-butler' to pick up new commits.
+(if (functionp 'use-package-vc-install)
+    (eval
+     '(use-package cc-butler
+        :vc (:url "https://github.com/toracle/cc-butler" :branch "main" :rev :newest)
+        :after claude-code-ide))
+  (defun cc-butler (&rest _)
+    (interactive)
+    (message "cc-butler package not installed.")))
+
+
 ;; Resolve the Claude CLI to an absolute, tilde-free path.
 ;; The ghostel backend spawns the program directly via execvp (no shell),
 ;; so a literal "~/..." is never expanded and the process dies instantly,

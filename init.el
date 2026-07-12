@@ -39,11 +39,8 @@
 
 (add-to-list 'load-path "~/.emacs.d/modules/")
 
-;; cc-butler: Claude Code session manager + butler control plane.
-;; A standalone package/repo at ~/projects/cc-butler (extracted from the old
-;; init-loader/32_* "CCSM" drop-ins); loaded here rather than via init-loader.
-(add-to-list 'load-path (expand-file-name "~/projects/cc-butler"))
-(require 'cc-butler)
+;; cc-butler is now installed + loaded via `use-package'/:vc in
+;; init-loader/04000_llm.el (was a manual load-path + require here).
 
 (put 'narrow-to-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

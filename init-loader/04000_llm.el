@@ -100,6 +100,81 @@
     (interactive)
     (message "cc-butler package not installed.")))
 
+;; The cc-butler governance store is pinned OUTSIDE this repo, and the pin
+;; deliberately does NOT live in this file.
+;;
+;; The store holds site-specific operating principles -- they name real people,
+;; repos and incidents -- so neither the store nor its location belongs in a
+;; public repo, and THIS FILE IS PUBLIC.  The actual `setq' lives in
+;; `~/.emacs.d/custom.el', which is gitignored by a COMMITTED `.gitignore'
+;; line (`.gitignore:17'), so it never reaches the remote.  Look there to see
+;; or change the path.
+;;
+;; Both `record_principle' and `cc-butler-governance-regenerate' act on
+;; `cc-butler-governance-dir', so that one pin keeps every write private.  The
+;; package's own governance/ stays the generic BUILT-IN default for fresh
+;; installs, and `cc-butler-governance-user-dir' remains available as an
+;; override/additive layer on top.  A defcustom is not re-evaluated once bound,
+;; which is why the value is set explicitly rather than left to the load-time
+;; default.
+;;
+;; FAILURE MODE -- read this before "fixing" anything here: if that pin is lost,
+;; governance does NOT error.  It silently falls back to the package's bundled
+;; generic store, and the fleet keeps running while reading the wrong
+;; principles.  Verify the live value, never infer it:
+;;   emacsclient -e '(cc-butler-governance-store)'
+
+;; A monocle topic template for `cc-butler-new-topic'.  Picking "monocle" and
+;; typing a topic name (e.g. "cli-rust") creates ~/projects/monocle-<topic>/ as
+;; the parent (projectile) workspace, clones the warmblood-kr/monocle meta repo
+;; into it as monocle/, and scaffolds .projectile + a CLAUDE.md that @-imports
+;; the meta repo's shared docs.  Template lives here in private config, not in
+;; the package (which ships no real repos).  Guard on the feature so the macro
+;; and its registry exist before we register.
+(with-eval-after-load 'cc-butler-workspace
+  ;; CONVENTION: `monocle' is the META repo of the whole monocle family.  EVERY
+  ;; monocle-related topic clones it FIRST (as the meta repo, per :repos order),
+  ;; then any project-specific repos — so a worker always has the shared monocle
+  ;; architecture (monocle/CLAUDE.md + monocle/DESIGN.md) at hand.
+  (cc-butler-define-project-template monocle
+    :base-dir "~/projects"
+    :dir-format "monocle-%s"
+    :repos ("git@github.com:warmblood-kr/monocle.git")
+    :claude-import ("monocle/CLAUDE.md" "monocle/DESIGN.md"))
+  ;; stark: the monocle admin console (관리자 콘솔) — a monocle-family topic, so
+  ;; it clones the monocle meta repo FIRST, then stark.  Imports the monocle
+  ;; meta docs plus stark's own guide (stark has CLAUDE.md but no DESIGN.md).
+  (cc-butler-define-project-template stark
+    :base-dir "~/projects"
+    :dir-format "stark-%s"
+    :repos ("git@github.com:warmblood-kr/monocle.git"
+            "git@github.com:warmblood-kr/stark.git")
+    :claude-import ("monocle/CLAUDE.md" "monocle/DESIGN.md" "stark/CLAUDE.md"))
+  ;; monocle-mobile: the Flutter mobile app (Android + iOS).  A monocle-family
+  ;; topic, so the monocle meta repo comes FIRST.  `monocle-flutter-core' rides
+  ;; along because it holds the transport layer the app talks to Stark through —
+  ;; chat/Responses-API and tool-calling work lands in one or both, so a topic
+  ;; that clones only the app keeps hitting a wall it cannot see into.
+  ;; flutter-core ships no CLAUDE.md of its own (README only), hence absent from
+  ;; the imports.
+  (cc-butler-define-project-template monocle-mobile
+    :base-dir "~/projects"
+    :dir-format "monocle-mobile-%s"
+    :repos ("git@github.com:warmblood-kr/monocle.git"
+            "git@github.com:warmblood-kr/monocle-mobile-app.git"
+            "git@github.com:warmblood-kr/monocle-flutter-core.git")
+    :claude-import ("monocle/CLAUDE.md" "monocle/DESIGN.md"
+                    "monocle-mobile-app/CLAUDE.md"))
+  ;; cc-butler itself — NOT a monocle-family topic, so no monocle meta repo.
+  ;; The repo ships no CLAUDE.md (start from README.org / docs/ / governance/),
+  ;; hence no :claude-import.  dir-format keeps topics out of the existing
+  ;; ~/projects/cc-butler working checkout.
+  (cc-butler-define-project-template cc-butler
+    :base-dir "~/projects"
+    :dir-format "cc-butler-%s"
+    :repos ("https://github.com/toracle/cc-butler.git")
+    :claude-import nil))
+
 
 ;; Resolve the Claude CLI to an absolute, tilde-free path.
 ;; The ghostel backend spawns the program directly via execvp (no shell),

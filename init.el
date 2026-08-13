@@ -42,8 +42,60 @@
 ;; cc-butler: Claude Code session manager + butler control plane.
 ;; A standalone package/repo at ~/projects/cc-butler (extracted from the old
 ;; init-loader/32_* "CCSM" drop-ins); loaded here rather than via init-loader.
-(add-to-list 'load-path (expand-file-name "~/projects/cc-butler"))
+;;
+;; Load from ~/cc-butler-runtime, NOT ~/projects/cc-butler -- 2026-08-14,
+;; jeongsoo. ~/projects/cc-butler is a live, mutable working directory that
+;; fleet workers routinely `git checkout' different branches in as part of
+;; normal review/development work. Tonight that caused two real incidents:
+;; (1) the checkout landed on a branch predating cc-butler-north-star.el,
+;; which the code hard-requires, so cc-butler failed to fully load and the
+;; daemon's periodic North Star check silently stopped running (confirmed in
+;; tonight's boot log: "Symbol's function definition is void:
+;; cc-butler--north-star-ensure-timer") -- this has happened for real, at
+;; least twice, not just theoretically; (2) unmerged code that had been
+;; hot-loaded directly into the running daemon vanished on the next restart
+;; because that restart re-loaded from whatever branch the mutable checkout
+;; happened to be on at that instant.
+;;
+;; ~/cc-butler-runtime is a separate, stable local clone of the same repo,
+;; remote set to the real GitHub origin, meant to only ever be
+;; fast-forwarded explicitly (`git -C ~/cc-butler-runtime pull --ff-only')
+;; and never branch-switched.
+(add-to-list 'load-path (expand-file-name "~/cc-butler-runtime"))
 (require 'cc-butler)
+
+;; claude-code-ide-mcp-server-port: pin the MCP tools server to a fixed port
+;; instead of leaving it at the default nil (auto-select). 2026-08-14,
+;; jeongsoo -- tonight, a live incident happened because this was left at
+;; nil: the single Emacs-process-global MCP server binds a fresh random
+;; OS-assigned port on every (re)start, but a Claude Code CLI session's
+;; connection URL is baked into its argv at spawn time with no
+;; re-resolution mechanism. So a session spawned in the narrow window
+;; before a later re-bind superseded an earlier one ends up permanently
+;; pointed at a dead port, with no error surfaced anywhere obvious. This
+;; happened for real: one fleet session, spawned right after a
+;; crash-restart, caught an early bind on port 35625, which was then
+;; superseded by a second bind on port 37587 about 4 minutes later, and had
+;; been silently broken since (confirmed via ps+ss; had to fall back to
+;; `emacsclient -e' to communicate with it at all).
+;;
+;; Investigated claude-code-ide-mcp-server.el and
+;; claude-code-ide-mcp-http-server.el before picking this fix: if this port
+;; is already bound by another process when the server tries to start, it
+;; does NOT silently fall back to picking a random port instead --
+;; `claude-code-ide-mcp-http-server-start' calls `ws-start' with the exact
+;; port, which calls `make-network-process' with that literal :service
+;; value; on bind failure that error propagates up (re-signaled by
+;; `claude-code-ide-mcp-http-server-start''s condition-case) to
+;; `claude-code-ide-mcp-server--start-server', whose condition-case logs it
+;; and calls `message' with "Warning: Failed to start MCP server: ..." and
+;; returns nil. The server just fails to start; it does not quietly rebind
+;; elsewhere. So pinning the port is safe: it can't silently degrade back
+;; into this bug's failure mode.
+;;
+;; 37587 is the port that is currently live and working for 10 of 11 fleet
+;; sessions right now, so it is the natural fixed value to standardize on.
+(setq claude-code-ide-mcp-server-port 37587)
 
 (put 'narrow-to-region 'disabled nil)
 (put 'upcase-region 'disabled nil)

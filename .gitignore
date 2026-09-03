@@ -31,3 +31,17 @@ session.*
 /.lsp-session-v1
 /tree-sitter/
 /forge-database*.sqlite
+
+# cc-butler 함대 런타임·운영 문서 (2026-08-30, steward)
+# 이 저장소는 PUBLIC 이다. cc-butler/ 아래에는 PRIVATE 저장소(jarvice·monocle 등)의
+# 보안 조사 결과·미수정 결함·결정 대기함·세션 대장이 들어 있어 공개되면 안 된다.
+# 지금까지는 untracked 라 노출이 없었을 뿐, `git add -A` 한 번이면 전부 나간다.
+cc-butler/
+cc-butler-sessions.eld
+
+# 빌드 산출물 + projectile 프로젝트 목록 (2026-09-04, 결정 0258)
+# 이 저장소는 PUBLIC 이다. `projects` 는 projectile 의 알려진 프로젝트 목록이라
+# 로컬 경로와 프로젝트명(=고객·내부 저장소 이름)이 그대로 노출된다.
+_elpa/
+eln-cache/
+projects

@@ -52,12 +52,19 @@
     (condition-case err
         (progn
           (load my/matrix-bridge-identity-file nil t)
-          (unless (and (boundp 'my/matrix-bridge-self-user-id)
-                      my/matrix-bridge-self-user-id)
-            (error "%s 를 로드했지만 my/matrix-bridge-self-user-id 를 설정하지 않음"
-                   my/matrix-bridge-identity-file))
+          (dolist (var '(my/matrix-bridge-self-user-id
+                         my/matrix-bridge-human-user-id))
+            (unless (and (boundp var) (symbol-value var))
+              (error "%s 를 로드했지만 %s 를 설정하지 않음"
+                     my/matrix-bridge-identity-file var)))
           (load my/matrix-bridge-file nil t)
           (setq matrix-bridge-self-user-id my/matrix-bridge-self-user-id)
+          ;; ⚠ 이 값은 self- 와 «고장 모양이 다르다». nil 이어도 아무도 기동을
+          ;; 막지 않는다 — `matrix-bridge.el:157/:211' 의 `equal' 이 조용히 nil 을
+          ;; 돌려주고, 그러면 그분 메시지가 「사람이 아닌 것」으로 분류돼 리마인더
+          ;; 없이 흘러간다. 그래서 가드가 위 `dolist' 에 있다: 이 변수는 스스로
+          ;; 크게 죽지 못하므로, 대신 여기서 죽여 준다.
+          (setq matrix-bridge-human-user-id my/matrix-bridge-human-user-id)
           ;; 이미 타이머가 돌고 있으면 두 번 띄우지 않는다 — 중복 배달이 된다
           ;; (m1 이 09-06 에 파이썬과 elisp 동시 가동으로 실제로 겪은 것).
           (if (and (boundp 'matrix-bridge--timer) (timerp matrix-bridge--timer))

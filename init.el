@@ -42,17 +42,18 @@
 ;; cc-butler is now installed + loaded via `use-package'/:vc in
 ;; init-loader/04000_llm.el (was a manual load-path + require here).
 
-;; Governance store moved out of the cc-butler repo (public) into the
-;; warmble-jumble vault (private-to-org, colleague-visible) — 정수님's
-;; decision, 2026-08-13. Explicit override so record_principle/
-;; regenerate_governance route here regardless of which cc-butler
-;; checkout's code happens to load (see cc-butler-governance-dir in
-;; cc-butler-governance.el).
+;; Where the governance store lives. Set explicitly so it does not depend on
+;; which checkout's code happens to load first (see cc-butler-governance-dir
+;; in cc-butler-governance.el).
 ;;
-;; ~/obsidian/warmble-jumble, NOT ~/projects/warmble-jumble — there are
-;; two clones on this machine and only ~/obsidian/warmble-jumble is
-;; what wb-para's own tooling (vault_paths.py, push-vault.sh, the Stop
-;; hook, capture/organize/promote/link) actually reads and pushes.
+;; Caution: this machine has more than one clone of that repo, and only the
+;; path below is the one the store's own tooling reads and pushes. Pointing
+;; at the other still loads and still writes -- to a tree nothing publishes,
+;; which is a silent loss rather than an error.
+;;
+;; This is a PUBLIC repo, so the path is all that belongs here. What the
+;; store is for, who decided it and when, and which scripts consume it are
+;; internal, and live with the store.
 (setq cc-butler-governance-dir
       (expand-file-name "~/obsidian/warmble-jumble/3-resources/cc-butler-governance/"))
 
